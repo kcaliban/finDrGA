@@ -21,6 +21,11 @@ int main(int argc, char *argv[])
             (bool) (i & (1<<3)),
             (bool) (i & (1<<4))));
   }
+  std::cout << "Initial generation: [";
+  for (auto gen : strategies) {
+    std::cout << gen << ",";
+  }
+  std::cout << "]" << std::endl;
   // Payoff table: number of years "saved" per strategy and players,
   //               i.e. (max number of years) - (actual sentenced years)
   //
@@ -34,4 +39,8 @@ int main(int argc, char *argv[])
   // Create our fitness function
   PrisonersDilemmaFitnessFunc fitnessFunc =
     PrisonersDilemmaFitnessFunc(strategies, payoff, 100);
+  // "Create" a Genome (this is ugly)
+  PrisonersDilemmaGenome genome;
+  // Run a simulation for 100 rounds, with mutation probability: 0.001
+  inst.simulate(genome, fitnessFunc, strategies, 500, 0.001);
 }

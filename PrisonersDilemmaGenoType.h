@@ -1,5 +1,6 @@
 #ifndef PRISGENOTYPE
 #define PRISGENOTYPE
+#include <iostream>
 class PrisonersDilemmaGenoType {
   public:
     // Strategies for the different cases, 0 ~ C; 1 ~ D
@@ -18,6 +19,21 @@ class PrisonersDilemmaGenoType {
       strategyDD = DD;
       strategyInit = init;
     };
+
+    bool operator == (const PrisonersDilemmaGenoType &Ref) const
+    {
+        return(this->strategyCC == Ref.strategyCC &&
+               this->strategyCD == Ref.strategyCD &&
+               this->strategyDC == Ref.strategyDC &&
+               this->strategyDD == Ref.strategyDD &&
+               this->strategyInit == Ref.strategyInit);
+    }
 };
+
+std::ostream& operator<<(std::ostream &strm, const PrisonersDilemmaGenoType &a) {
+  return strm << "(Strategy: CC:" << a.strategyCC << ", CD:" << a.strategyCD
+              << ", DC:" << a.strategyDC << ", DD:" << a.strategyDD << "; Init:"
+              << a.strategyInit << ")";
+}
 
 #endif
