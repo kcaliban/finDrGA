@@ -20,6 +20,9 @@ class PrisonersDilemmaGenoType {
       strategyInit = init;
     };
 
+    // Destructor
+    ~PrisonersDilemmaGenoType() { };
+
     bool operator == (const PrisonersDilemmaGenoType &Ref) const
     {
         return(this->strategyCC == Ref.strategyCC &&

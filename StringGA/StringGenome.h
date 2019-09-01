@@ -11,9 +11,9 @@ class StringGenome : public Genome<std::string> {
   public:
     StringGenome(std::string alphabet1) { alphabet = alphabet1; };
 
-    std::string crossOver(std::string, std::string, ...);
+    std::string crossOver(std::string& , std::string& , ...);
 
-    std::string mutate(std::string, ...);
+    std::string mutate(std::string&, ...);
 
 };
 

@@ -7,6 +7,6 @@ class StringFitnessFunc {
     std::string goalString;;
   public:
     StringFitnessFunc(std::string goal) { goalString = goal; };
-    float calculateFitness(std::string, ...);
+    float calculateFitness(std::string &, ...);
 };
 #endif

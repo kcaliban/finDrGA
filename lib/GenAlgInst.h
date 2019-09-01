@@ -17,13 +17,13 @@ class GenAlgInst
                                      float mutateProb, bool debug=true,
                                      bool entropy=true,
                                      char * entropyFile="entropy") {
-      std::vector<GenoType> curGen = genotype;
+      std::vector<GenoType> newGen = genotype;
       for (int i = 0; i < n; i++) {
         if (debug) {
           std::cout << "Generation: " << (i + 1) << std::endl;
         }
         // Will the old gen be deleted automatically?
-        curGen = nextGen(genome, fitnessfunc, curGen, mutateProb,
+        newGen = nextGen(genome, fitnessfunc, newGen, mutateProb,
                           debug, entropy, entropyFile);
       }
     };

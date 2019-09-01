@@ -1,8 +1,8 @@
 #include "PrisonersDilemmaFitnessFunc.h"
 
-bool * PrisonersDilemmaFitnessFunc::simGame(PrisonersDilemmaGenoType strat1, PrisonersDilemmaGenoType strat2, bool prevGame[2]) {
+void PrisonersDilemmaFitnessFunc::simGame(PrisonersDilemmaGenoType strat1, PrisonersDilemmaGenoType strat2, bool prevGame[2], bool * newStrat) {
   // Given a previous game and two strategies, return the next moves
-  bool * newStrat = new bool[2];
+  // bool * newStrat = new bool[2];
   if (prevGame[0] == false) {
     if (prevGame[1] == false) {
       newStrat[0] = strat1.strategyCC;
@@ -20,7 +20,6 @@ bool * PrisonersDilemmaFitnessFunc::simGame(PrisonersDilemmaGenoType strat1, Pri
       newStrat[1] = strat2.strategyDD;
     }
   }
-  return newStrat;
 }
 
 float PrisonersDilemmaFitnessFunc::calculateFitness(PrisonersDilemmaGenoType gen, ...) {
@@ -34,7 +33,8 @@ float PrisonersDilemmaFitnessFunc::calculateFitness(PrisonersDilemmaGenoType gen
   for (auto strat : strategies) {
     bool prevGame[2] = {gen.strategyInit, strat.strategyInit};
     for (int i = 0; i < n; i++) {
-      bool * game = simGame(gen, strat, prevGame);
+      bool game[2];
+      simGame(gen, strat, prevGame, game);
       if (game[0] == false) {
         if (game[1] == false) {
           fitness += payoff[0][0];

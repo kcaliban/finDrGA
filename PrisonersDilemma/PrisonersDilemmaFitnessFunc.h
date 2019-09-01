@@ -21,7 +21,7 @@ class PrisonersDilemmaFitnessFunc : public FitnessFunction<PrisonersDilemmaGenoT
     std::vector<PrisonersDilemmaGenoType> strategies;
     int payoff[2][2];
     int n;
-    bool * simGame(PrisonersDilemmaGenoType, PrisonersDilemmaGenoType, bool[2]);
+    void simGame(PrisonersDilemmaGenoType, PrisonersDilemmaGenoType, bool[2], bool *);
 };
 
 #endif
