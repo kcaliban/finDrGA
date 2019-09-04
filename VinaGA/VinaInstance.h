@@ -12,13 +12,14 @@
 #include <filesystem>
 class VinaInstance {
   public:
-    /* Paths are self-explanatory, but beware:
+    /* Docking instance using AutoDock Vina
+     * Paths are self-explanatory, but beware:
      *    ALWAYS WITHOUT '/' AT THE END
      *    NEVER STARTING WITH '~'
      *
      * workDir ~ working directory, programm will create subdirectory
      *           with name of ligand
-     * receptor, ligand ~ names, should be in workDir
+     * receptor, ligand ~ absolute path to files
      */
     VinaInstance(const char *  vinaPath1, const char * pythonShPath1,
                   const char * mgltoolstilitiesPath1, const char * workDir1,

@@ -1,5 +1,5 @@
 # Specify compiler commands
-CXX = g++ -O3 -Wall
+CXX = g++ -O3 -Wall -fopenmp
 # Specify name of file containing main function, without ext.
 BINARY = Test
 # Objects except binary and libraries

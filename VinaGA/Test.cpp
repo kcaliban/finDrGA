@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <limits.h>
 #include <unistd.h>
+#include <omp.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,9 +25,15 @@ int main(int argc, char *argv[])
   const char * workDir = "/home/fk/Documents/iGEM/GenAlg/VinaGA/WorkingDir";
 
   PoolMGR poolMGR = PoolMGR(workDir, vinaPath, pythonShPath,
-                            mgltoolstilitiesPath, receptor, 1, 5);
-  poolMGR.addElement("AFAFA");
-  poolMGR.addElement("FAFAF");
+                            mgltoolstilitiesPath, receptor, 4, 5);
+
+  std::vector<std::string> seqs = {"AFAFA", "FAFAF"};
+  #pragma omp parallel
+  #pragma omp for
+  for (unsigned long i = 0; i < seqs.size(); i++) {
+    poolMGR.addElement(seqs.at(i));
+  }
+
   poolMGR.printSeqAff();
   return 0;
 }
