@@ -16,7 +16,7 @@ class GenAlgInst
                                      std::vector<GenoType> genotype, int n,
                                      float mutateProb, bool debug=true,
                                      bool entropy=true,
-                                     char * entropyFile="entropy") {
+                                     const char * entropyFile="entropy") {
       std::vector<GenoType> newGen = genotype;
       for (int i = 0; i < n; i++) {
         if (debug) {
@@ -49,7 +49,7 @@ class GenAlgInst
     std::vector<GenoType> nextGen(Genome genome, FitnessFunction fitnessfunc,
                                     std::vector<GenoType> genotypes,
                                     float mutateProb, bool debug=true,
-                                    bool entropy=true, char * entropyFile="entropy") {
+                                    bool entropy=true, const char * entropyFile="entropy") {
       std::vector<GenoType> newGen;
       // Required for selection and recombination
       std::vector<float> fitnesses;
