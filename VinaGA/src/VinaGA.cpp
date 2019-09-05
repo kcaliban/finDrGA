@@ -2,39 +2,55 @@
 
 int main(int argc, char *argv[])
 {
-  if (argc < 2) {
+  if (argc < 3) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: VinaGA [Number of populations]"
+                 " [prob. of random poinmutation]"
       << std::endl;
     exit(-1);
   }
-  const char * vinaPath = "/home/fk/autodock_vina_1_1_2_linux_x86/bin";
-  const char * pythonShPath = "/home/fk/MGLTools-1.5.6/bin/pythonsh";
-  const char * mgltoolstilitiesPath = "/home/fk/MGLTools-1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24";
-  const char * receptor = "/home/fk/Documents/iGEM/GenAlg/VinaGA/WorkingDir/AFAFA.pdb";
-  const char * workDir = "/home/fk/Documents/iGEM/GenAlg/VinaGA/WorkingDir";
+
+  INIReader reader("config.ini");
+  if (reader.ParseError() != 0) {
+        std::cout << "Can't load 'config.ini'\n";
+        return 1;
+  }
+
+  std::string vinaPath = reader.Get("paths", "vina", "");
+  std::string pythonShPath = reader.Get("paths", "pythonsh", "");
+  std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities", "");
+  std::string workDir = reader.Get("paths", "workingDir", "");
+  std::string receptor = reader.Get("paths", "receptor", "");
+  int exhaustiveness = reader.GetInteger("options", "exhaustiveness", 1);
+  int energy_range = reader.GetInteger("options", "energy_range", 5);
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
-  std::vector<std::string> startingSequences = {"AFG", "YFA", "AYE", "HGA",
-      "BAY", "AAF", "AAG", "HHA", "HGG", "HAG", "AGF", "BYA", "YYA",
-      "AYA", "AAY"};
-  PoolMGR poolmgr(workDir, vinaPath, pythonShPath, mgltoolstilitiesPath,
-                   receptor, 4, 5);
+  std::vector<std::string> startingSequences = {"AFG", "YFA", "AYE", "HGA"};
+     // "BAY", "AAF", "AAG", "HHA", "HGG", "HAG", "AGF", "BYA", "YYA",
+     // "AYA", "AAY"};
 
-  // Initialize Pool manager for starting sequences
-  #pragma omp parallel
-  #pragma omp for
-  for (unsigned long i = 0; i < startingSequences.size(); i++) {
-    // std::cout << "Adding sequence: " << seqs.at(i) << std::endl;
-    poolmgr.addElement(startingSequences.at(i));
-  }
+  PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
+                  mgltoolstilitiesPath.c_str(), receptor.c_str(),
+                  exhaustiveness, energy_range);
 
   VinaFitnessFunc fitnessFunc(&poolmgr);
   VinaGenome vinaGenome;
 
-  inst.simulate(vinaGenome, fitnessFunc, startingSequences, 2000, 0.05);
+  std::vector<std::string> curGen = startingSequences;
+  for (int i = 0; i < atoi(argv[1]); i++) {
+    // Add the new elements (PoolMGR only adds them if they don't exist already)
+    #pragma omp parallel
+    #pragma omp for
+    for (unsigned int i = 0; i < curGen.size(); i++) {
+      poolmgr.addElement(curGen.at(i));
+    }
+    // CleanUp of not used strings
+    poolmgr.update(curGen);
+    poolmgr.cleanUp(3);
+    // Get new generation
+    curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, atof(argv[2]));
+  }
 
-  std::cout << "lol" << std::endl;
   poolmgr.printSeqAff();
   return 0;
 }

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <omp.h>
 template <typename GenoType, typename Genome, typename FitnessFunction>
 class GenAlgInst
 {
@@ -28,28 +29,10 @@ class GenAlgInst
       }
       // Print result at the end
       std::cout << "Individuals in the last population" << std::endl;
-      for (int i = 0; i < genotype.size(); i++) {
+      for (unsigned int i = 0; i < genotype.size(); i++) {
         std::cout << "\t\t" << newGen.at(i) << std::endl;
       }
     };
-  private:
-    int calculateEntropy(std::vector<GenoType> genotypes) {
-      unsigned int entropy = 0;
-      // Naive O(n^2) Worst Case implementation
-      for (unsigned int i = 0; i < genotypes.size(); i++) {
-        bool unique = true;
-        for (unsigned int j = i + 1; j < genotypes.size(); j++) {
-          if (genotypes[i] == genotypes[j]) {
-            unique = false;
-            break;
-          }
-        }
-        if (unique) {
-          entropy++;
-        }
-      }
-      return entropy;
-    }
 
     std::vector<GenoType> nextGen(Genome genome, FitnessFunction fitnessfunc,
                                     std::vector<GenoType> genotypes,
@@ -61,10 +44,22 @@ class GenAlgInst
       if (debug) {
         std::cout << "\tCalculating fitnesses..." << std::endl;
       }
+      // Initialize vector so that we can use parallelization for fitness calculation
+      for (unsigned int i = 0; i < genotypes.size(); i++) {
+        fitnesses.push_back(0.0);
+      }
+      // #pragma omp parallel
+      // #pragma omp for
+      for (unsigned int i = 0; i < genotypes.size(); i++) {
+        float fitness = fitnessfunc.calculateFitness(genotypes.at(i));
+        fitnesses.at(i) = fitness;
+      }
+      /*
       for (GenoType genotype : genotypes) {
         float fitness = fitnessfunc.calculateFitness(genotype);
         fitnesses.push_back(fitness);
       }
+      */
       // SELECTION (this should become "modular" aswell)
       //           (the way selection and recombination is done should be
       //            defined elsewhere)
@@ -80,8 +75,8 @@ class GenAlgInst
       sort(sortedindices.begin(), sortedindices.end(),
           [fitnesses](size_t i1, size_t i2) {
             return fitnesses[i1] > fitnesses[i2];});
-      int amount = (int) (0.1 * genotypes.size());
-      for (int i = 0; i < amount; i++) {
+      unsigned int amount = (int) (0.1 * genotypes.size());
+      for (unsigned int i = 0; i < amount; i++) {
         newGen.push_back(genotypes[sortedindices[i]]);
       }
       if (debug) {
@@ -117,7 +112,7 @@ class GenAlgInst
         std::cout << "\tMutation..." << std::endl;
       }
       std::uniform_real_distribution<float> uniformdistribution(0.0, 1.0);
-      for (int i = 0; i < newGen.size(); i++) {
+      for (unsigned int i = 0; i < newGen.size(); i++) {
         if (uniformdistribution(generator) <= mutateProb) {
           GenoType mutatedGen = genome.mutate(newGen[i]);
           /*
@@ -141,6 +136,26 @@ class GenAlgInst
       // std::move?
       return newGen;
     }
+
+    private:
+      int calculateEntropy(std::vector<GenoType> genotypes) {
+        unsigned int entropy = 0;
+        // Naive O(n^2) Worst Case implementation
+        for (unsigned int i = 0; i < genotypes.size(); i++) {
+          bool unique = true;
+          for (unsigned int j = i + 1; j < genotypes.size(); j++) {
+            if (genotypes[i] == genotypes[j]) {
+              unique = false;
+              break;
+            }
+          }
+          if (unique) {
+            entropy++;
+          }
+        }
+        return entropy;
+      }
+
 };
 
 #endif

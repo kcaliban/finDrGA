@@ -40,7 +40,7 @@ class PoolMGR {
     // in current Generation
     void update(std::vector<std::string>);
     // Deletes any element and their MD & PDB files that have not been used
-    // for 3 consecutive generations
+    // for int generations
     void cleanUp(int);
     // Print all sequences and their affinity
     void printSeqAff();
@@ -70,6 +70,8 @@ class PoolMGR {
     void genMD(std::string);
     // Get docking result
     void genDock(std::string);
+    // Delete an element
+    void deleteElementData(std::string);
 };
 
 #endif

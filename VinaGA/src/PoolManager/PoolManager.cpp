@@ -4,7 +4,6 @@ void PoolMGR::printSeqAff() {
   for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
     std::cout << it->first << ": " << std::get<2>(it->second) << std::endl;
   }
-
 }
 
 float PoolMGR::getAffinity(std::string FASTASEQ) {
@@ -14,7 +13,7 @@ float PoolMGR::getAffinity(std::string FASTASEQ) {
     genMD(FASTASEQ);
     genDock(FASTASEQ);
   }
-  return std::get<2>(internalMap[FASTASEQ]);
+  return std::get<2>(internalMap.at(FASTASEQ));
 }
 
 void PoolMGR::addElement(std::string FASTASEQ) {
@@ -82,4 +81,45 @@ void PoolMGR::genDock(std::string FASTASEQ) {
   vinaInstance.generatePDBQT();
   std::get<2>(internalMap[FASTASEQ]) =
     vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+}
+
+void PoolMGR::update(std::vector<std::string> gen) {
+  // Set number of times not used to minus one for all elements that have been used
+  for (auto FASTASEQ : gen) {
+    std::get<3>(internalMap.at(FASTASEQ)) = -1;
+  }
+  // Increase every number by one
+  for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
+    std::get<3>(it->second) += 1;
+  }
+};
+
+void PoolMGR::cleanUp(int x) {
+  // Cleans all files of PDBs that have not been used for x generations
+  for (auto it = internalMap.begin(); it != internalMap.end(); ) {
+    if (std::get<3>(it->second) > x) {
+      std::cout << "CLEANUP\t\tRemoving: " << it->first << std::endl;
+      deleteElementData(it->first);
+      internalMap.erase(it++);
+    } else {
+      it++;
+    }
+  }
+}
+
+void PoolMGR::deleteElementData(std::string FASTASEQ) {
+  std::cout << "Has not been used for some generations: "
+            << FASTASEQ << std::endl;
+  // Simply remove the directory recursively
+  std::string cmd;
+  cmd.append("rm -rf ");
+  cmd.append(workDir);
+  cmd.append("/");
+  cmd.append(FASTASEQ);
+  int success = system(cmd.c_str());
+  if (success == -1) {
+    std::cout << "Error deleting directory in cleaning step of PoolMGR!\n"
+              << "Directory: " << workDir << "/" << FASTASEQ << std::endl;
+    exit(-1);
+  }
 }

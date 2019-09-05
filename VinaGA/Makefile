@@ -4,12 +4,13 @@ CXX = g++ -O3 -Wall -fopenmp
 BINARY = VinaGA
 # Source files; ** wildcard does not work on my Make so just one level depth
 SRCFILES = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+SRCFILES := $(filter-out $(wildcard src/*/*Test.cpp), $(filter-out $(wildcard src/*Test.cpp),$(SRCFILES)))
 # Object files
 # Change ext. and path
 OBJFILES = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCFILES)))
 
-$(info    SRCFILES is $(SRCFILES))
-$(info    OBJFILES is $(OBJFILES))
+$(info    Source files: $(SRCFILES))
+$(info    Object files: $(OBJFILES))
 all: compile
 
 # Link everything together 
@@ -23,3 +24,7 @@ objs: $(OBJFILES)
 obj/%.o: src/%.cpp
 	$(CXX) -c -o $@ $<
 
+clean:
+	rm $(BINARY)
+	rm obj/*.o
+	rm obj/*/*.o

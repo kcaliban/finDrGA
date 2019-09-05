@@ -4,6 +4,7 @@
 #include "VinaGenome.h"
 #include "VinaFitnessFunc.h"
 #include "PoolManager/PoolManager.h"
+#include "inih/INIReader.h"
 #include <omp.h>
 
 #endif

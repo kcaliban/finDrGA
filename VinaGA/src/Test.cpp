@@ -14,7 +14,7 @@ std::string getexepath()
   return std::string( result, (count > 0) ? count : 0 );
 }
 
-int maino(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   const char * vinaPath = "/home/fk/autodock_vina_1_1_2_linux_x86/bin";
   const char * pythonShPath = "/home/fk/MGLTools-1.5.6/bin/pythonsh";

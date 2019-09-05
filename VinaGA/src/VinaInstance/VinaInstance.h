@@ -35,7 +35,11 @@ class VinaInstance {
       strcpy(cmd, "mkdir ");
       strcat(cmd, workDir.c_str());
       strcat(cmd, " 2>/dev/null"); // Error is usually that path already exists
-      system(cmd);
+      int success = system(cmd);
+      if (success == -1) {
+        // Path already exists or working directory is not a valid path,
+        // which will lead to an error later on
+      }
     }
     void generatePDBQT();
 
