@@ -14,14 +14,12 @@ std::string getexepath()
   return std::string( result, (count > 0) ? count : 0 );
 }
 
-int main(int argc, char *argv[])
+int maino(int argc, char *argv[])
 {
   const char * vinaPath = "/home/fk/autodock_vina_1_1_2_linux_x86/bin";
   const char * pythonShPath = "/home/fk/MGLTools-1.5.6/bin/pythonsh";
   const char * mgltoolstilitiesPath = "/home/fk/MGLTools-1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24";
-  // const char * receptor = "AFAFA_D.pdb";
-  const char * receptor = "/home/fk/Documents/iGEM/GenAlg/VinaGA/AFAFA.pdb";
-
+  const char * receptor = "/home/fk/Documents/iGEM/GenAlg/VinaGA/WorkingDir/AFAFA.pdb";
   const char * workDir = "/home/fk/Documents/iGEM/GenAlg/VinaGA/WorkingDir";
 
   PoolMGR poolMGR = PoolMGR(workDir, vinaPath, pythonShPath,
@@ -31,6 +29,7 @@ int main(int argc, char *argv[])
   #pragma omp parallel
   #pragma omp for
   for (unsigned long i = 0; i < seqs.size(); i++) {
+    // std::cout << "Adding sequence: " << seqs.at(i) << std::endl;
     poolMGR.addElement(seqs.at(i));
   }
 

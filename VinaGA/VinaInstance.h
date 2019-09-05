@@ -27,22 +27,9 @@ class VinaInstance {
       vinaPath = vinaPath1;
       pythonShPath = pythonShPath1;
       mgltoolstilitiesPath = mgltoolstilitiesPath1;
-
-      std::cout << "Workdir given to VinaInstance constructor" << std::endl;
-      std::cout << workDir1 << std::endl;
-      std::cout << "---------------------" << std::endl;
-
-      std::string workDirStr = workDir1;
-
-      // Set up workdir and paths
-      workDir = workDirStr;
-      // Set up paths for receptor and ligand
+      workDir = workDir1;
       receptor = receptor1;
       ligand = ligand1;
-
-      std::cout << "Workdir @ VinaInstance constructor" << std::endl;
-      std::cout << workDir << std::endl;
-      std::cout << "---------------------" << std::endl;
 
       char cmd[2000];
       strcpy(cmd, "mkdir ");

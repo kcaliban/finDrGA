@@ -4,6 +4,10 @@ void VinaInstance::generateConf() {
   // Generate conf file for docking
   // Size x,y,z are simply the max minus the min
 
+  /*
+  std::cout << "Trying to read receptor file: "
+            << receptor << std::endl;
+            */
   // Read receptor file
   std::ifstream t(receptor);
   t.seekg(0, std::ios::end);
@@ -12,6 +16,8 @@ void VinaInstance::generateConf() {
   t.seekg(0);
   t.read(&buffer[0], size);
   t.close();
+
+  // std::cout << "Read receptor file!" << std::endl;
 
   // For max and min no sorting is required
   float xmin = std::numeric_limits<float>::infinity();
@@ -48,9 +54,11 @@ void VinaInstance::generateConf() {
   float offsetz = zmin + sizez / 2.0;
 
   std::string outfile = workDir;
+  /*
   std::cout << "Workdir @ generateConf" << std::endl;
   std::cout << workDir << std::endl;
   std::cout << "---------------------" << std::endl;
+  */
   outfile.append("/");
   outfile.append("conf");
 
@@ -128,6 +136,8 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   strcat(cmd, "qt");
   strcat(cmd, " --energy_range ");
   strcat(cmd, (std::to_string(energy_range)).c_str());
+
+  std::cout << "\t\t\tDocking of: " << ligand << std::endl;
 
   // Execute command and stream using popen
   std::string vinaOutput;

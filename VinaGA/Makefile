@@ -1,7 +1,7 @@
 # Specify compiler commands
 CXX = g++ -O3 -Wall -fopenmp
 # Specify name of file containing main function, without ext.
-BINARY = Test
+BINARY = VinaGA
 # Objects except binary and libraries
 OBJ = $(basename $(wildcard *.cpp))
 

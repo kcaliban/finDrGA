@@ -7,10 +7,20 @@ void PoolMGR::printSeqAff() {
 
 }
 
+float PoolMGR::getAffinity(std::string FASTASEQ) {
+  if (internalMap.count(FASTASEQ) == 0) {
+    // Sequence is not in our pool
+    genPDB(FASTASEQ);
+    genMD(FASTASEQ);
+    genDock(FASTASEQ);
+  }
+  return std::get<2>(internalMap[FASTASEQ]);
+}
+
 void PoolMGR::addElement(std::string FASTASEQ) {
   if (internalMap.count(FASTASEQ) == 0) {
     // Add object to map
-    internalMap[FASTASEQ] = std::make_tuple("", "", 100, 0);
+    internalMap[FASTASEQ] = std::make_tuple("", "", 0, 0);
     // Generate PDB, MD and fitness function
     genPDB(FASTASEQ);
     genMD(FASTASEQ);
@@ -20,19 +30,19 @@ void PoolMGR::addElement(std::string FASTASEQ) {
 
 void PoolMGR::genPDB(std::string FASTASEQ) {
   // Create directory
-  std::string cmd = "mkdir ";
-  cmd.append(workDir);
-  cmd.append("/");
-  cmd.append(FASTASEQ);
-  cmd.append(" 2>/dev/null");
-  int success = system(cmd.c_str());
+  std::string command = "mkdir ";
+  command.append(workDir);
+  command.append("/");
+  command.append(FASTASEQ);
+  command.append(" 2>/dev/null");
+  int success = system(command.c_str());
   if (success == -1) {
     std::cout << "Error creating directory for PDB file!\n"
               << "Sequence name: " << FASTASEQ << std::endl;
     exit(-1);
   }
+  command.clear();
   // Run Pymol to create ligand
-  std::string command;
   command.append("pymol -kcQ -d \"fab ");
   command.append(FASTASEQ);
   command.append(", ");
@@ -66,11 +76,10 @@ void PoolMGR::genDock(std::string FASTASEQ) {
                             workDir.c_str(),
                             receptor.c_str(),
                             std::get<1>(internalMap[FASTASEQ]).c_str());
-  std::cout << "trying to dock, 1" << std::endl;
+  // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
   vinaInstance.generateConf();
-  std::cout << "trying to dock, 2" << std::endl;
+  // std::cout << "Generated config for: " << FASTASEQ << std::endl;
   vinaInstance.generatePDBQT();
-  std::cout << "trying to dock, 3" << std::endl;
   std::get<2>(internalMap[FASTASEQ]) =
     vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
 }

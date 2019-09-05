@@ -34,6 +34,8 @@ class PoolMGR {
     void addElementPDB(std::string);
     // Adds an element if it does not exist already
     void addElement(std::string);
+    // Read out affinity for given string
+    float getAffinity(std::string);
     // Updates number of rounds not used; input: vector of FASTA seq.
     // in current Generation
     void update(std::vector<std::string>);

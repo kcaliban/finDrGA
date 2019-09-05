@@ -26,6 +26,11 @@ class GenAlgInst
         newGen = nextGen(genome, fitnessfunc, newGen, mutateProb,
                           debug, entropy, entropyFile);
       }
+      // Print result at the end
+      std::cout << "Individuals in the last population" << std::endl;
+      for (int i = 0; i < genotype.size(); i++) {
+        std::cout << "\t\t" << newGen.at(i) << std::endl;
+      }
     };
   private:
     int calculateEntropy(std::vector<GenoType> genotypes) {
@@ -75,12 +80,13 @@ class GenAlgInst
       sort(sortedindices.begin(), sortedindices.end(),
           [fitnesses](size_t i1, size_t i2) {
             return fitnesses[i1] > fitnesses[i2];});
-      int amount = (int) (0.2 * genotypes.size());
+      int amount = (int) (0.1 * genotypes.size());
       for (int i = 0; i < amount; i++) {
         newGen.push_back(genotypes[sortedindices[i]]);
       }
       if (debug) {
         std::cout << "\tBest individual: " << genotypes[sortedindices[0]]
+                  << ", " << fitnesses[sortedindices[0]]
                   << std::endl;
       }
       // RECOMBINATION
