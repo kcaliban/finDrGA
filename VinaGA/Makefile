@@ -2,19 +2,24 @@
 CXX = g++ -O3 -Wall -fopenmp
 # Specify name of file containing main function, without ext.
 BINARY = VinaGA
-# Objects except binary and libraries
-OBJ = $(basename $(wildcard *.cpp))
+# Source files; ** wildcard does not work on my Make so just one level depth
+SRCFILES = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+# Object files
+# Change ext. and path
+OBJFILES = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCFILES)))
 
+$(info    SRCFILES is $(SRCFILES))
+$(info    OBJFILES is $(OBJFILES))
 all: compile
 
 # Link everything together 
 compile: objs
-	$(CXX) $(addsuffix .o, $(OBJ)) -o $(BINARY)
+	$(CXX) $(OBJFILES) -o $(BINARY)
 
-# Generate all object files except libraries
-objs: $(addsuffix .o, $(OBJ))
+# Generate all object files
+objs: $(OBJFILES)
 
 # Generate object file
-%.o: %.cpp %.h
-	$(CXX) -c $<
+obj/%.o: src/%.cpp
+	$(CXX) -c -o $@ $<
 

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <vector>
-#include "VinaInstance.h"
+#include "../VinaInstance/VinaInstance.h"
 class PoolMGR {
   /* Pool Manager: Keeps track of all PDB files and their corresponding
    *               FASTA sequence.

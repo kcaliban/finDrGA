@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(int argc, char *argv[])
+int main2(int argc, char *argv[])
 {
   const char * gromacsPath = "/usr/local/gromacs/bin";
   const char * ligand = "/home/fk/Documents/iGEM/GenAlg/VinaGA/GMXInstance/work/AFAFA.pdb";
