@@ -1,23 +1,51 @@
 #include "GMXInstance.h"
 
+std::string GMXInstance::logStr() {
+  if (log) {
+    return " >> " + workDir + "/GMXINSTLOG" + " 2>&1";
+  }
+  return " > /dev/null 2>&1";
+}
+
+void GMXInstance::debugPrint(const char * str) {
+  if (debug) {
+    std::cout << "\033[1;32mINFO (MD, " << ligand << "): " << str << "\033[0m" << std::endl;
+  }
+}
+
+void GMXInstance::errorPrint(const char * str) {
+  std::cout << "\033[1;31mERROR (MD): " << str << std::endl;
+  std::cout << "Ligand: " << ligand << "\033[0m" << std::endl;
+
+  exit(-1);
+}
+
 void GMXInstance::preparePDB() {
-  // Clean file from crystal water
+  // Export path to forcefield
+  debugPrint("Setting env forcefield value...");
   std::string cmd;
+  int success = setenv("GMXLIB", forcefieldPath.c_str(), 1);
+  if (success != 0) {
+    std::cout << "Error trying to set GMXLib Path!"
+              << std::endl;
+    exit(-1);
+  }
+  cmd.clear();
+  // Clean file from crystal water
+  debugPrint("Cleaning ligand from crystal water...");
   cmd.append("grep -v HOH ");
   cmd.append(ligand);
   cmd.append(" > ");
   cmd.append(workDir);
   cmd.append("/");
   cmd.append("clean.pdb");
-  int success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not clean PDB file for MD!\n"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  success = system(cmd.c_str());
+  if (success != 0) {
+    errorPrint("Could not clean PDB file for MD!");
   }
   cmd.clear();
   // Create topology using force field
+  debugPrint("Creating topology...");
   cmd.append(gromacsPath);
   cmd.append("/gmx");
   cmd.append(" pdb2gmx -f ");
@@ -37,15 +65,14 @@ void GMXInstance::preparePDB() {
   cmd.append(" -ff ");
   cmd.append(forcefield);
   cmd.append(" -ignh");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not generate topology for MD!\n"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not generate topology for MD!");
   }
   cmd.clear();
   // Define the bounding box
+  debugPrint("Defining the bounding box...");
   cmd.append(gromacsPath);
   cmd.append("/gmx");
   cmd.append(" editconf");
@@ -60,15 +87,14 @@ void GMXInstance::preparePDB() {
   cmd.append(std::to_string(boxsize));
   cmd.append(" -bt ");
   cmd.append(bt);
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not define bounding box for MD!\n"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not define bounding box for MD!");
   }
   cmd.clear();
   // Solvate
+  debugPrint("Solvating...");
   cmd.append(gromacsPath);
   cmd.append("/gmx");
   cmd.append(" solvate");
@@ -83,15 +109,14 @@ void GMXInstance::preparePDB() {
   cmd.append(" -p ");
   cmd.append(workDir);
   cmd.append("/topol.top"); // Where will this file be?
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not solvate for MD!"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not solvate for MD!");
   }
   cmd.clear();
   // Add ions
+  debugPrint("Adding ions...");
   // Step one
   cmd.append(gromacsPath);
   cmd.append("/gmx");
@@ -104,19 +129,17 @@ void GMXInstance::preparePDB() {
   cmd.append("/solv.gro");
   cmd.append(" -p ");
   cmd.append(workDir);
-  cmd.append("/topol.top"); // Where will this file be?
+  cmd.append("/topol.top");
   cmd.append(" -o ");
   cmd.append(workDir);
   cmd.append("/ions.tpr");
   cmd.append(" -po ");
   cmd.append(workDir);
   cmd.append("/mdout.mdp");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not perform step one of ion adding"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not perform step one of ion adding");
   }
   cmd.clear();
   // Step two
@@ -137,17 +160,17 @@ void GMXInstance::preparePDB() {
   cmd.append(" -nname ");
   cmd.append("CL");
   cmd.append(" -neutral ");
+  cmd.append(logStr());
+  cmd.append(" ");
   cmd.append("<<eof\n13\neof"); // group SOL, might have to change to 16 depending
                                 // on gromacs version
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not perform step two of ion adding"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not perform step two of ion adding");
   }
   cmd.clear();
   // Energy minimization
+  debugPrint("Minimzing energy...");
   // Prepare
   cmd.append(gromacsPath);
   cmd.append("/gmx");
@@ -167,12 +190,10 @@ void GMXInstance::preparePDB() {
   cmd.append(" -po ");
   cmd.append(workDir);
   cmd.append("/mdout.mdp");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not prepare energy minimzation"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not prepare energy minimzation");
   }
   cmd.clear();
   // Run MD for enery minimization
@@ -196,15 +217,14 @@ void GMXInstance::preparePDB() {
   cmd.append(" -g ");
   cmd.append(workDir);
   cmd.append("/em.log");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not do energy minimzation"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not do energy minimzation");
   }
   cmd.clear();
   // Temperature Equilibrium
+  debugPrint("Equilibriating temperature...");
   // Preparation
   cmd.append(gromacsPath);
   cmd.append("/gmx");
@@ -227,12 +247,10 @@ void GMXInstance::preparePDB() {
   cmd.append(" -po ");
   cmd.append(workDir);
   cmd.append("/mdout.mdp");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not prepare establishing of equilibrium"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not prepare establishing of equilibrium");
   }
   cmd.clear();
   // Run MD for equilibrium
@@ -259,15 +277,14 @@ void GMXInstance::preparePDB() {
   cmd.append(" -g ");
   cmd.append(workDir);
   cmd.append("/nvt.log");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not establish equilibrim"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not establish equilibrim");
   }
   cmd.clear();
   // Pressure Equilibrium
+  debugPrint("Equilibriating pressure...");
   // Preparation
   cmd.append(gromacsPath);
   cmd.append("/gmx");
@@ -293,12 +310,10 @@ void GMXInstance::preparePDB() {
   cmd.append(" -po ");
   cmd.append(workDir);
   cmd.append("/mdout.mdp");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not prepare establishing of equilibrium"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not prepare establishing of equilibrium");
   }
   cmd.clear();
   // Run MD for equilibrium
@@ -325,15 +340,14 @@ void GMXInstance::preparePDB() {
   cmd.append(" -cpo ");
   cmd.append(workDir);
   cmd.append("/npt.cpt");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not establish equilibrim"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not establish equilibrim");
   }
   cmd.clear();
   // Final preparation
+  debugPrint("Final preparation for MD...");
   cmd.append(gromacsPath);
   cmd.append("/gmx");
   cmd.append(" grompp");
@@ -355,19 +369,17 @@ void GMXInstance::preparePDB() {
   cmd.append(" -po ");
   cmd.append(workDir);
   cmd.append("/mdout.mdp");
+  cmd.append(logStr());
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Could not prepare MD tpr file"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not prepare MD tpr file");
   }
   cmd.clear();
 }
 
 void GMXInstance::runMD() {
-  /*
   // Run MD
+  debugPrint("Running the MD...");
   std::string cmd;
   cmd.append(gromacsPath);
   cmd.append("/gmx");
@@ -394,19 +406,16 @@ void GMXInstance::runMD() {
   cmd.append(" -x ");
   cmd.append(workDir);
   cmd.append("/md_0_1.xtc");
+  cmd.append(logStr());
   int success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Error running the MD!"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Error running the MD!");
   }
   cmd.clear();
-  */
-  std::string cmd;
-  int success;
+  debugPrint("MD successful!");
   // Generate .pdb file
   // Step one
+  debugPrint("Generating PDB file...");
   cmd.append(gromacsPath);
   cmd.append("/gmx");
   cmd.append(" trjconv");
@@ -421,13 +430,12 @@ void GMXInstance::runMD() {
   cmd.append("/md_0_1_noPBC.xtc");
   cmd.append(" -pbc mol ");
   cmd.append(" -center ");
+  cmd.append(logStr());
+  cmd.append(" ");
   cmd.append("<<eof\n1\n0\neof");
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Error trying to generate PDB from MD!"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Error trying to generate PDB from MD!");
   }
   cmd.clear();
   // Step two
@@ -443,13 +451,12 @@ void GMXInstance::runMD() {
   cmd.append(" -o ");
   cmd.append(workDir);
   cmd.append("/MD.pdb");
+  cmd.append(logStr());
+  cmd.append(" ");
   cmd.append(" <<eof\n1\neof");
   success = system(cmd.c_str());
-  if (success == -1) {
-    std::cout << "Error trying to generate PDB from MD!"
-              << "Ligand: " << ligand
-              << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Error trying to generate PDB from MD!");
   }
   cmd.clear();
 }

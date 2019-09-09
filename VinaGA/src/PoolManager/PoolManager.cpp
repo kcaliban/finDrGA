@@ -33,7 +33,7 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append(workDir);
   command.append("/");
   command.append(FASTASEQ);
-  command.append(" 2>/dev/null");
+  command.append(" 2>/dev/null 1>&2");
   int success = system(command.c_str());
   if (success == -1) {
     std::cout << "Error creating directory for PDB file!\n"
@@ -65,8 +65,14 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
 }
 
 void PoolMGR::genMD(std::string FASTASEQ) {
-  // TODO, for testing use the same as PDB
-  std::get<1>(internalMap[FASTASEQ]) = std::get<0>(internalMap[FASTASEQ]);
+  GMXInstance gmxInstance(std::get<0>(internalMap[FASTASEQ]).c_str(),
+                          gromacsPath.c_str(), (workDir + "/" + FASTASEQ).c_str(),
+                          forcefield.c_str(), forcefieldPath.c_str(), water.c_str(),
+                          boundingboxtype.c_str(), boxsize, mdpPath.c_str(), true, true);
+  gmxInstance.preparePDB();
+  gmxInstance.runMD();
+
+  std::get<1>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/MD.pdb";
 }
 
 void PoolMGR::genDock(std::string FASTASEQ) {
@@ -74,7 +80,8 @@ void PoolMGR::genDock(std::string FASTASEQ) {
                             mgltoolstilitiesPath.c_str(),
                             workDir.c_str(),
                             receptor.c_str(),
-                            std::get<1>(internalMap[FASTASEQ]).c_str());
+                            std::get<1>(internalMap[FASTASEQ]).c_str(),
+                            true, true);
   // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
   vinaInstance.generateConf();
   // std::cout << "Generated config for: " << FASTASEQ << std::endl;

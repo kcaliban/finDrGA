@@ -1,5 +1,26 @@
 #include "VinaInstance.h"
 
+std::string VinaInstance::logStr() {
+  if (log) {
+    return " >> " + ligand.substr(0,
+        ligand.size() - 7) + "/VINAINSTLOG" + " 2>&1";
+  }
+  return " > /dev/null 2>&1";
+}
+
+void VinaInstance::debugPrint(const char * str) {
+  if (debug) {
+    std::cout << "\033[1;32mINFO (DOCKING, " << ligand << "): " << str << "\033[0m" << std::endl;
+  }
+}
+
+void VinaInstance::errorPrint(const char * str) {
+  std::cout << "\033[1;31mERROR (DOCKING): " << str << std::endl;
+  std::cout << "Ligand: " << ligand << "\033[0m" << std::endl;
+
+  exit(-1);
+}
+
 void VinaInstance::generateConf() {
   // Generate conf file for docking
   // Size x,y,z are simply the max minus the min
@@ -65,8 +86,7 @@ void VinaInstance::generateConf() {
   std::ofstream confFile;
   confFile.open(outfile.c_str(), std::ios::trunc);
   if (!confFile) {
-    std::cout << "Could not open config file!" << std::endl;
-    exit(-1);
+    errorPrint("Could not open config file!");
   }
   confFile << "center_x = " << offsetx << std::endl;
   confFile << "center_y = " << offsety << std::endl;
@@ -79,7 +99,8 @@ void VinaInstance::generateConf() {
 }
 
 void VinaInstance::generatePDBQT() {
-  // Generate receptor
+  debugPrint("Generating pdbqts...");
+  // Generate receptor PDBQT
   char cmd[3000];
   strcpy(cmd, pythonShPath.c_str());
   strcpy(cmd, " ");
@@ -89,17 +110,16 @@ void VinaInstance::generatePDBQT() {
   strcat(cmd, " -A bonds_hydrogens -U nphs -o ");
   strcat(cmd, receptor.c_str());
   strcat(cmd, "qt");
-  strcat(cmd, " >/dev/null"); // Hides console output
+  strcat(cmd, logStr().c_str());
   int success = system(cmd);
 
-  if (success == -1) {
-    std::cout << "ERROR: Could not generate pdbqt file from receptor" << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not generate pdbqt file from receptor");
   }
 
   memset(cmd, 0, sizeof(cmd));
 
-  // Generate ligand
+  // Generate ligand PDBQT
   strcpy(cmd, pythonShPath.c_str());
   strcpy(cmd, " ");
   strcat(cmd, mgltoolstilitiesPath.c_str());
@@ -108,12 +128,11 @@ void VinaInstance::generatePDBQT() {
   strcat(cmd, " -A bonds_hydrogens -U nphs -o ");
   strcat(cmd, ligand.c_str());
   strcat(cmd, "qt");
-  strcat(cmd, " >/dev/null");
+  strcat(cmd, logStr().c_str());
   success = system(cmd);
 
-  if (success == -1) {
-    std::cout << "ERROR: Could not generate pdbqt file from receptor" << std::endl;
-    exit(-1);
+  if (success != 0) {
+    errorPrint("Could not generate pdbqt file from receptor");
   }
 }
 
@@ -137,7 +156,7 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   strcat(cmd, " --energy_range ");
   strcat(cmd, (std::to_string(energy_range)).c_str());
 
-  std::cout << "\t\t\tDocking of: " << ligand << std::endl;
+  debugPrint("Docking...");
 
   // Execute command and stream using popen
   std::string vinaOutput;
@@ -153,12 +172,5 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   std::smatch affinityMatch;
   std::regex_search(vinaOutput, affinityMatch, affinityRegEx);
 
-  /* For debugging
-  std::cout << vinaOutput << std::endl;
-
-  std::cout << affinityMatch.size() << std::endl;
-  std::cout << affinityMatch.str(0) << std::endl;
-  std::cout << "Match: " << affinityMatch.str(1) << ", " << stof(affinityMatch.str(1)) << std::endl;
-  */
   return stof(affinityMatch.str(1));
 }

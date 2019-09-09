@@ -8,8 +8,10 @@ class GMXInstance {
   public:
     GMXInstance(const char * ligand1, const char * gromacsPath1,
                 const char * workDir1, const char * forcefield1,
+                const char * forcefieldPath1,
                 const char * water1, const char * bt1,
-                float boxsize1, const char * mdpPath1) {
+                float boxsize1, const char * mdpPath1,
+                bool debug1, bool log1) {
       ligand = ligand1;
       gromacsPath = gromacsPath1;
       workDir = workDir1;
@@ -18,6 +20,9 @@ class GMXInstance {
       bt = bt1;
       boxsize = boxsize1;
       mdpPath = mdpPath1; // Where all parameter files are
+      forcefieldPath = forcefieldPath1;
+      debug = debug1;
+      log = log1;
     }
 
     // Prepares a PDB for MD simulation
@@ -26,6 +31,7 @@ class GMXInstance {
     void runMD();
     // Returns path to clustered MD simulation (after clstering, that is)
     std::string clusteredMD();
+    std::string logStr();
 
   private:
     std::string ligand;
@@ -35,7 +41,13 @@ class GMXInstance {
     std::string bt;
     std::string gromacsPath;
     std::string mdpPath;
+    std::string forcefieldPath;
     float boxsize;
+    bool debug;
+    bool log;
+
+    void debugPrint(const char *);
+    void errorPrint(const char *);
 };
 
 #endif

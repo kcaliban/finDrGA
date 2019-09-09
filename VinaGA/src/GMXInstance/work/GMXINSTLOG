@@ -1,0 +1,1025 @@
+                     :-) GROMACS - gmx pdb2gmx, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx pdb2gmx, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx pdb2gmx -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/clean.pdb -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/processed.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -i /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/posre.itp -water spce -ff amber99sb-ildn-fme -ignh
+
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.r2b
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/dna.r2b
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/rna.r2b
+All occupancies are one
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/atomtypes.atp
+Atomtype 1Atomtype 2Atomtype 3Atomtype 4Atomtype 5Atomtype 6Atomtype 7Atomtype 8Atomtype 9Atomtype 10Atomtype 11Atomtype 12Atomtype 13Atomtype 14Atomtype 15Atomtype 16Atomtype 17Atomtype 18Atomtype 19Atomtype 20Atomtype 21Atomtype 22Atomtype 23Atomtype 24Atomtype 25Atomtype 26Atomtype 27Atomtype 28Atomtype 29Atomtype 30Atomtype 31Atomtype 32Atomtype 33Atomtype 34Atomtype 35Atomtype 36Atomtype 37Atomtype 38Atomtype 39Atomtype 40Atomtype 41Atomtype 42Atomtype 43Atomtype 44Atomtype 45Atomtype 46Atomtype 47Atomtype 48Atomtype 49Atomtype 50Atomtype 51Atomtype 52Atomtype 53Atomtype 54Atomtype 55Atomtype 56Atomtype 57Atomtype 58Atomtype 59Atomtype 60Atomtype 61Atomtype 62Atomtype 63Atomtype 64Atomtype 65Atomtype 66Atomtype 67Atomtype 68
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.rtp
+Residue 1Residue 2Residue 3Residue 4Residue 5Residue 6Residue 7Residue 8Residue 9Residue 10Residue 11Residue 12Residue 13Residue 14Residue 15Residue 16Residue 17Residue 18Residue 19Residue 20Residue 21Residue 22Residue 23Residue 24Residue 25Residue 26Residue 27Residue 28Residue 29Residue 30Residue 31Residue 32Residue 33Residue 34Residue 35Residue 36Residue 37Residue 38Residue 39Residue 40Residue 41Residue 42Residue 43Residue 44Residue 45Residue 46Residue 47Residue 48Residue 49Residue 50Residue 51Residue 52Residue 53Residue 54Residue 55Residue 56Residue 57Residue 58Residue 59Residue 60Residue 61Residue 62Residue 63Residue 64Residue 65Residue 66Residue 67Residue 68Residue 69Residue 70Residue 71Residue 72Residue 73Residue 74Residue 75Residue 76Residue 77Residue 78Residue 79Residue 80Residue 81Residue 82Residue 83Residue 84Residue 85Residue 86Residue 87Residue 88Residue 89Residue 90Residue 91Residue 92Residue 93Residue 94Residue 95
+Sorting it all out...
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/dna.rtp
+Residue 96Residue 97Residue 98Residue 99Residue 100Residue 101Residue 102Residue 103Residue 104Residue 105Residue 106Residue 107Residue 108Residue 109Residue 110Residue 111
+Sorting it all out...
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/rna.rtp
+Residue 112Residue 113Residue 114Residue 115Residue 116Residue 117Residue 118Residue 119Residue 120Residue 121Residue 122Residue 123Residue 124Residue 125Residue 126Residue 127
+Sorting it all out...
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.hdb
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/dna.hdb
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/rna.hdb
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.n.tdb
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.c.tdb
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#topol.top.2#
+8 out of 8 lines of specbond.dat converted successfully
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.arn
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/dna.arn
+Opening force field file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/rna.arn
+Making bonds...
+Number of bonds was 75, now 74
+Generating angles, dihedrals and pairs...
+Before cleaning: 184 pairs
+Before cleaning: 184 dihedrals
+Keeping all generated dihedrals
+Making cmap torsions...
+There are  184 dihedrals,   21 impropers,  129 angles
+           178 pairs,       74 bonds and     0 virtual sites
+Total mass 525.600 a.m.u.
+Total charge 0.000 e
+Writing topology
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/posre.itp to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#posre.itp.1#
+
+Writing coordinate file...
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/processed.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#processed.gro.1#
+
+GROMACS reminds you: ""Everything organic and natural is good" - ignoring the fact that organic natural substances include arsenic and poo and crocodiles. And everything chemical is bad, ignoring the fact that... everything is chemicals." (Tim Minchin)
+
+
+Using the Amber99sb-ildn-fme force field in directory /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff
+
+going to rename /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/aminoacids.r2b
+going to rename /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/dna.r2b
+going to rename /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields/amber99sb-ildn-fme.ff/rna.r2b
+Reading /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/clean.pdb...
+Read '', 37 atoms
+Analyzing pdb file
+Splitting chemical chains based on TER records or chain id changing.
+There are 1 chains and 0 blocks of water and 5 residues with 37 atoms
+
+  chain  #res #atoms
+  1 ' '     5     37  
+
+Reading residue database... (Amber99sb-ildn-fme)
+Processing chain 1 (37 atoms, 5 residues)
+Identified residue ALA1 as a starting terminus.
+Identified residue ALA5 as a ending terminus.
+Checking for duplicate atoms....
+Generating any missing hydrogen atoms and/or adding termini.
+Now there are 5 residues with 73 atoms
+		--------- PLEASE NOTE ------------
+You have successfully generated a topology from: /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/clean.pdb.
+The Amber99sb-ildn-fme force field and the spce water model are used.
+		--------- ETON ESAELP ------------
+                     :-) GROMACS - gmx editconf, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx editconf, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx editconf -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/processed.gro -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/newbox.gro -c -d 1.000000 -bt dodecahedron
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/newbox.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#newbox.gro.1#
+
+GROMACS reminds you: "That Was Cool" (Beavis and Butthead)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.Read 73 atoms
+Volume: 1.15036 nm^3, corresponds to roughly 500 electrons
+No velocities found
+    system size :  1.040  0.800  1.381 (nm)
+    diameter    :  1.452               (nm)
+    center      :  0.233 -0.058 -0.154 (nm)
+    box vectors :  1.041  0.800  1.381 (nm)
+    box angles  :  90.00  90.00  90.00 (degrees)
+    box volume  :   1.15               (nm^3)
+    shift       :  2.356  2.647  1.374 (nm)
+new center      :  2.589  2.589  1.221 (nm)
+new box vectors :  3.452  3.452  3.452 (nm)
+new box angles  :  60.00  60.00  90.00 (degrees)
+new box volume  :  29.10               (nm^3)
+                     :-) GROMACS - gmx solvate, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx solvate, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx solvate -cp /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/newbox.gro -cs spc216.gro -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top
+
+Reading solute configuration
+Reading solvent configuration
+
+Initialising inter-atomic distances...
+
+WARNING: Masses and atomic (Van der Waals) radii will be guessed
+         based on residue and atom names, since they could not be
+         definitively assigned from the information in your input
+         files. These guessed numbers might deviate from the mass
+         and radius of the atom type. Please check the output
+         files if necessary.
+
+NOTE: From version 5.0 gmx solvate uses the Van der Waals radii
+from the source below. This means the results may be different
+compared to previous GROMACS versions.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+A. Bondi
+van der Waals Volumes and Radii
+J. Phys. Chem. 68 (1964) pp. 441-451
+-------- -------- --- Thank You --- -------- --------
+
+Generating solvent configuration
+Will generate new solvent configuration of 2x2x2 boxes
+Solvent box contains 3750 atoms in 1250 residues
+Removed 930 solvent atoms due to solvent-solvent overlap
+Removed 75 solvent atoms due to solute-solvent overlap
+Sorting configuration
+Found 1 molecule type:
+    SOL (   3 atoms):   915 residues
+Generated solvent containing 2745 atoms in 915 residues
+Writing generated configuration to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv.gro
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#solv.gro.1#
+
+Output configuration contains 2818 atoms in 920 residues
+Volume                 :      29.095 (nm^3)
+Density                :     972.693 (g/l)
+Number of solvent molecules:    915   
+
+Processing topology
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#topol.top.3#
+
+GROMACS reminds you: "Home computers are being called upon to perform many new functions, including the consumption of homework formerly eaten by the dog." (Doug Larson)
+
+Adding line for 915 solvent molecules with resname (SOL) to topology file (/home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top)
+                      :-) GROMACS - gmx grompp, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx grompp, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx grompp -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/ions.mdp -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/ions.tpr -po /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/mdout.mdp
+
+
+NOTE 1 [file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/ions.mdp]:
+  With Verlet lists the optimal nstlist is >= 10, with GPUs >= 20. Note
+  that with the Verlet scheme, nstlist has no effect on the accuracy of
+  your simulation.
+
+Setting the LD random seed to 249328743
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+Generated 2145 of the 2145 1-4 parameter combinations
+Excluding 3 bonded neighbours molecule type 'Protein'
+Excluding 2 bonded neighbours molecule type 'SOL'
+Removing all charge groups because cutoff-scheme=Verlet
+Number of degrees of freedom in T-Coupling group rest is 5706.00
+
+NOTE 2 [file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/ions.mdp]:
+  You are using a plain Coulomb cut-off, which might produce artifacts.
+  You might want to consider using PME electrostatics.
+
+
+
+There were 2 notes
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/ions.tpr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#ions.tpr.1#
+
+GROMACS reminds you: "Misslycka kan man med all kod" (Mats Nylen)
+
+Analysing residue names:
+There are:     5    Protein residues
+There are:   915      Water residues
+Analysing Protein...
+This run will generate roughly 0 Mb of data
+                      :-) GROMACS - gmx genion, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx genion, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx genion -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/ions.tpr -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv_ions.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -pname NA -nname CL -neutral
+
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/ions.tpr, VERSION 2019.3 (single precision)
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/ions.tpr, VERSION 2019.3 (single precision)
+No ions to add, will just copy input configuration.
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv_ions.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#solv_ions.gro.1#
+
+GROMACS reminds you: "Don't Push Me, Cause I'm Close to the Edge" (Grandmaster Flash)
+
+                      :-) GROMACS - gmx grompp, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx grompp, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx grompp -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/minim.mdp -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/solv_ions.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.tpr -po /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/mdout.mdp
+
+
+NOTE 1 [file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/minim.mdp]:
+  With Verlet lists the optimal nstlist is >= 10, with GPUs >= 20. Note
+  that with the Verlet scheme, nstlist has no effect on the accuracy of
+  your simulation.
+
+Setting the LD random seed to 1294105459
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+Generated 2145 of the 2145 1-4 parameter combinations
+Excluding 3 bonded neighbours molecule type 'Protein'
+Excluding 2 bonded neighbours molecule type 'SOL'
+Removing all charge groups because cutoff-scheme=Verlet
+Number of degrees of freedom in T-Coupling group rest is 5706.00
+Estimate for the relative computational load of the PME mesh part: 0.30
+
+There was 1 note
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.tpr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#em.tpr.1#
+
+GROMACS reminds you: "Those people who think they know everything are a great annoyance to those of us who do." (Isaac Asimov)
+
+Analysing residue names:
+There are:     5    Protein residues
+There are:   915      Water residues
+Analysing Protein...
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 32x32x32, spacing 0.108 0.108 0.108
+This run will generate roughly 0 Mb of data
+                      :-) GROMACS - gmx mdrun, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx mdrun -gcom 2 -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.tpr -deffnm em -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.gro -e /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.edr -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.trr -g /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.log
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.log to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#em.log.1#
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.tpr, VERSION 2019.3 (single precision)
+Using 1 MPI thread
+Using 4 OpenMP threads 
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.trr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#em.trr.1#
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.edr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#em.edr.1#
+
+Steepest Descents:
+   Tolerance (Fmax)   =  1.00000e+03
+   Number of steps    =        50000
+
+writing lowest energy coordinates.
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#em.gro.1#
+
+Steepest Descents converged to Fmax < 1000 in 173 steps
+Potential Energy  = -4.3375797e+04
+Maximum force     =  9.3982538e+02 on atom 71
+Norm of force     =  7.0228626e+01
+
+GROMACS reminds you: "Uh-oh, We're In Trouble" (Shampoo)
+
+                      :-) GROMACS - gmx grompp, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx grompp, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx grompp -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/nvt.mdp -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.gro -r /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/em.gro -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.tpr -po /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/mdout.mdp
+
+Ignoring obsolete mdp entry 'title'
+Setting the LD random seed to 520512469
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+Generated 2145 of the 2145 1-4 parameter combinations
+Excluding 3 bonded neighbours molecule type 'Protein'
+Excluding 2 bonded neighbours molecule type 'SOL'
+Setting gen_seed to -1189506784
+Velocities were taken from a Maxwell distribution at 300 K
+Removing all charge groups because cutoff-scheme=Verlet
+Number of degrees of freedom in T-Coupling group Protein is 183.90
+Number of degrees of freedom in T-Coupling group non-Protein is 5487.10
+Estimate for the relative computational load of the PME mesh part: 0.24
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.tpr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#nvt.tpr.1#
+
+GROMACS reminds you: "I never see what has been done; I only see what remains to be done." (Marie Curie)
+
+turning H bonds into constraints...
+turning H bonds into constraints...
+Analysing residue names:
+There are:     5    Protein residues
+There are:   915      Water residues
+Analysing Protein...
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+Calculated rlist for 1x1 atom pair-list as 1.035 nm, buffer size 0.035 nm
+Set rlist, assuming 4x4 atom pair-list, to 1.000 nm, buffer size 0.000 nm
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 24x24x24, spacing 0.144 0.144 0.144
+This run will generate roughly 7 Mb of data
+                      :-) GROMACS - gmx mdrun, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx mdrun -gcom 2 -deffnm nvt -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.tpr -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.gro -e /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.edr -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.trr -cpo /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.cpt -g /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.log
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.log to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#nvt.log.1#
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.tpr, VERSION 2019.3 (single precision)
+Changing nstlist from 10 to 40, rlist from 1 to 1.096
+
+Using 1 MPI thread
+Using 4 OpenMP threads 
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.trr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#nvt.trr.1#
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.edr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#nvt.edr.1#
+starting mdrun 'Protein in water'
+50000 steps,    100.0 ps.
+
+Writing final coordinates.
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#nvt.gro.1#
+
+               Core t (s)   Wall t (s)        (%)
+       Time:      218.613       54.653      400.0
+                 (ns/day)    (hour/ns)
+Performance:      158.091        0.152
+
+GROMACS reminds you: "Exactly" (Pulp Fiction)
+
+                      :-) GROMACS - gmx grompp, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx grompp, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx grompp -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/npt.mdp -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.gro -r /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.gro -t /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/nvt.cpt -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.tpr -po /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/mdout.mdp
+
+Ignoring obsolete mdp entry 'title'
+Setting the LD random seed to -478211905
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+Generated 2145 of the 2145 1-4 parameter combinations
+Excluding 3 bonded neighbours molecule type 'Protein'
+Excluding 2 bonded neighbours molecule type 'SOL'
+Removing all charge groups because cutoff-scheme=Verlet
+
+NOTE 1 [file topol.top, line 740]:
+  You are combining position restraints with Parrinello-Rahman pressure
+  coupling, which can lead to instabilities. If you really want to combine
+  position restraints with pressure coupling, we suggest to use Berendsen
+  pressure coupling instead.
+
+The center of mass of the position restraint coord's is  2.629  2.601  1.194
+The center of mass of the position restraint coord's is  2.629  2.601  1.194
+Number of degrees of freedom in T-Coupling group Protein is 183.90
+Number of degrees of freedom in T-Coupling group non-Protein is 5487.10
+Reading Coordinates, Velocities and Box size from old trajectory
+Will read whole trajectory
+Last frame         -1 time  100.000   
+Using frame at t = 100 ps
+Starting time for run is 0 ps
+Estimate for the relative computational load of the PME mesh part: 0.24
+
+There was 1 note
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.tpr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#npt.tpr.1#
+
+GROMACS reminds you: "That Was Really Cool" (Butthead)
+
+turning H bonds into constraints...
+turning H bonds into constraints...
+Analysing residue names:
+There are:     5    Protein residues
+There are:   915      Water residues
+Analysing Protein...
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+Calculated rlist for 1x1 atom pair-list as 1.035 nm, buffer size 0.035 nm
+Set rlist, assuming 4x4 atom pair-list, to 1.000 nm, buffer size 0.000 nm
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 24x24x24, spacing 0.144 0.144 0.144
+This run will generate roughly 7 Mb of data
+                      :-) GROMACS - gmx mdrun, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx mdrun -gcom 2 -deffnm npt -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.tpr -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.gro -e /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.edr -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.trr -g /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.log -cpo /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.cpt
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.log to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#npt.log.1#
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.tpr, VERSION 2019.3 (single precision)
+Changing nstlist from 10 to 40, rlist from 1 to 1.096
+
+Using 1 MPI thread
+Using 4 OpenMP threads 
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.trr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#npt.trr.1#
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.edr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#npt.edr.1#
+starting mdrun 'Protein in water'
+50000 steps,    100.0 ps.
+
+Writing final coordinates.
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#npt.gro.1#
+
+               Core t (s)   Wall t (s)        (%)
+       Time:      233.957       58.489      400.0
+                 (ns/day)    (hour/ns)
+Performance:      147.722        0.162
+
+GROMACS reminds you: "I was elected to lead, not to read" (President A. Schwarzenegger)
+
+                      :-) GROMACS - gmx grompp, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx grompp, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx grompp -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ/md.mdp -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.gro -t /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/npt.cpt -p /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/topol.top -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr -po /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/mdout.mdp
+
+Ignoring obsolete mdp entry 'title'
+Setting the LD random seed to -544335772
+Generated 2145 of the 2145 non-bonded parameter combinations
+Generating 1-4 interactions: fudge = 0.5
+Generated 2145 of the 2145 1-4 parameter combinations
+Excluding 3 bonded neighbours molecule type 'Protein'
+Excluding 2 bonded neighbours molecule type 'SOL'
+Removing all charge groups because cutoff-scheme=Verlet
+Number of degrees of freedom in T-Coupling group Protein is 183.90
+Number of degrees of freedom in T-Coupling group non-Protein is 5487.10
+Reading Coordinates, Velocities and Box size from old trajectory
+Will read whole trajectory
+Last frame         -1 time  100.000   
+Using frame at t = 100 ps
+Starting time for run is 0 ps
+Estimate for the relative computational load of the PME mesh part: 0.24
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1.tpr.1#
+
+GROMACS reminds you: "Here, kitty, kitty..." (Erwin Schroedinger)
+
+turning H bonds into constraints...
+turning H bonds into constraints...
+Analysing residue names:
+There are:     5    Protein residues
+There are:   915      Water residues
+Analysing Protein...
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+Calculated rlist for 1x1 atom pair-list as 1.036 nm, buffer size 0.036 nm
+Set rlist, assuming 4x4 atom pair-list, to 1.000 nm, buffer size 0.000 nm
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 24x24x24, spacing 0.142 0.142 0.142
+This run will generate roughly 0 Mb of data
+                      :-) GROMACS - gmx mdrun, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx mdrun -deffnm md_0_1 -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr -c /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.gro -e /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.edr -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.trr -g /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.log -cpo /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.cpt -x /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.xtc
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.log to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1.log.1#
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr, VERSION 2019.3 (single precision)
+Changing nstlist from 10 to 40, rlist from 1 to 1.097
+
+Using 1 MPI thread
+Using 4 OpenMP threads 
+
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.xtc to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1.xtc.1#
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.edr to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1.edr.1#
+starting mdrun 'Protein in water'
+50000 steps,    100.0 ps.
+
+Writing final coordinates.
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.gro to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1.gro.1#
+
+               Core t (s)   Wall t (s)        (%)
+       Time:      233.352       58.338      400.0
+                 (ns/day)    (hour/ns)
+Performance:      148.105        0.162
+
+GROMACS reminds you: "Molecular biology is essentially the practice of biochemistry without a license." (Edwin Chargaff)
+
+                     :-) GROMACS - gmx trjconv, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx trjconv, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx trjconv -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.xtc -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1_noPBC.xtc -pbc mol -center
+
+Will write xtc: Compressed trajectory (portable xdr format): xtc
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr, VERSION 2019.3 (single precision)
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr, VERSION 2019.3 (single precision)
+Group     0 (         System) has  2818 elements
+Group     1 (        Protein) has    73 elements
+Group     2 (      Protein-H) has    38 elements
+Group     3 (        C-alpha) has     5 elements
+Group     4 (       Backbone) has    15 elements
+Group     5 (      MainChain) has    21 elements
+Group     6 (   MainChain+Cb) has    26 elements
+Group     7 (    MainChain+H) has    28 elements
+Group     8 (      SideChain) has    45 elements
+Group     9 (    SideChain-H) has    17 elements
+Group    10 (    Prot-Masses) has    73 elements
+Group    11 (    non-Protein) has  2745 elements
+Group    12 (          Water) has  2745 elements
+Group    13 (            SOL) has  2745 elements
+Group    14 (      non-Water) has    73 elements
+Select a group: Group     0 (         System) has  2818 elements
+Group     1 (        Protein) has    73 elements
+Group     2 (      Protein-H) has    38 elements
+Group     3 (        C-alpha) has     5 elements
+Group     4 (       Backbone) has    15 elements
+Group     5 (      MainChain) has    21 elements
+Group     6 (   MainChain+Cb) has    26 elements
+Group     7 (    MainChain+H) has    28 elements
+Group     8 (      SideChain) has    45 elements
+Group     9 (    SideChain-H) has    17 elements
+Group    10 (    Prot-Masses) has    73 elements
+Group    11 (    non-Protein) has  2745 elements
+Group    12 (          Water) has  2745 elements
+Group    13 (            SOL) has  2745 elements
+Group    14 (      non-Water) has    73 elements
+Select a group: Reading frame       0 time    0.000   
+Precision of /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.xtc is 0.001 (nm)
+Using output precision of 0.001 (nm)
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1_noPBC.xtc to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#md_0_1_noPBC.xtc.1#
+ ->  frame      0 time    0.000      Reading frame       1 time   10.000    ->  frame      1 time   10.000      Reading frame       2 time   20.000    ->  frame      2 time   20.000      Reading frame       3 time   30.000    ->  frame      3 time   30.000      Reading frame       4 time   40.000    ->  frame      4 time   40.000      Reading frame       5 time   50.000    ->  frame      5 time   50.000      Reading frame       6 time   60.000    ->  frame      6 time   60.000      Reading frame       7 time   70.000    ->  frame      7 time   70.000      Reading frame       8 time   80.000    ->  frame      8 time   80.000      Reading frame       9 time   90.000    ->  frame      9 time   90.000      Reading frame      10 time  100.000    ->  frame     10 time  100.000      Last frame         10 time  100.000   
+
+
+GROMACS reminds you: "If I could remember the names of all these particles, I’d be a botanist." (Albert Einstein)
+
+Note that major changes are planned in future for trjconv, to improve usability and utility.
+Select group for centering
+Selected 1: 'Protein'
+Select group for output
+Selected 0: 'System'
+                     :-) GROMACS - gmx trjconv, 2019.3 (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx trjconv, version 2019.3
+Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance
+Command line:
+  gmx trjconv -s /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr -f /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1_noPBC.xtc -o /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/MD.pdb
+
+Will write pdb: Protein data bank file
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr, VERSION 2019.3 (single precision)
+Reading file /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1.tpr, VERSION 2019.3 (single precision)
+Group     0 (         System) has  2818 elements
+Group     1 (        Protein) has    73 elements
+Group     2 (      Protein-H) has    38 elements
+Group     3 (        C-alpha) has     5 elements
+Group     4 (       Backbone) has    15 elements
+Group     5 (      MainChain) has    21 elements
+Group     6 (   MainChain+Cb) has    26 elements
+Group     7 (    MainChain+H) has    28 elements
+Group     8 (      SideChain) has    45 elements
+Group     9 (    SideChain-H) has    17 elements
+Group    10 (    Prot-Masses) has    73 elements
+Group    11 (    non-Protein) has  2745 elements
+Group    12 (          Water) has  2745 elements
+Group    13 (            SOL) has  2745 elements
+Group    14 (      non-Water) has    73 elements
+Select a group: Reading frame       0 time    0.000   
+Precision of /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/md_0_1_noPBC.xtc is 0.001 (nm)
+
+Back Off! I just backed up /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/MD.pdb to /home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/work/#MD.pdb.1#
+ ->  frame      0 time    0.000      Reading frame       1 time   10.000    ->  frame      1 time   10.000      Reading frame       2 time   20.000    ->  frame      2 time   20.000      Reading frame       3 time   30.000    ->  frame      3 time   30.000      Reading frame       4 time   40.000    ->  frame      4 time   40.000      Reading frame       5 time   50.000    ->  frame      5 time   50.000      Reading frame       6 time   60.000    ->  frame      6 time   60.000      Reading frame       7 time   70.000    ->  frame      7 time   70.000      Reading frame       8 time   80.000    ->  frame      8 time   80.000      Reading frame       9 time   90.000    ->  frame      9 time   90.000      Reading frame      10 time  100.000    ->  frame     10 time  100.000      Last frame         10 time  100.000   
+
+
+GROMACS reminds you: "Blessed is He Who In the Name Of Charity and Good Will Shepherds the Weak Through the Valley Of Darkness, For He is Truly His Brother's Keeper and the Finder Of Lost Children." (Pulp Fiction)
+
+Note that major changes are planned in future for trjconv, to improve usability and utility.
+Select group for output
+Selected 1: 'Protein'

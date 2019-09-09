@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 #include "../VinaInstance/VinaInstance.h"
+#include "../GMXInstance/GMXInstance.h"
 class PoolMGR {
   /* Pool Manager: Keeps track of all PDB files and their corresponding
    *               FASTA sequence.
@@ -20,7 +21,11 @@ class PoolMGR {
             const char * pythonShPath1, const char * mgltoolstilitiesPath1,
             const char * receptor1,
             int exhaustiveness1,
-            int energy_range1) {
+            int energy_range1,
+            const char * gromacsPath1, const char * mdpPath1,
+            const char * forcefield1, const char * forcefieldPath1,
+            const char * water1, const char * boundingboxtype1,
+            float boxsize1) {
       workDir = workDir1;
       receptor = receptor1;
       vinaPath = vinaPath1;
@@ -28,6 +33,13 @@ class PoolMGR {
       mgltoolstilitiesPath = mgltoolstilitiesPath1;
       exhaustiveness = exhaustiveness1;
       energy_range = energy_range1;
+      gromacsPath = gromacsPath1;
+      mdpPath = mdpPath1;
+      forcefield = forcefield1;
+      forcefieldPath = forcefieldPath1;
+      water = water1;
+      boundingboxtype = boundingboxtype1;
+      boxsize = boxsize1;
     };
 
     // Add PDB file
@@ -56,6 +68,14 @@ class PoolMGR {
     std::string vinaPath;
     std::string pythonShPath;
     std::string mgltoolstilitiesPath;
+    // Directories required for GROMACS
+    std::string gromacsPath;
+    std::string mdpPath;
+    std::string forcefield;
+    std::string forcefieldPath;
+    std::string water;
+    std::string boundingboxtype;
+    float boxsize;
     // Map of FASTA sequence and a tuple containing (if applicable)
     // path of PDB file, path of MD file, result of fitness function,
     // integer of number of rounds not accessed to

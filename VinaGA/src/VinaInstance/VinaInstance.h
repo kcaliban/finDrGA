@@ -23,13 +23,16 @@ class VinaInstance {
      */
     VinaInstance(const char *  vinaPath1, const char * pythonShPath1,
                   const char * mgltoolstilitiesPath1, const char * workDir1,
-                  const char * receptor1, const char * ligand1) {
+                  const char * receptor1, const char * ligand1,
+                  bool debug1, bool log1) {
       vinaPath = vinaPath1;
       pythonShPath = pythonShPath1;
       mgltoolstilitiesPath = mgltoolstilitiesPath1;
       workDir = workDir1;
       receptor = receptor1;
       ligand = ligand1;
+      debug = debug1;
+      log = log1;
 
       char cmd[2000];
       strcpy(cmd, "mkdir ");
@@ -54,5 +57,11 @@ class VinaInstance {
     std::string receptor;
     std::string ligand;
     std::string workDir;
+    bool debug;
+    bool log;
+
+    std::string logStr();
+    void debugPrint(const char *);
+    void errorPrint(const char *);
 };
 #endif
