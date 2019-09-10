@@ -3,7 +3,7 @@
 std::string VinaInstance::logStr() {
   if (log) {
     return " >> " + ligand.substr(0,
-        ligand.size() - 7) + "/VINAINSTLOG" + " 2>&1";
+        ligand.size() - 15) + "/VINAINSTLOG" + " 2>&1";
   }
   return " > /dev/null 2>&1";
 }

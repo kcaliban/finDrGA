@@ -22,11 +22,13 @@ class VinaInstance {
      * receptor, ligand ~ absolute path to files
      */
     VinaInstance(const char *  vinaPath1, const char * pythonShPath1,
-                  const char * mgltoolstilitiesPath1, const char * workDir1,
+                  const char * mgltoolstilitiesPath1, const char * pymolPath1,
+                  const char * workDir1,
                   const char * receptor1, const char * ligand1,
                   bool debug1, bool log1) {
       vinaPath = vinaPath1;
       pythonShPath = pythonShPath1;
+      pymolPath = pymolPath1;
       mgltoolstilitiesPath = mgltoolstilitiesPath1;
       workDir = workDir1;
       receptor = receptor1;
@@ -53,6 +55,7 @@ class VinaInstance {
   private:
     std::string vinaPath;
     std::string pythonShPath;
+    std::string pymolPath;
     std::string mgltoolstilitiesPath;
     std::string receptor;
     std::string ligand;

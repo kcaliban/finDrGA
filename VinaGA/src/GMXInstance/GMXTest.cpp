@@ -14,14 +14,15 @@ int main(int argc, char *argv[])
   const char * mdpPath = "/home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/templ";
   const char * forcefield = "amber99sb-ildn-fme"; // how to do with correct directory?
   const char * forcefieldPath = "/home/fk/Documents/iGEM/GenAlg/VinaGA/src/GMXInstance/forcefields";
+  const char * pymolPath = "pymol";
   const char * water = "spce";
   const char * bt = "dodecahedron";
   float boxsize = 1.0;
 
-  GMXInstance gmxInstance(ligand, gromacsPath, workDir, forcefield, forcefieldPath,
-                          water, bt, boxsize, mdpPath, true, true);
+  GMXInstance gmxInstance(ligand, gromacsPath, pymolPath, workDir, forcefield, forcefieldPath,
+                          water, bt, 0.12 ,boxsize, mdpPath, true, true);
 
-  gmxInstance.preparePDB();
-  gmxInstance.runMD();
+  gmxInstance.clusteredMD();
+  gmxInstance.extractTopCluster();
   return 0;
 }

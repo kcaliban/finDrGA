@@ -19,17 +19,19 @@ class PoolMGR {
   public:
     PoolMGR(const char * workDir1, const char * vinaPath1,
             const char * pythonShPath1, const char * mgltoolstilitiesPath1,
+            const char * pymolPath1,
             const char * receptor1,
             int exhaustiveness1,
             int energy_range1,
             const char * gromacsPath1, const char * mdpPath1,
             const char * forcefield1, const char * forcefieldPath1,
             const char * water1, const char * boundingboxtype1,
-            float boxsize1) {
+            float boxsize1, float clustercutoff1) {
       workDir = workDir1;
       receptor = receptor1;
       vinaPath = vinaPath1;
       pythonShPath = pythonShPath1;
+      pymolPath = pymolPath1;
       mgltoolstilitiesPath = mgltoolstilitiesPath1;
       exhaustiveness = exhaustiveness1;
       energy_range = energy_range1;
@@ -40,6 +42,7 @@ class PoolMGR {
       water = water1;
       boundingboxtype = boundingboxtype1;
       boxsize = boxsize1;
+      clustercutoff = clustercutoff1;
     };
 
     // Add PDB file
@@ -68,6 +71,7 @@ class PoolMGR {
     std::string vinaPath;
     std::string pythonShPath;
     std::string mgltoolstilitiesPath;
+    std::string pymolPath;
     // Directories required for GROMACS
     std::string gromacsPath;
     std::string mdpPath;
@@ -76,6 +80,7 @@ class PoolMGR {
     std::string water;
     std::string boundingboxtype;
     float boxsize;
+    float clustercutoff;
     // Map of FASTA sequence and a tuple containing (if applicable)
     // path of PDB file, path of MD file, result of fitness function,
     // integer of number of rounds not accessed to

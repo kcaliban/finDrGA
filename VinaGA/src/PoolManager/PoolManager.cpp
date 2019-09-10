@@ -13,12 +13,19 @@ float PoolMGR::getAffinity(std::string FASTASEQ) {
     genMD(FASTASEQ);
     genDock(FASTASEQ);
   }
-  return std::get<2>(internalMap.at(FASTASEQ));
+  float affinity;
+  #pragma omp critical
+  affinity = std::get<2>(internalMap.at(FASTASEQ));
+  return affinity;
 }
 
 void PoolMGR::addElement(std::string FASTASEQ) {
-  if (internalMap.count(FASTASEQ) == 0) {
+  int count;
+  #pragma omp critical
+  count = internalMap.count(FASTASEQ);
+  if (count == 0) {
     // Add object to map
+    #pragma omp critical
     internalMap[FASTASEQ] = std::make_tuple("", "", 0, 0);
     // Generate PDB, MD and fitness function
     genPDB(FASTASEQ);
@@ -42,7 +49,8 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   }
   command.clear();
   // Run Pymol to create ligand
-  command.append("pymol -kcQ -d \"fab ");
+  command.append(pymolPath);
+  command.append(" -kcQ -d \"fab ");
   command.append(FASTASEQ);
   command.append(", ");
   command.append(FASTASEQ);
@@ -54,6 +62,7 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append("/");
   command.append(FASTASEQ);
   command.append(".pdb\"");
+  command.append(" >/dev/null 2>&1");
   success = system(command.c_str());
   if (success == -1) {
     std::cout << "Error creating PDB file from sequence!\n"
@@ -61,23 +70,30 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
     exit(-1);
   }
   // Add path to map
+  #pragma omp critical
   std::get<0>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb";
 }
 
 void PoolMGR::genMD(std::string FASTASEQ) {
   GMXInstance gmxInstance(std::get<0>(internalMap[FASTASEQ]).c_str(),
-                          gromacsPath.c_str(), (workDir + "/" + FASTASEQ).c_str(),
+                          gromacsPath.c_str(), pymolPath.c_str(),
+                          (workDir + "/" + FASTASEQ).c_str(),
                           forcefield.c_str(), forcefieldPath.c_str(), water.c_str(),
-                          boundingboxtype.c_str(), boxsize, mdpPath.c_str(), true, true);
+                          boundingboxtype.c_str(), clustercutoff,
+                          boxsize, mdpPath.c_str(), true, true);
   gmxInstance.preparePDB();
   gmxInstance.runMD();
+  gmxInstance.clusteredMD();
+  gmxInstance.extractTopCluster();
 
-  std::get<1>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/MD.pdb";
+  #pragma omp critical
+  std::get<1>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/topcluster.pdb";
 }
 
 void PoolMGR::genDock(std::string FASTASEQ) {
   VinaInstance vinaInstance(vinaPath.c_str(), pythonShPath.c_str(),
                             mgltoolstilitiesPath.c_str(),
+                            pymolPath.c_str(),
                             workDir.c_str(),
                             receptor.c_str(),
                             std::get<1>(internalMap[FASTASEQ]).c_str(),
@@ -86,8 +102,10 @@ void PoolMGR::genDock(std::string FASTASEQ) {
   vinaInstance.generateConf();
   // std::cout << "Generated config for: " << FASTASEQ << std::endl;
   vinaInstance.generatePDBQT();
-  std::get<2>(internalMap[FASTASEQ]) =
-    vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+  float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+
+  #pragma omp critical
+  std::get<2>(internalMap[FASTASEQ]) = affinity;
 }
 
 void PoolMGR::update(std::vector<std::string> gen) {

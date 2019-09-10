@@ -461,6 +461,92 @@ void GMXInstance::runMD() {
   cmd.clear();
 }
 
-std::string GMXInstance::clusteredMD() {
-  return "";
+void GMXInstance::clusteredMD() {
+  std::string cmd;
+  debugPrint("Clustering PDB...");
+  cmd.append(gromacsPath);
+  cmd.append("/gmx");
+  cmd.append(" cluster");
+  cmd.append(" -f ");
+  cmd.append(workDir);
+  cmd.append("/MD.pdb");
+  cmd.append(" -o ");
+  cmd.append(workDir);
+  cmd.append("/rmsd-clust.xpm");
+  cmd.append(" -g ");
+  cmd.append(workDir);
+  cmd.append("/clust.log");
+  cmd.append(" -s ");
+  cmd.append(workDir);
+  cmd.append("/md_0_1.tpr");
+  cmd.append(" -dist ");
+  cmd.append(workDir);
+  cmd.append("/rmsd-dist.xvg");
+  cmd.append(" -cl ");
+  cmd.append(workDir);
+  cmd.append("/clusters.pdb");
+  cmd.append(" -sz ");
+  cmd.append(workDir);
+  cmd.append("/clust-size.xvg");
+  cmd.append(" -cutoff ");
+  cmd.append(std::to_string(clustercutoff));
+  cmd.append(" ");
+  cmd.append(logStr());
+  cmd.append(" <<eof\n1\n1\neof");
+  int success = system(cmd.c_str());
+  if (success != 0) {
+    errorPrint("Error clustering the MD!");
+  }
+  cmd.clear();
+}
+
+void GMXInstance::extractTopCluster() {
+  debugPrint("Extracting the top cluster...");
+  std::string clustSizeFile;
+  clustSizeFile.append(workDir);
+  clustSizeFile.append("/clust-size.xvg");
+
+  // Read clust-size.xvg
+  std::ifstream t(clustSizeFile);
+  t.seekg(0, std::ios::end);
+  size_t size = t.tellg();
+  std::string buffer(size, ' ');
+  t.seekg(0);
+  t.read(&buffer[0], size);
+  t.close();
+
+  // Get the biggest cluster
+  int maxNo;
+  int max = - std::numeric_limits<int>::infinity();
+  std::string line;
+  std::stringstream clustSizeFileStream(buffer);
+  std::regex clusterSizeRegEx("^\\s*([0-9]+)\\s*([0-9]+)\\s*$");// Regex for number
+  std::smatch lineClusterMatch;
+  while (std::getline(clustSizeFileStream, line, '\n')) {
+    std::regex_search(line, lineClusterMatch, clusterSizeRegEx);
+    if (lineClusterMatch.empty()) {continue;}
+    int cur = stoi(lineClusterMatch.str(2));
+    int curNo = stoi(lineClusterMatch.str(1));
+    if (cur > max) {
+      max = cur;
+      maxNo = curNo;
+    }
+  }
+
+  // Extract biggest cluster
+  std::string cmd;
+  cmd.append(pymolPath);
+  cmd.append(" -kcQ -d \"load ");
+  cmd.append(workDir);
+  cmd.append("/clusters.pdb;");
+  cmd.append(" save ");
+  cmd.append(workDir);
+  cmd.append("/topcluster.pdb, state=");
+  cmd.append(std::to_string(maxNo));
+  cmd.append("\"");
+  cmd.append(logStr());
+  int success = system(cmd.c_str());
+  if (success != 0) {
+    errorPrint("Could not extract top cluster from clustered MD!");
+  }
 }
