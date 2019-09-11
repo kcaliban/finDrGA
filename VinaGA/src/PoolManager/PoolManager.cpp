@@ -6,6 +6,83 @@ void PoolMGR::printSeqAff() {
   }
 }
 
+std::string PoolMGR::PDBtoFASTA(std::string filename) {
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    std::cout << "Error: Could not open PDB file to convert to FASTA sequence"
+              << std::endl;
+    std::cout << "Filename: " << filename << std::endl;
+    exit(-1);
+  }
+  std::unordered_map<std::string, std::string> AA({
+    {"ALA","A"},{"ARG","R"},{"ASN","N"},{"ASP","D"},{"CYS","C"},{"GLU","E"},{"GLN","Q"},{"GLY","G"},{"HIS","H"},
+     {"ILE","I"},{"LEU","L"},{"LYS","K"},{"MET","M"},{"PHE","F"},{"PRO","P"},{"SER","S"},{"THR","T"},{"TRP","W"},
+     {"TYR","Y"},{"VAL","V"}
+  });
+
+  std::string FASTA;
+  std::string line;
+  int previd = -1;
+  while (getline(file, line)) {
+    if (line.substr(0, 4) == "ATOM" or line.substr(0, 6) == "HETATM") {
+      std::string aa = line.substr(17, 3);
+      int id = stoi(line.substr(22, 4));
+      if (id != previd) {
+        FASTA.append(AA[aa]);
+      }
+      previd = id;
+    }
+  }
+  return FASTA;
+}
+
+void PoolMGR::addElementPDB(std::string file) {
+  // Get FASTA sequence
+  std::string FASTASEQ = PDBtoFASTA(file);
+  // If FASTA is already in pool we can return
+  int count;
+  #pragma omp critical
+  count = internalMap.count(FASTASEQ);
+  if (count != 0) { return;}
+  // Make required directory
+  std::string command = "mkdir ";
+  command.append(workDir);
+  command.append("/");
+  command.append(FASTASEQ);
+  command.append(" 2>/dev/null 1>&2");
+  int success = system(command.c_str());
+  if (success == -1) {
+    std::cout << "Error creating directory for PDB file!\n"
+              << "Sequence name: " << FASTASEQ << std::endl;
+    exit(-1);
+  }
+  command.clear();
+  // Move file
+  command.append("mv ");
+  command.append(file);
+  command.append(" ");
+  command.append(workDir);
+  command.append("/");
+  command.append(FASTASEQ);
+  command.append("/");
+  command.append(FASTASEQ);
+  command.append(".pdb");
+  success = system(command.c_str());
+  if (success == -1) {
+    std::cout << "Error moving PDB file!"
+              << "File: " << file << std::endl;
+    exit(-1);
+  }
+  command.clear();
+  // Add file to internal map, do MD, dock
+  #pragma omp critical
+  internalMap[FASTASEQ] = std::make_tuple(FASTASEQ,
+                                          workDir + "/" + FASTASEQ + "/" +
+                                          FASTASEQ + ".pdb", 0, 0);
+  genMD(FASTASEQ);
+  genDock(FASTASEQ);
+}
+
 std::string PoolMGR::toStr() {
   std::string returnStr;
   returnStr.append("[");
@@ -22,12 +99,15 @@ std::string PoolMGR::toStr() {
 }
 
 float PoolMGR::getAffinity(std::string FASTASEQ) {
+  /* Obsolete, we always add the element before we access its affinity
   if (internalMap.count(FASTASEQ) == 0) {
+    std::cout << "Affinity requested even tho not in pool!" << std::endl;
     // Sequence is not in our pool
     genPDB(FASTASEQ);
     genMD(FASTASEQ);
     genDock(FASTASEQ);
   }
+  */
   float affinity;
   #pragma omp critical
   affinity = std::get<2>(internalMap.at(FASTASEQ));
@@ -47,11 +127,8 @@ void PoolMGR::addElement(std::string FASTASEQ) {
     genMD(FASTASEQ);
     genDock(FASTASEQ);
   } else {
-    /*
-    // Do another MD and dock again
     genMD(FASTASEQ);
     genDock(FASTASEQ);
-    */
   }
 }
 

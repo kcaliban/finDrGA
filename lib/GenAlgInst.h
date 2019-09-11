@@ -135,6 +135,8 @@ class GenAlgInst
     private:
       int calculateEntropy(std::vector<GenoType> genotypes) {
         unsigned int entropy = 0;
+        // O(n log n) could be possible with sort and unique, but then
+        // would have to require '<' relation on GenoType
         // Naive O(n^2) Worst Case implementation
         for (unsigned int i = 0; i < genotypes.size(); i++) {
           bool unique = true;

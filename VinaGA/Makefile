@@ -1,5 +1,5 @@
 # Specify compiler commands
-CXX = g++ -O3 -Wall -fopenmp -std=c++11
+CXX = g++ -O3 -Wall -fopenmp
 # Specify name of file containing main function, without ext.
 BINARY = VinaGA
 # Source files; ** wildcard does not work on my Make so just one level depth

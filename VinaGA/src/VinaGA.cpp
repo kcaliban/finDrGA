@@ -13,7 +13,6 @@ std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
   returnStr.append("]");
 
   return returnStr;
-
 }
 
 int main(int argc, char *argv[])
@@ -53,8 +52,8 @@ int main(int argc, char *argv[])
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
-  std::vector<std::string> startingSequences = {"NFGY", "KYFA", "HSYE", "WHGA",
-      "HLYE", "LAFY"}; //"IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA",
+  std::vector<std::string> startingSequences = {"NFY", "KYA", "HSY", "WHA"};
+      // "HLYE", "LAFY"}; //"IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA",
 //      "AYHA", "ALLH"};
 
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
@@ -70,11 +69,18 @@ int main(int argc, char *argv[])
 
   std::vector<std::string> curGen = startingSequences;
   for (int i = 0; i < atoi(argv[1]); i++) {
-    // Add the new elements (PoolMGR only adds them if they don't exist already)
+    // Remove duplicates for adding
+    std::vector<std::string> curGenDistinct;
+    curGenDistinct = curGen;
+    // Sort and then remove consecutive duplicates
+    std::sort(curGenDistinct.begin(), curGenDistinct.end());
+    curGenDistinct.erase(std::unique(curGenDistinct.begin(), curGenDistinct.end()),
+                          curGenDistinct.end());
+    // Add the new elements (PoolMGR only adds them if they don't exist already, does a new MD else)
     #pragma omp parallel
     #pragma omp for
-    for (unsigned int i = 0; i < curGen.size(); i++) {
-      poolmgr.addElement(curGen.at(i));
+    for (unsigned int i = 0; i < curGenDistinct.size(); i++) {
+      poolmgr.addElement(curGenDistinct.at(i));
     }
     // CleanUp of not used strings
     // poolmgr.update(curGen);

@@ -99,6 +99,8 @@ class PoolMGR {
     void genDock(std::string);
     // Delete an element
     void deleteElementData(std::string);
+    // Generate FASTA from file
+    std::string PDBtoFASTA(std::string);
 };
 
 #endif
