@@ -9,7 +9,6 @@
 #include <regex>
 #include <sstream>
 #include <fstream>
-#include <filesystem>
 class VinaInstance {
   public:
     /* Docking instance using AutoDock Vina

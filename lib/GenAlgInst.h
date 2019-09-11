@@ -15,7 +15,7 @@ class GenAlgInst
   public:
     void simulate(Genome genome, FitnessFunction fitnessfunc,
                                      std::vector<GenoType> genotype, int n,
-                                     float mutateProb, bool debug=true,
+                                     float mutateProb, bool debug=false,
                                      bool entropy=true,
                                      const char * entropyFile="entropy") {
       std::vector<GenoType> newGen = genotype;
@@ -23,20 +23,14 @@ class GenAlgInst
         if (debug) {
           std::cout << "Generation: " << (i + 1) << std::endl;
         }
-        // Will the old gen be deleted automatically?
         newGen = nextGen(genome, fitnessfunc, newGen, mutateProb,
                           debug, entropy, entropyFile);
-      }
-      // Print result at the end
-      std::cout << "Individuals in the last population" << std::endl;
-      for (unsigned int i = 0; i < genotype.size(); i++) {
-        std::cout << "\t\t" << newGen.at(i) << std::endl;
       }
     };
 
     std::vector<GenoType> nextGen(Genome genome, FitnessFunction fitnessfunc,
                                     std::vector<GenoType> genotypes,
-                                    float mutateProb, bool debug=true,
+                                    float mutateProb, bool debug=false,
                                     bool entropy=true, const char * entropyFile="entropy") {
       std::vector<GenoType> newGen;
       // Required for selection and recombination
@@ -48,8 +42,8 @@ class GenAlgInst
       for (unsigned int i = 0; i < genotypes.size(); i++) {
         fitnesses.push_back(0.0);
       }
-      // #pragma omp parallel
-      // #pragma omp for
+      #pragma omp parallel
+      #pragma omp for
       for (unsigned int i = 0; i < genotypes.size(); i++) {
         float fitness = fitnessfunc.calculateFitness(genotypes.at(i));
         fitnesses.at(i) = fitness;
@@ -130,7 +124,8 @@ class GenAlgInst
           outfile.open(entropyFile, std::ios::out | std::ios::app);
           outfile.close();
           outfile.open(entropyFile, std::ios_base::app);
-          outfile << calculateEntropy(newGen) << std::endl;
+          outfile << calculateEntropy(newGen) << "\t"
+                  << fitnesses[sortedindices[0]] << std::endl;
       }
 
       // std::move?

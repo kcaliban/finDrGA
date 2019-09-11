@@ -59,6 +59,8 @@ class PoolMGR {
     void cleanUp(int);
     // Print all sequences and their affinity
     void printSeqAff();
+    // The above as a string
+    std::string toStr();
   private:
     // Exhaustiveness & Energy range
     int exhaustiveness;

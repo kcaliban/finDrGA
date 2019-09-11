@@ -47,7 +47,6 @@ void GMXInstance::preparePDB() {
   // Create topology using force field
   debugPrint("Creating topology...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" pdb2gmx -f ");
   cmd.append(workDir);
   cmd.append("/clean.pdb");
@@ -74,7 +73,6 @@ void GMXInstance::preparePDB() {
   // Define the bounding box
   debugPrint("Defining the bounding box...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" editconf");
   cmd.append(" -f ");
   cmd.append(workDir);
@@ -96,7 +94,6 @@ void GMXInstance::preparePDB() {
   // Solvate
   debugPrint("Solvating...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" solvate");
   cmd.append(" -cp ");
   cmd.append(workDir);
@@ -119,7 +116,6 @@ void GMXInstance::preparePDB() {
   debugPrint("Adding ions...");
   // Step one
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" grompp");
   cmd.append(" -f ");
   cmd.append(mdpPath);
@@ -144,7 +140,6 @@ void GMXInstance::preparePDB() {
   cmd.clear();
   // Step two
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" genion");
   cmd.append(" -s ");
   cmd.append(workDir);
@@ -173,7 +168,6 @@ void GMXInstance::preparePDB() {
   debugPrint("Minimzing energy...");
   // Prepare
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" grompp");
   cmd.append(" -f ");
   cmd.append(mdpPath);
@@ -198,7 +192,6 @@ void GMXInstance::preparePDB() {
   cmd.clear();
   // Run MD for enery minimization
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" mdrun");
   cmd.append(" -gcom 2");
   cmd.append(" -s ");
@@ -227,7 +220,6 @@ void GMXInstance::preparePDB() {
   debugPrint("Equilibriating temperature...");
   // Preparation
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" grompp");
   cmd.append(" -f ");
   cmd.append(mdpPath);
@@ -255,7 +247,6 @@ void GMXInstance::preparePDB() {
   cmd.clear();
   // Run MD for equilibrium
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" mdrun");
   cmd.append(" -gcom 2");
   cmd.append(" -deffnm nvt");
@@ -287,7 +278,6 @@ void GMXInstance::preparePDB() {
   debugPrint("Equilibriating pressure...");
   // Preparation
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" grompp");
   cmd.append(" -f ");
   cmd.append(mdpPath);
@@ -318,7 +308,6 @@ void GMXInstance::preparePDB() {
   cmd.clear();
   // Run MD for equilibrium
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" mdrun");
   cmd.append(" -gcom 2");
   cmd.append(" -deffnm npt");
@@ -349,7 +338,6 @@ void GMXInstance::preparePDB() {
   // Final preparation
   debugPrint("Final preparation for MD...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" grompp");
   cmd.append(" -f ");
   cmd.append(mdpPath);
@@ -382,7 +370,6 @@ void GMXInstance::runMD() {
   debugPrint("Running the MD...");
   std::string cmd;
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" mdrun");
   cmd.append(" -deffnm md_0_1");
   cmd.append(" -s ");
@@ -417,7 +404,6 @@ void GMXInstance::runMD() {
   // Step one
   debugPrint("Generating PDB file...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" trjconv");
   cmd.append(" -s ");
   cmd.append(workDir);
@@ -440,7 +426,6 @@ void GMXInstance::runMD() {
   cmd.clear();
   // Step two
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" trjconv");
   cmd.append(" -s ");
   cmd.append(workDir);
@@ -465,7 +450,6 @@ void GMXInstance::clusteredMD() {
   std::string cmd;
   debugPrint("Clustering PDB...");
   cmd.append(gromacsPath);
-  cmd.append("/gmx");
   cmd.append(" cluster");
   cmd.append(" -f ");
   cmd.append(workDir);

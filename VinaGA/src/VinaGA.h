@@ -5,6 +5,7 @@
 #include "VinaFitnessFunc.h"
 #include "PoolManager/PoolManager.h"
 #include "inih/INIReader.h"
+#include <fstream>
 #include <omp.h>
 
 #endif

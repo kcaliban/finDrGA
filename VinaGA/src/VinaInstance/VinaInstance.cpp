@@ -141,7 +141,6 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   // Create command
   char cmd[3000];
   strcpy(cmd, vinaPath.c_str());
-  strcat(cmd, "/vina");
   strcat(cmd, " --config ");
   strcat(cmd, workDir.c_str());
   strcat(cmd, "/conf");

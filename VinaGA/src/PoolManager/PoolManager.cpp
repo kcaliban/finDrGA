@@ -6,6 +6,21 @@ void PoolMGR::printSeqAff() {
   }
 }
 
+std::string PoolMGR::toStr() {
+  std::string returnStr;
+  returnStr.append("[");
+  for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
+    returnStr.append(it->first);
+    returnStr.append(": ");
+    returnStr.append(std::to_string(std::get<2>(it->second)));
+    returnStr.append(", ");
+  }
+  returnStr.pop_back(); returnStr.pop_back();
+  returnStr.append("]");
+
+  return returnStr;
+}
+
 float PoolMGR::getAffinity(std::string FASTASEQ) {
   if (internalMap.count(FASTASEQ) == 0) {
     // Sequence is not in our pool
@@ -31,6 +46,12 @@ void PoolMGR::addElement(std::string FASTASEQ) {
     genPDB(FASTASEQ);
     genMD(FASTASEQ);
     genDock(FASTASEQ);
+  } else {
+    /*
+    // Do another MD and dock again
+    genMD(FASTASEQ);
+    genDock(FASTASEQ);
+    */
   }
 }
 
@@ -75,7 +96,21 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
 }
 
 void PoolMGR::genMD(std::string FASTASEQ) {
-  GMXInstance gmxInstance(std::get<0>(internalMap[FASTASEQ]).c_str(),
+  std::string prevMD;
+  #pragma omp critical
+  prevMD = std::get<1>(internalMap[FASTASEQ]);
+  std::string mdinput;
+  // If there has not been an MD yet, we simply take the original pdb
+  if (prevMD == "") {
+    #pragma omp critical
+    mdinput = std::get<0>(internalMap[FASTASEQ]);
+  }
+  // If there has, use it to do a further MD
+  else {
+    #pragma omp critical
+    mdinput = std::get<1>(internalMap[FASTASEQ]);
+  }
+  GMXInstance gmxInstance(mdinput.c_str(),
                           gromacsPath.c_str(), pymolPath.c_str(),
                           (workDir + "/" + FASTASEQ).c_str(),
                           forcefield.c_str(), forcefieldPath.c_str(), water.c_str(),

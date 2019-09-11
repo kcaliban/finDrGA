@@ -1,5 +1,21 @@
 #include "VinaGA.h"
 
+std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
+  std::string returnStr;
+  returnStr.append("[");
+  for (auto g : gen) {
+    returnStr.append(g);
+    returnStr.append(": ");
+    returnStr.append(std::to_string(poolmgr.getAffinity(g)));
+    returnStr.append(", ");
+  }
+  returnStr.pop_back(); returnStr.pop_back();
+  returnStr.append("]");
+
+  return returnStr;
+
+}
+
 int main(int argc, char *argv[])
 {
   if (argc < 3) {
@@ -17,17 +33,17 @@ int main(int argc, char *argv[])
   }
 
   // AutoDock VINA
-  std::string vinaPath = reader.Get("paths", "vina", "");
-  std::string pythonShPath = reader.Get("paths", "pythonsh", "");
+  std::string vinaPath = reader.Get("paths", "vina", "vina");
+  std::string pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
   std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities", "");
-  std::string pymolPath = reader.Get("paths", "pymol", "");
+  std::string pymolPath = reader.Get("paths", "pymol", "pymol");
   std::string workDir = reader.Get("paths", "workingDir", "");
   std::string receptor = reader.Get("paths", "receptor", "");
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
 
   // GROMACS
-  std::string gromacsPath = reader.Get("paths", "gromacs", "");
+  std::string gromacsPath = reader.Get("paths", "gmx", "gmx");
   std::string mdpPath = reader.Get("paths", "mdp", "");
   std::string forcefieldPath = reader.Get("paths", "forcefieldpath", "");
   std::string forcefield = reader.Get("GROMACS", "forcefield", "");
@@ -37,9 +53,9 @@ int main(int argc, char *argv[])
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
-  std::vector<std::string> startingSequences = {"NFGY", "KYFA", "HSYE", "WHGA"};
-     // "BAY", "AAF", "AAG", "HHA", "HGG", "HAG", "AGF", "BYA", "YYA",
-     // "AYA", "AAY"};
+  std::vector<std::string> startingSequences = {"NFGY", "KYFA", "HSYE", "WHGA",
+      "HLYE", "LAFY"}; //"IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA",
+//      "AYHA", "ALLH"};
 
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
@@ -61,12 +77,23 @@ int main(int argc, char *argv[])
       poolmgr.addElement(curGen.at(i));
     }
     // CleanUp of not used strings
-    poolmgr.update(curGen);
-    poolmgr.cleanUp(3);
+    // poolmgr.update(curGen);
+    // poolmgr.cleanUp(3);
+    // Output to log file
+    std::string output = "Generation: ";
+    output.append(std::to_string(i));
+    output.append("\n");
+    output.append(genToStr(curGen, poolmgr));
+    output.append("\n");
+    std::string outputFileDir = workDir;
+    outputFileDir.append("/VINAGALOG");
+    std::ofstream outputFileStream(outputFileDir,  std::ios::out | std::ios::app);
+    outputFileStream << output;
+    outputFileStream.close();
+    // Output for best/entropy graph
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, atof(argv[2]));
   }
 
-  poolmgr.printSeqAff();
   return 0;
 }
