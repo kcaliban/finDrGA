@@ -35,11 +35,11 @@ class VinaInstance {
       debug = debug1;
       log = log1;
 
-      char cmd[2000];
-      strcpy(cmd, "mkdir ");
-      strcat(cmd, workDir.c_str());
-      strcat(cmd, " 2>/dev/null"); // Error is usually that path already exists
-      int success = system(cmd);
+      std::string command;
+      command.append("mkdir ");
+      command.append(workDir);
+      command.append(" 2>/dev/null"); // Error is usually that path already exists
+      int success = system(command.c_str());
       if (success == -1) {
         // Path already exists or working directory is not a valid path,
         // which will lead to an error later on

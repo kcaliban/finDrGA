@@ -99,35 +99,33 @@ void VinaInstance::generateConf() {
 void VinaInstance::generatePDBQT() {
   debugPrint("Generating pdbqts...");
   // Generate receptor PDBQT
-  char cmd[3000];
-  strcpy(cmd, pythonShPath.c_str());
-  strcat(cmd, " ");
-  strcat(cmd, mgltoolstilitiesPath.c_str());
-  strcat(cmd, "/prepare_receptor4.py -r ");
-  strcat(cmd, receptor.c_str());
-  strcat(cmd, " -A bonds_hydrogens -U nphs -o ");
-  strcat(cmd, receptor.c_str());
-  strcat(cmd, "qt");
-  strcat(cmd, logStr().c_str());
-  int success = system(cmd);
-
+  std::string command;
+  command.append(pythonShPath);
+  command.append(" ");
+  command.append(mgltoolstilitiesPath);
+  command.append("/prepare_receptor4.py -r ");
+  command.append(receptor);
+  command.append(" -A bonds_hydrogens -U nphs -o ");
+  command.append(receptor);
+  command.append("qt");
+  command.append(logStr());
+  int success = system(command.c_str());
   if (success != 0) {
     errorPrint("Could not generate pdbqt file from receptor");
   }
-
-  memset(cmd, 0, sizeof(cmd));
+  command.clear();
 
   // Generate ligand PDBQT
-  strcpy(cmd, pythonShPath.c_str());
-  strcat(cmd, " ");
-  strcat(cmd, mgltoolstilitiesPath.c_str());
-  strcat(cmd, "/prepare_ligand4.py -l ");
-  strcat(cmd, ligand.c_str());
-  strcat(cmd, " -A bonds_hydrogens -U nphs -o ");
-  strcat(cmd, ligand.c_str());
-  strcat(cmd, "qt");
-  strcat(cmd, logStr().c_str());
-  success = system(cmd);
+  command.append(pythonShPath);
+  command.append(" ");
+  command.append(mgltoolstilitiesPath);
+  command.append("/prepare_ligand4.py -l ");
+  command.append(ligand);
+  command.append(" -A bonds_hydrogens -U nphs -o ");
+  command.append(ligand);
+  command.append("qt");
+  command.append(logStr());
+  success = system(command.c_str());
 
   if (success != 0) {
     errorPrint("Could not generate pdbqt file from receptor");
@@ -137,27 +135,27 @@ void VinaInstance::generatePDBQT() {
 float VinaInstance::calculateBindingAffinity(int exhaustiveness,
                                               int energy_range) {
   // Create command
-  char cmd[3000];
-  strcpy(cmd, vinaPath.c_str());
-  strcat(cmd, " --config ");
-  strcat(cmd, receptor.c_str());
-  strcat(cmd, "_conf");
-  strcat(cmd, " --exhaustiveness ");
-  strcat(cmd, (std::to_string(exhaustiveness)).c_str());
-  strcat(cmd, " --receptor ");
-  strcat(cmd, receptor.c_str());
-  strcat(cmd, "qt");
-  strcat(cmd, " --ligand ");
-  strcat(cmd, ligand.c_str());
-  strcat(cmd, "qt");
-  strcat(cmd, " --energy_range ");
-  strcat(cmd, (std::to_string(energy_range)).c_str());
+  std::string command;
+  command.append(vinaPath);
+  command.append(" --config ");
+  command.append(receptor);
+  command.append("_conf");
+  command.append(" --exhaustiveness ");
+  command.append(std::to_string(exhaustiveness));
+  command.append(" --receptor ");
+  command.append(receptor);
+  command.append("qt");
+  command.append(" --ligand ");
+  command.append(ligand);
+  command.append("qt");
+  command.append(" --energy_range ");
+  command.append(std::to_string(energy_range));
 
   debugPrint("Docking...");
 
   // Execute command and stream using popen
   std::string vinaOutput;
-  FILE * vinaOutptStream = popen(cmd, "r");
+  FILE * vinaOutptStream = popen(command.c_str(), "r");
   char buff[1024];
   while (fgets(buff, 1024, vinaOutptStream)) {
     vinaOutput += buff;

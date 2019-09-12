@@ -286,12 +286,12 @@ void PoolMGR::deleteElementData(std::string FASTASEQ) {
   std::cout << "Has not been used for some generations: "
             << FASTASEQ << std::endl;
   // Simply remove the directory recursively
-  std::string cmd;
-  cmd.append("rm -rf ");
-  cmd.append(workDir);
-  cmd.append("/");
-  cmd.append(FASTASEQ);
-  int success = system(cmd.c_str());
+  std::string command;
+  command.append("rm -rf ");
+  command.append(workDir);
+  command.append("/");
+  command.append(FASTASEQ);
+  int success = system(command.c_str());
   if (success == -1) {
     std::cout << "Error deleting directory in cleaning step of PoolMGR!\n"
               << "Directory: " << workDir << "/" << FASTASEQ << std::endl;
