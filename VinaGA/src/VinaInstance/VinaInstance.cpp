@@ -21,14 +21,13 @@ void VinaInstance::errorPrint(const char * str) {
   exit(-1);
 }
 
+/* OBSOLETE
 void VinaInstance::generateConf() {
   // Generate conf file for docking
   // Size x,y,z are simply the max minus the min
 
-  /*
   std::cout << "Trying to read receptor file: "
             << receptor << std::endl;
-            */
   // Read receptor file
   std::ifstream t(receptor);
   t.seekg(0, std::ios::end);
@@ -75,11 +74,9 @@ void VinaInstance::generateConf() {
   float offsetz = zmin + sizez / 2.0;
 
   std::string outfile = workDir;
-  /*
   std::cout << "Workdir @ generateConf" << std::endl;
   std::cout << workDir << std::endl;
   std::cout << "---------------------" << std::endl;
-  */
   outfile.append("/");
   outfile.append("conf");
 
@@ -97,6 +94,7 @@ void VinaInstance::generateConf() {
   confFile << "size_z = " << sizez + 10 << std::endl;
   confFile.close();
 }
+*/
 
 void VinaInstance::generatePDBQT() {
   debugPrint("Generating pdbqts...");
@@ -142,8 +140,8 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   char cmd[3000];
   strcpy(cmd, vinaPath.c_str());
   strcat(cmd, " --config ");
-  strcat(cmd, workDir.c_str());
-  strcat(cmd, "/conf");
+  strcat(cmd, receptor.c_str());
+  strcat(cmd, "_conf");
   strcat(cmd, " --exhaustiveness ");
   strcat(cmd, (std::to_string(exhaustiveness)).c_str());
   strcat(cmd, " --receptor ");

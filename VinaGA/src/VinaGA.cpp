@@ -45,7 +45,7 @@ std::vector<std::string> getReceptors(std::string dir) {
   std::string command;
   command.append("ls ");
   command.append(dir);
-  command.append(" | cat | grep -v .pdbqt");
+  command.append(" | cat | grep -v .pdbqt | grep -v conf");
   std::string output;
   FILE * lsOutputStream = popen(command.c_str(), "r");
   char buf[1024];
@@ -61,6 +61,77 @@ std::vector<std::string> getReceptors(std::string dir) {
     result.push_back(line);
   }
   return result;
+}
+
+void prepareConfig(std::string receptor) {
+  // Generate conf file for docking
+  // Size x,y,z are simply the max minus the min
+
+  /*
+  std::cout << "Trying to read receptor file: "
+            << receptor << std::endl;
+            */
+  // Read receptor file
+  std::ifstream t(receptor);
+  t.seekg(0, std::ios::end);
+  size_t size = t.tellg();
+  std::string buffer(size, ' ');
+  t.seekg(0);
+  t.read(&buffer[0], size);
+  t.close();
+
+  // std::cout << "Read receptor file!" << std::endl;
+
+  // For max and min no sorting is required
+  float xmin = std::numeric_limits<float>::infinity();
+  float ymin = std::numeric_limits<float>::infinity();
+  float zmin = std::numeric_limits<float>::infinity();
+  float xmax = - std::numeric_limits<float>::infinity();
+  float ymax = - std::numeric_limits<float>::infinity();
+  float zmax = - std::numeric_limits<float>::infinity();
+
+  // Read line per line, set min and max accordingly
+  std::string line;
+  std::stringstream receptorStream(buffer);
+  while (std::getline(receptorStream, line, '\n')) {
+    if (line.substr(0, 4) == "ATOM" or line.substr(0, 6) == "HETATM") {
+      float x = stof(line.substr(31, 8));
+      xmin = (x < xmin) ? x : xmin;
+      xmax = (x > xmax) ? x : xmax;
+      float y = stof(line.substr(39, 8));
+      ymin = (y < ymin) ? y : ymin;
+      ymax = (y > ymax) ? y : ymax;
+      float z = stof(line.substr(47, 8));
+      zmin = (z < zmin) ? z : zmin;
+      zmax = (z > zmax) ? z : zmax;
+    }
+  }
+
+  float sizex = xmax - xmin;
+  float sizey = ymax - ymin;
+  float sizez = zmax - zmin;
+
+  // float offsetx = xmin + sizex / 2;
+  float offsetx = xmin + sizex / 2.0;
+  float offsety = ymin + sizey / 2.0;
+  float offsetz = zmin + sizez / 2.0;
+
+  std::string outfile = receptor + "_conf";
+
+  std::ofstream confFile;
+  confFile.open(outfile.c_str(), std::ios::trunc);
+  if (!confFile) {
+    std::cout << "Could not open config file!" << std::endl;
+    exit(-1);
+  }
+  confFile << "center_x = " << offsetx << std::endl;
+  confFile << "center_y = " << offsety << std::endl;
+  confFile << "center_z = " << offsetz << std::endl;
+  confFile << std::endl;
+  confFile << "size_x = " << sizex + 10 << std::endl;
+  confFile << "size_y = " << sizey + 10 << std::endl;
+  confFile << "size_z = " << sizez + 10 << std::endl;
+  confFile.close();
 }
 
 int main(int argc, char *argv[])
@@ -117,6 +188,10 @@ int main(int argc, char *argv[])
   std::vector<std::string> receptorfiles = getReceptors(receptorsPath);
   for (auto s : receptorfiles) {
     receptors.push_back(receptorsPath + "/" + s);
+  }
+  // Generate config files
+  for (auto s : receptors) {
+    prepareConfig(s);
   }
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;

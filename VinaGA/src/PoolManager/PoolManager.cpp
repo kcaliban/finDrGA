@@ -246,7 +246,7 @@ void PoolMGR::genDock(std::string FASTASEQ) {
                               std::get<1>(internalMap[FASTASEQ]).c_str(),
                               true, true);
     // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
-    vinaInstance.generateConf();
+    // vinaInstance.generateConf();
     // std::cout << "Generated config for: " << FASTASEQ << std::endl;
     vinaInstance.generatePDBQT();
     float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
