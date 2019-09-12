@@ -103,7 +103,7 @@ void VinaInstance::generatePDBQT() {
   // Generate receptor PDBQT
   char cmd[3000];
   strcpy(cmd, pythonShPath.c_str());
-  strcpy(cmd, " ");
+  strcat(cmd, " ");
   strcat(cmd, mgltoolstilitiesPath.c_str());
   strcat(cmd, "/prepare_receptor4.py -r ");
   strcat(cmd, receptor.c_str());
@@ -121,7 +121,7 @@ void VinaInstance::generatePDBQT() {
 
   // Generate ligand PDBQT
   strcpy(cmd, pythonShPath.c_str());
-  strcpy(cmd, " ");
+  strcat(cmd, " ");
   strcat(cmd, mgltoolstilitiesPath.c_str());
   strcat(cmd, "/prepare_ligand4.py -l ");
   strcat(cmd, ligand.c_str());
