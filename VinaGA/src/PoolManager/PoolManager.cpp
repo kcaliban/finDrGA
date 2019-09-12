@@ -36,14 +36,14 @@ std::string PoolMGR::PDBtoFASTA(std::string filename) {
   return FASTA;
 }
 
-void PoolMGR::addElementPDB(std::string file) {
+std::string PoolMGR::addElementPDB(std::string file) {
   // Get FASTA sequence
   std::string FASTASEQ = PDBtoFASTA(file);
   // If FASTA is already in pool we can return
   int count;
   #pragma omp critical
   count = internalMap.count(FASTASEQ);
-  if (count != 0) { return;}
+  if (count != 0) { return "";}
   // Make required directory
   std::string command = "mkdir ";
   command.append(workDir);
@@ -74,13 +74,18 @@ void PoolMGR::addElementPDB(std::string file) {
     exit(-1);
   }
   command.clear();
-  // Add file to internal map, do MD, dock
+  // Add file to internal map
   #pragma omp critical
   internalMap[FASTASEQ] = std::make_tuple(FASTASEQ,
                                           workDir + "/" + FASTASEQ + "/" +
-                                          FASTASEQ + ".pdb", 0, 0);
+                                          FASTASEQ + ".pdb",
+                                          new std::vector<int>
+                                          , 0);
+  /* Is done later in the main program
   genMD(FASTASEQ);
   genDock(FASTASEQ);
+  */
+  return FASTASEQ;
 }
 
 std::string PoolMGR::toStr() {
@@ -121,7 +126,7 @@ void PoolMGR::addElement(std::string FASTASEQ) {
   if (count == 0) {
     // Add object to map
     #pragma omp critical
-    internalMap[FASTASEQ] = std::make_tuple("", "", 0, 0);
+    internalMap[FASTASEQ] = std::make_tuple("", "", new std::vector<int>, 0);
     // Generate PDB, MD and fitness function
     genPDB(FASTASEQ);
     genMD(FASTASEQ);

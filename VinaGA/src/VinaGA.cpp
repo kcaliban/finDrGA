@@ -15,12 +15,58 @@ std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
   return returnStr;
 }
 
+// Get a random sample of PDB files from specified folder
+std::vector<std::string> getRandomSample(std::string dir, int amount) {
+  std::string command;
+  command.append("ls ");
+  command.append(dir);
+  command.append(" | shuf -n ");
+  command.append(std::to_string(amount));
+  std::string output;
+  FILE * lsOutputStream = popen(command.c_str(), "r");
+  char buf[1024];
+  while (fgets(buf, 1024, lsOutputStream)) {
+    output += buf;
+  }
+  pclose(lsOutputStream);
+  // Create and return vector
+  std::vector<std::string> result;
+  std::string line;
+  std::stringstream outputStream(output);
+  while (std::getline(outputStream, line, '\n')) {
+    result.push_back(line);
+  }
+  return result;
+}
+
+std::vector<std::string> getReceptors(std::string dir) {
+  // Read all files in a directory
+  std::string command;
+  command.append("ls | cat");
+  command.append(dir);
+  std::string output;
+  FILE * lsOutputStream = popen(command.c_str(), "r");
+  char buf[1024];
+  while (fgets(buf, 1024, lsOutputStream)) {
+    output += buf;
+  }
+  pclose(lsOutputStream);
+  // Return vector of every filename
+  std::vector<std::string> result;
+  std::string line;
+  std::stringstream outputStream(output);
+  while (std::getline(outputStream, line, '\n')) {
+    result.push_back(line);
+  }
+}
+
 int main(int argc, char *argv[])
 {
-  if (argc < 3) {
+  if (argc != 3 || argc != 4) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: VinaGA [Number of populations]"
                  " [prob. of random poinmutation]"
+                 " [optional: size of initial gen (if initialpdbs specified)]"
       << std::endl;
     exit(-1);
   }
@@ -37,7 +83,7 @@ int main(int argc, char *argv[])
   std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities", "");
   std::string pymolPath = reader.Get("paths", "pymol", "pymol");
   std::string workDir = reader.Get("paths", "workingDir", "");
-  std::string receptor = reader.Get("paths", "receptor", "");
+  std::string receptorsPath = reader.Get("paths", "receptors", "");
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
 
@@ -51,21 +97,49 @@ int main(int argc, char *argv[])
   float boxsize = reader.GetReal("GROMACS", "bt", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
 
-  GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
-  std::vector<std::string> startingSequences = {"NFY", "KYA", "HSY", "WHA"};
-      // "HLYE", "LAFY"}; //"IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA",
-//      "AYHA", "ALLH"};
+  // Path to PDB files to take random sample from
+  std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
+  int gen = 0;
+  if (argc != 4) {
+    // Size of initial gen not specified
+    initialpdbs = "";
+  } else {
+    gen = atoi(argv[3]);
+  }
 
+  // Get receptors
+  std::vector<std::string> receptors;
+
+  GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
-                  receptor.c_str(),
+                  receptors,
                   exhaustiveness, energy_range, gromacsPath.c_str(),
                   mdpPath.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff);
-
   VinaFitnessFunc fitnessFunc(&poolmgr);
   VinaGenome vinaGenome;
+
+  // Gather elements
+  std::vector<std::string> startingSequences;
+  if (initialpdbs == "") {
+    // Just some random sequences for testing
+    startingSequences = {
+         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA"};
+  } else {
+    // Gather random sample of files
+    std::vector<std::string> files = getRandomSample(initialpdbs, gen);
+    // Add each file to pool whilst adding their fasta sequences to initial population
+    // for later MD and Docking
+    for (auto filename : files) {
+      std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + filename);
+      if (!FASTA.empty()) {
+        startingSequences.push_back(FASTA);
+      }
+    }
+  }
+  std::cout << genToStr(startingSequences, poolmgr) << std::endl;
 
   std::vector<std::string> curGen = startingSequences;
   for (int i = 0; i < atoi(argv[1]); i++) {

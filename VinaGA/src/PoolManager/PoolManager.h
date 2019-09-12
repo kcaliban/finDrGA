@@ -20,7 +20,7 @@ class PoolMGR {
     PoolMGR(const char * workDir1, const char * vinaPath1,
             const char * pythonShPath1, const char * mgltoolstilitiesPath1,
             const char * pymolPath1,
-            const char * receptor1,
+            std::vector<std::string> receptors1,
             int exhaustiveness1,
             int energy_range1,
             const char * gromacsPath1, const char * mdpPath1,
@@ -28,7 +28,8 @@ class PoolMGR {
             const char * water1, const char * boundingboxtype1,
             float boxsize1, float clustercutoff1) {
       workDir = workDir1;
-      receptor = receptor1;
+      receptors = receptors1;
+      nReceptors = receptors1.size();
       vinaPath = vinaPath1;
       pythonShPath = pythonShPath1;
       pymolPath = pymolPath1;
@@ -45,8 +46,8 @@ class PoolMGR {
       clustercutoff = clustercutoff1;
     };
 
-    // Add PDB file
-    void addElementPDB(std::string);
+    // Add PDB file, return value is FASTA seq
+    std::string addElementPDB(std::string);
     // Adds an element if it does not exist already
     void addElement(std::string);
     // Read out affinity for given string
@@ -65,8 +66,9 @@ class PoolMGR {
     // Exhaustiveness & Energy range
     int exhaustiveness;
     int energy_range;
-    // Goal receptor clustered MD pdb
-    std::string receptor;
+    // Goal receptors
+    std::vector<std::string> receptors;
+    int nReceptors;
     // Working directory
     std::string workDir;
     // Directories required for AutoDock VINA
@@ -88,7 +90,7 @@ class PoolMGR {
     // integer of number of rounds not accessed to
     std::unordered_map<std::string, std::tuple<std::string,
                                                std::string,
-                                               float,
+                                               std::vector<int>,
                                                int> > internalMap;
 
     // Generate PDB
