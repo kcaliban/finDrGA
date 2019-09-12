@@ -11,7 +11,7 @@ OBJFILES = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCFILES)))
 
 $(info    Source files: $(SRCFILES))
 $(info    Object files: $(OBJFILES))
-all: folders compile
+all: clean folders compile
 
 # Create required folders
 folders:
@@ -31,6 +31,5 @@ obj/%.o: src/%.cpp
 	$(CXX) -c -o $@ $<
 
 clean:
-	rm $(BINARY)
-	rm obj/*.o
-	rm obj/*/*.o
+	rm -rf $(BINARY)
+	rm -rf obj
