@@ -13,10 +13,8 @@ void PoolMGR::printSeqAff() {
 std::string PoolMGR::PDBtoFASTA(std::string filename) {
   std::ifstream file(filename);
   if (!file.is_open()) {
-    std::cout << "Error: Could not open PDB file to convert to FASTA sequence"
-              << std::endl;
-    std::cout << "Filename: " << filename << std::endl;
-    exit(-1);
+    throw PoolManagerException("Could not open PDB file to convert to FASTA sequence",
+        filename);
   }
   std::unordered_map<std::string, std::string> AA({
     {"ALA","A"},{"ARG","R"},{"ASN","N"},{"ASP","D"},{"CYS","C"},{"GLU","E"},{"GLN","Q"},{"GLY","G"},{"HIS","H"},
@@ -55,10 +53,8 @@ std::string PoolMGR::addElementPDB(std::string file) {
   command.append(FASTASEQ);
   command.append(" 2>/dev/null 1>&2");
   int success = system(command.c_str());
-  if (success == -1) {
-    std::cout << "Error creating directory for PDB file!\n"
-              << "Sequence name: " << FASTASEQ << std::endl;
-    exit(-1);
+  if (success != 0) {
+    PoolManagerException("Could not create directory for PDB file", FASTASEQ);
   }
   command.clear();
   // Move file
@@ -72,10 +68,8 @@ std::string PoolMGR::addElementPDB(std::string file) {
   command.append(FASTASEQ);
   command.append(".pdb");
   success = system(command.c_str());
-  if (success == -1) {
-    std::cout << "Error moving PDB file!"
-              << "File: " << file << std::endl;
-    exit(-1);
+  if (success != 0) {
+    throw PoolManagerException("Could not move PDB file", file);
   }
   command.clear();
   // Add file to internal map
@@ -86,10 +80,6 @@ std::string PoolMGR::addElementPDB(std::string file) {
                                           workDir + "/" + FASTASEQ + "/" +
                                           FASTASEQ + ".pdb",
                                           *blub, 0);
-  /* Is done later in the main program
-  genMD(FASTASEQ);
-  genDock(FASTASEQ);
-  */
   return FASTASEQ;
 }
 
@@ -115,15 +105,6 @@ std::string PoolMGR::toStr() {
 }
 
 float PoolMGR::getAffinity(std::string FASTASEQ) {
-  /* Obsolete, we always add the element before we access its affinity
-  if (internalMap.count(FASTASEQ) == 0) {
-    std::cout << "Affinity requested even tho not in pool!" << std::endl;
-    // Sequence is not in our pool
-    genPDB(FASTASEQ);
-    genMD(FASTASEQ);
-    genDock(FASTASEQ);
-  }
-  */
   float affinity = 100;
   // Return the minimum
   std::vector<std::pair<std::string, float>> vec;
@@ -164,10 +145,8 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append(FASTASEQ);
   command.append(" 2>/dev/null 1>&2");
   int success = system(command.c_str());
-  if (success == -1) {
-    std::cout << "Error creating directory for PDB file!\n"
-              << "Sequence name: " << FASTASEQ << std::endl;
-    exit(-1);
+  if (success != 0) {
+    throw PoolManagerException("Could not create directory for PDB file", FASTASEQ);
   }
   command.clear();
   // Run Pymol to create ligand
@@ -186,10 +165,8 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append(".pdb\"");
   command.append(" >/dev/null 2>&1");
   success = system(command.c_str());
-  if (success == -1) {
-    std::cout << "Error creating PDB file from sequence!\n"
-              << "Sequence name: " << FASTASEQ << std::endl;
-    exit(-1);
+  if (success != 0) {
+    throw PoolManagerException("Could not create PDB file", FASTASEQ);
   }
   // Add path to map
   #pragma omp critical
@@ -292,9 +269,8 @@ void PoolMGR::deleteElementData(std::string FASTASEQ) {
   command.append("/");
   command.append(FASTASEQ);
   int success = system(command.c_str());
-  if (success == -1) {
-    std::cout << "Error deleting directory in cleaning step of PoolMGR!\n"
-              << "Directory: " << workDir << "/" << FASTASEQ << std::endl;
-    exit(-1);
+  if (success != 0) {
+    throw PoolManagerException("Could not clean unused PDB files",
+              workDir + "/" + FASTASEQ);
   }
 }

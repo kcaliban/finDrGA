@@ -14,12 +14,14 @@ void VinaInstance::debugPrint(const char * str) {
   }
 }
 
+/*
 void VinaInstance::errorPrint(const char * str) {
   std::cout << "\033[1;31mERROR (DOCKING): " << str << std::endl;
   std::cout << "Ligand: " << ligand << "\033[0m" << std::endl;
 
   exit(-1);
 }
+*/
 
 /* OBSOLETE
 void VinaInstance::generateConf() {
@@ -83,7 +85,7 @@ void VinaInstance::generateConf() {
   std::ofstream confFile;
   confFile.open(outfile.c_str(), std::ios::trunc);
   if (!confFile) {
-    errorPrint("Could not open config file!");
+    throw VinaException("Could not open config file!", ligand);
   }
   confFile << "center_x = " << offsetx << std::endl;
   confFile << "center_y = " << offsety << std::endl;
@@ -111,7 +113,7 @@ void VinaInstance::generatePDBQT() {
   command.append(logStr());
   int success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not generate pdbqt file from receptor");
+    throw VinaException("Could not generate pdbqt file for receptor", receptor);
   }
   command.clear();
 
@@ -128,7 +130,7 @@ void VinaInstance::generatePDBQT() {
   success = system(command.c_str());
 
   if (success != 0) {
-    errorPrint("Could not generate pdbqt file from receptor");
+    throw VinaException("Could not generate pdbqt file for ligand", ligand);
   }
 }
 

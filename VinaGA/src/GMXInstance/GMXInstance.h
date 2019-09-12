@@ -6,8 +6,31 @@
 #include <fstream>
 #include <sstream>
 #include <regex>
+#include <exception>
+class GMXException : virtual public std::exception {
+  public:
+    GMXException(const std::string msg1, const std::string file1) {
+      msg = msg1;
+      file = file1;
+    }
+
+    virtual const char * what () const throw () {
+      std::string error;
+      error.append("Error in GMXInstance!\n");
+      error.append("File: ");
+      error.append(file);
+      error.append("\n");
+      error.append("Message: ");
+      error.append(msg);
+      return error.c_str();
+    }
+
+  private:
+    std::string msg;
+    std::string file;
+};
+
 class GMXInstance {
-  // Problem: forcefield folder needs to be in working dir and mdppath
   public:
     GMXInstance(const char * ligand1, const char * gromacsPath1,
                 const char * pymolPath1,
@@ -25,20 +48,16 @@ class GMXInstance {
       bt = bt1;
       boxsize = boxsize1;
       clustercutoff = clustercutoff1;
-      mdpPath = mdpPath1; // Where all parameter files are
+      mdpPath = mdpPath1;
       forcefieldPath = forcefieldPath1;
       pymolPath = pymolPath1;
       debug = debug1;
       log = log1;
     }
 
-    // Prepares a PDB for MD simulation
     void preparePDB();
-    // Run MD simulation
     void runMD();
-    // Returns path to clustered MD simulation (after clstering, that is)
     void clusteredMD();
-    // Extract the top clusters
     void extractTopCluster();
     std::string logStr();
 

@@ -13,22 +13,13 @@ void GMXInstance::debugPrint(const char * str) {
   }
 }
 
-void GMXInstance::errorPrint(const char * str) {
-  std::cout << "\033[1;31mERROR (MD): " << str << std::endl;
-  std::cout << "Ligand: " << ligand << "\033[0m" << std::endl;
-
-  exit(-1);
-}
-
 void GMXInstance::preparePDB() {
   // Export path to forcefield
   debugPrint("Setting env forcefield value...");
   std::string command;
   int success = setenv("GMXLIB", forcefieldPath.c_str(), 1);
   if (success != 0) {
-    std::cout << "Error trying to set GMXLib Path!"
-              << std::endl;
-    exit(-1);
+    throw (GMXException("Could not set GMXLib Path", ""));
   }
   command.clear();
   // Clean file from crystal water
@@ -41,7 +32,7 @@ void GMXInstance::preparePDB() {
   command.append("clean.pdb");
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not clean PDB file for MD!");
+    throw(GMXException("Could not clean PDB file for MD", ligand));
   }
   command.clear();
   // Create topology using force field
@@ -67,7 +58,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not generate topology for MD!");
+    throw GMXException("Could not generate topology for MD", ligand);
   }
   command.clear();
   // Define the bounding box
@@ -88,7 +79,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not define bounding box for MD!");
+    throw GMXException("Could not define bounding box for MD", ligand);
   }
   command.clear();
   // Solvate
@@ -109,7 +100,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not solvate for MD!");
+    throw GMXException("Could not solvate for MD", ligand);
   }
   command.clear();
   // Add ions
@@ -135,7 +126,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not perform step one of ion adding");
+    throw GMXException("Could not ionize for MD (1)", ligand);
   }
   command.clear();
   // Step two
@@ -161,7 +152,7 @@ void GMXInstance::preparePDB() {
                                 // on gromacs version
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not perform step two of ion adding");
+    throw GMXException("Could not ionize for MD (2)", ligand);
   }
   command.clear();
   // Energy minimization
@@ -187,7 +178,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not prepare energy minimzation");
+    throw GMXException("Could not prepare energy minimzation", ligand);
   }
   command.clear();
   // Run MD for enery minimization
@@ -213,7 +204,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not do energy minimzation");
+    throw GMXException("Could not do energy minimzation", ligand);
   }
   command.clear();
   // Temperature Equilibrium
@@ -242,7 +233,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not prepare establishing of equilibrium");
+    throw GMXException("Could not prepare establishing of equilibrium", ligand);
   }
   command.clear();
   // Run MD for equilibrium
@@ -271,7 +262,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not establish equilibrim");
+    throw GMXException("Could not establish equilibrim", ligand);
   }
   command.clear();
   // Pressure Equilibrium
@@ -303,7 +294,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not prepare establishing of equilibrium");
+    throw GMXException("Could not prepare establishing of equilibrium", ligand);
   }
   command.clear();
   // Run MD for equilibrium
@@ -332,7 +323,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not establish equilibrim");
+    throw GMXException("Could not establish equilibrim", ligand);
   }
   command.clear();
   // Final preparation
@@ -360,7 +351,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not prepare MD tpr file");
+    throw GMXException("Could not prepare MD tpr file", ligand);
   }
   command.clear();
 }
@@ -396,7 +387,7 @@ void GMXInstance::runMD() {
   command.append(logStr());
   int success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Error running the MD!");
+    throw GMXException("Could not run the MD", ligand);
   }
   command.clear();
   debugPrint("MD successful!");
@@ -421,7 +412,7 @@ void GMXInstance::runMD() {
   command.append("<<eof\n1\n0\neof");
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Error trying to generate PDB from MD!");
+    throw GMXException("Could not generate PDB from MD", ligand);
   }
   command.clear();
   // Step two
@@ -441,7 +432,7 @@ void GMXInstance::runMD() {
   command.append(" <<eof\n1\neof");
   success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Error trying to generate PDB from MD!");
+    throw GMXException("Could not generate PDB from MD", ligand);
   }
   command.clear();
 }
@@ -479,7 +470,7 @@ void GMXInstance::clusteredMD() {
   command.append(" <<eof\n1\n1\neof");
   int success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Error clustering the MD!");
+    throw GMXException("Could not cluster the MD", ligand);
   }
   command.clear();
 }
@@ -531,6 +522,6 @@ void GMXInstance::extractTopCluster() {
   command.append(logStr());
   int success = system(command.c_str());
   if (success != 0) {
-    errorPrint("Could not extract top cluster from clustered MD!");
+    throw GMXException("Could not extract top cluster from clustered MD", ligand);
   }
 }
