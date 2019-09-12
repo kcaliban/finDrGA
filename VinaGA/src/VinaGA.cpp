@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
 
   // GROMACS
-  std::string gromacsPath = reader.Get("paths", "gmx", "gmx");
+  std::string gromacsPath = reader.Get("paths", "gromacs", "gmx");
   std::string mdpPath = reader.Get("paths", "mdp", "");
   std::string forcefieldPath = reader.Get("paths", "forcefieldpath", "");
   std::string forcefield = reader.Get("GROMACS", "forcefield", "");
@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
   float boxsize = reader.GetReal("GROMACS", "bt", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
 
+  std::cout << gromacsPath << std::endl;
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
   // Standard number of randomly picked individuals: 10
