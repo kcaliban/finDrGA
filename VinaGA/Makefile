@@ -11,8 +11,14 @@ OBJFILES = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCFILES)))
 
 $(info    Source files: $(SRCFILES))
 $(info    Object files: $(OBJFILES))
-all: compile
+all: folders compile
 
+# Create required folders
+folders:
+	mkdir obj
+	mkdir obj/VinaInstance
+	mkdir obj/PoolManager
+	mkdir obj/GMXInstance
 # Link everything together 
 compile: objs
 	$(CXX) $(OBJFILES) -o $(BINARY)
