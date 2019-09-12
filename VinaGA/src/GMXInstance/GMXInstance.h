@@ -7,14 +7,14 @@
 #include <sstream>
 #include <regex>
 #include <exception>
-class GMXException : virtual public std::exception {
+class GMXException : public std::exception {
   public:
+    std::string type;
+
     GMXException(const std::string msg1, const std::string file1) {
       msg = msg1;
       file = file1;
-    }
-
-    virtual const char * what () const throw () {
+      type = "";
       std::string error;
       error.append("Error in GMXInstance!\n");
       error.append("File: ");
@@ -22,12 +22,32 @@ class GMXException : virtual public std::exception {
       error.append("\n");
       error.append("Message: ");
       error.append(msg);
-      return error.c_str();
+      errorMsg = error;
+    }
+
+    GMXException(const std::string msg1, const std::string file1,
+                 const std::string type1) {
+      msg = msg1;
+      file = file1;
+      type = type1;
+      std::string error;
+      error.append("Error in GMXInstance!\n");
+      error.append("File: ");
+      error.append(file);
+      error.append("\n");
+      error.append("Message: ");
+      error.append(msg);
+      errorMsg = error;
+    }
+
+    const char * what () const throw () {
+      return errorMsg.c_str();
     }
 
   private:
     std::string msg;
     std::string file;
+    std::string errorMsg;
 };
 
 class GMXInstance {

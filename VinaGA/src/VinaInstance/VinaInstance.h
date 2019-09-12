@@ -15,9 +15,6 @@ class VinaException : virtual public std::exception {
     VinaException(const std::string msg1, const std::string file1) {
       msg = msg1;
       file = file1;
-    }
-
-    virtual const char * what () const throw () {
       std::string error;
       error.append("Error in VinaInstance!\n");
       error.append("File: ");
@@ -25,12 +22,17 @@ class VinaException : virtual public std::exception {
       error.append("\n");
       error.append("Message: ");
       error.append(msg);
-      return error.c_str();
+      errorMsg = error;
+    }
+
+    virtual const char * what () const throw () {
+      return errorMsg.c_str();
     }
 
   private:
     std::string msg;
     std::string file;
+    std::string errorMsg;
 };
 
 class VinaInstance {

@@ -80,6 +80,13 @@ std::string PoolMGR::addElementPDB(std::string file) {
                                           workDir + "/" + FASTASEQ + "/" +
                                           FASTASEQ + ".pdb",
                                           *blub, 0);
+  // Generate MD and dock
+  try {
+    genMD(FASTASEQ);
+  } catch (GMXException& e) {
+    throw; // Throw upwards for handling in main
+  }
+  genDock(FASTASEQ);
   return FASTASEQ;
 }
 
@@ -222,9 +229,6 @@ void PoolMGR::genDock(std::string FASTASEQ) {
                               receptors.at(i).c_str(),
                               std::get<1>(internalMap[FASTASEQ]).c_str(),
                               true, true);
-    // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
-    // vinaInstance.generateConf();
-    // std::cout << "Generated config for: " << FASTASEQ << std::endl;
     vinaInstance.generatePDBQT();
     float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
     #pragma omp critical

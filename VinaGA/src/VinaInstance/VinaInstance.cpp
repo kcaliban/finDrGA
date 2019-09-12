@@ -153,7 +153,8 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   command.append(" --energy_range ");
   command.append(std::to_string(energy_range));
 
-  debugPrint("Docking...");
+  std::string out = "Docking against " + receptor + "...";
+  debugPrint(out.c_str());
 
   // Execute command and stream using popen
   std::string vinaOutput;

@@ -58,7 +58,7 @@ void GMXInstance::preparePDB() {
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
-    throw GMXException("Could not generate topology for MD", ligand);
+    throw GMXException("Could not generate topology for MD", ligand, "TOP");
   }
   command.clear();
   // Define the bounding box

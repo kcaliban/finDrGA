@@ -39,6 +39,11 @@ std::vector<std::string> getRandomSample(std::string dir, int amount) {
   return result;
 }
 
+// Get a single PDB
+std::string getRandomPDB(std::string dir) {
+  return getRandomSample(dir, 1).at(0);
+}
+
 // Get receptor filenames
 std::vector<std::string> getReceptors(std::string dir) {
   // Read all pdb files in a directory
@@ -142,7 +147,7 @@ int main(int argc, char *argv[])
                  " [prob. of random poinmutation]"
                  " [optional: size of initial gen (if initialpdbs specified)]"
       << std::endl;
-    exit(-1);
+    return 1;
   }
 
   INIReader reader("config.ini");
@@ -175,7 +180,7 @@ int main(int argc, char *argv[])
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
   // Standard number of randomly picked individuals: 10
-  int gen = 10;
+  unsigned int gen = 10;
   if (argc != 4) {
     // Size of initial gen not specified
     initialpdbs = "";
@@ -212,12 +217,22 @@ int main(int argc, char *argv[])
     startingSequences = {
          "HLYE", "LAFY", "IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA"};
   } else {
-    // Gather random sample of files
-    std::vector<std::string> files = getRandomSample(initialpdbs, gen);
-    // Add each file to pool whilst adding their fasta sequences to initial population
-    // for later MD and Docking
-    for (auto filename : files) {
-      std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + filename);
+    // Try to add PDB sequences until we have gen, some PDBs could fail => catch
+    while (startingSequences.size() < gen) {
+      // Wait till every thread has read the number of elements
+      // This works by assumption that the threads don't all finish at the same time
+      std::string filename = getRandomPDB(initialpdbs);
+      std::string FASTA;
+      try {
+        FASTA = poolmgr.addElementPDB(initialpdbs + "/" + filename);
+      } catch (GMXException& e) {
+        // Problem with topology is usually because of problem with PDB file
+        if (e.type == "TOP") {
+          continue;
+        } else {
+          throw;
+        }
+      }
       if (!FASTA.empty()) {
         startingSequences.push_back(FASTA);
       }
@@ -226,22 +241,6 @@ int main(int argc, char *argv[])
 
   std::vector<std::string> curGen = startingSequences;
   for (int i = 0; i < atoi(argv[1]); i++) {
-    // Remove duplicates for adding
-    std::vector<std::string> curGenDistinct;
-    curGenDistinct = curGen;
-    // Sort and then remove consecutive duplicates
-    std::sort(curGenDistinct.begin(), curGenDistinct.end());
-    curGenDistinct.erase(std::unique(curGenDistinct.begin(), curGenDistinct.end()),
-                          curGenDistinct.end());
-    // Add the new elements (PoolMGR only adds them if they don't exist already, does a new MD else)
-    #pragma omp parallel
-    #pragma omp for
-    for (unsigned int i = 0; i < curGenDistinct.size(); i++) {
-      poolmgr.addElement(curGenDistinct.at(i));
-    }
-    // CleanUp of not used strings
-    // poolmgr.update(curGen);
-    // poolmgr.cleanUp(3);
     // Output to log file
     std::string output = "Generation: ";
     output.append(std::to_string(i));
@@ -258,6 +257,20 @@ int main(int argc, char *argv[])
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, atof(argv[2]));
     // Temporary debug output
     poolmgr.printSeqAff();
+
+    // Remove duplicates for adding
+    std::vector<std::string> curGenDistinct;
+    curGenDistinct = curGen;
+    // Sort and then remove consecutive duplicates
+    std::sort(curGenDistinct.begin(), curGenDistinct.end());
+    curGenDistinct.erase(std::unique(curGenDistinct.begin(), curGenDistinct.end()),
+                          curGenDistinct.end());
+    // Add the new elements (PoolMGR only adds them if they don't exist already, does a new MD else)
+    #pragma omp parallel
+    #pragma omp for
+    for (unsigned int i = 0; i < curGenDistinct.size(); i++) {
+      poolmgr.addElement(curGenDistinct.at(i));
+    }
   }
 
   return 0;
