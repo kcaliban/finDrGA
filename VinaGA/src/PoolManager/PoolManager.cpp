@@ -2,7 +2,11 @@
 
 void PoolMGR::printSeqAff() {
   for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
-    std::cout << it->first << ": " << std::get<2>(it->second) << std::endl;
+    std::cout << it->first << ": ";
+    for (auto i : std::get<2>(it->second)) {
+      std::cout << i.first << ": " << i.second << ",";
+    }
+    std::cout << std::endl;
   }
 }
 
@@ -75,12 +79,13 @@ std::string PoolMGR::addElementPDB(std::string file) {
   }
   command.clear();
   // Add file to internal map
+  // Generate new vector on the heap
+  auto blub = new std::vector<std::pair<std::string, float>>();
   #pragma omp critical
   internalMap[FASTASEQ] = std::make_tuple(FASTASEQ,
                                           workDir + "/" + FASTASEQ + "/" +
                                           FASTASEQ + ".pdb",
-                                          new std::vector<int>
-                                          , 0);
+                                          *blub, 0);
   /* Is done later in the main program
   genMD(FASTASEQ);
   genDock(FASTASEQ);
@@ -94,8 +99,14 @@ std::string PoolMGR::toStr() {
   for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
     returnStr.append(it->first);
     returnStr.append(": ");
-    returnStr.append(std::to_string(std::get<2>(it->second)));
-    returnStr.append(", ");
+    for (auto i : std::get<2>(it->second)) {
+      returnStr.append(i.first);
+      returnStr.append(": ");
+      returnStr.append(std::to_string(i.second));
+      returnStr.append(", ");
+    }
+    returnStr.pop_back(); returnStr.pop_back();
+    returnStr.append("; ");
   }
   returnStr.pop_back(); returnStr.pop_back();
   returnStr.append("]");
@@ -113,9 +124,16 @@ float PoolMGR::getAffinity(std::string FASTASEQ) {
     genDock(FASTASEQ);
   }
   */
-  float affinity;
+  float affinity = 100;
+  // Return the minimum
+  std::vector<std::pair<std::string, float>> vec;
   #pragma omp critical
-  affinity = std::get<2>(internalMap.at(FASTASEQ));
+  vec = std::get<2>(internalMap.at(FASTASEQ));
+  for (auto f : vec) {
+    if (f.second < affinity) {
+      affinity = f.second;
+    }
+  }
   return affinity;
 }
 
@@ -124,9 +142,10 @@ void PoolMGR::addElement(std::string FASTASEQ) {
   #pragma omp critical
   count = internalMap.count(FASTASEQ);
   if (count == 0) {
+    auto blub = new std::vector<std::pair<std::string, float>>();
     // Add object to map
     #pragma omp critical
-    internalMap[FASTASEQ] = std::make_tuple("", "", new std::vector<int>, 0);
+    internalMap[FASTASEQ] = std::make_tuple("", "", *blub, 0);
     // Generate PDB, MD and fitness function
     genPDB(FASTASEQ);
     genMD(FASTASEQ);
@@ -208,21 +227,35 @@ void PoolMGR::genMD(std::string FASTASEQ) {
 }
 
 void PoolMGR::genDock(std::string FASTASEQ) {
-  VinaInstance vinaInstance(vinaPath.c_str(), pythonShPath.c_str(),
-                            mgltoolstilitiesPath.c_str(),
-                            pymolPath.c_str(),
-                            workDir.c_str(),
-                            receptor.c_str(),
-                            std::get<1>(internalMap[FASTASEQ]).c_str(),
-                            true, true);
-  // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
-  vinaInstance.generateConf();
-  // std::cout << "Generated config for: " << FASTASEQ << std::endl;
-  vinaInstance.generatePDBQT();
-  float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+  // Debug: print out all receptors
+  /*
+  for (auto s : receptors) {
+    std::cout << s << std::endl;
+  }
+  */
+  std::vector<std::pair<std::string, float>> affinities;
+  // Do a docking for each receptor
+  #pragma omp parallel
+  #pragma omp for
+  for (int i = 0; i < nReceptors; i++) {
+    VinaInstance vinaInstance(vinaPath.c_str(), pythonShPath.c_str(),
+                              mgltoolstilitiesPath.c_str(),
+                              pymolPath.c_str(),
+                              workDir.c_str(),
+                              receptors.at(i).c_str(),
+                              std::get<1>(internalMap[FASTASEQ]).c_str(),
+                              true, true);
+    // std::cout << "Trying to generate config for: " << FASTASEQ << std::endl;
+    vinaInstance.generateConf();
+    // std::cout << "Generated config for: " << FASTASEQ << std::endl;
+    vinaInstance.generatePDBQT();
+    float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+    #pragma omp critical
+    affinities.push_back(std::make_pair(receptors.at(i).c_str(), affinity));
+  }
 
   #pragma omp critical
-  std::get<2>(internalMap[FASTASEQ]) = affinity;
+  std::get<2>(internalMap[FASTASEQ]) = affinities;
 }
 
 void PoolMGR::update(std::vector<std::string> gen) {

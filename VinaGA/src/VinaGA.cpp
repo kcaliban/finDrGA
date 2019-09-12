@@ -15,7 +15,7 @@ std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
   return returnStr;
 }
 
-// Get a random sample of PDB files from specified folder
+// Get a random sample of PDB filenames from specified folder
 std::vector<std::string> getRandomSample(std::string dir, int amount) {
   std::string command;
   command.append("ls ");
@@ -39,11 +39,13 @@ std::vector<std::string> getRandomSample(std::string dir, int amount) {
   return result;
 }
 
+// Get receptor filenames
 std::vector<std::string> getReceptors(std::string dir) {
-  // Read all files in a directory
+  // Read all pdb files in a directory
   std::string command;
-  command.append("ls | cat");
+  command.append("ls ");
   command.append(dir);
+  command.append(" | cat | grep -v .pdbqt");
   std::string output;
   FILE * lsOutputStream = popen(command.c_str(), "r");
   char buf[1024];
@@ -58,11 +60,12 @@ std::vector<std::string> getReceptors(std::string dir) {
   while (std::getline(outputStream, line, '\n')) {
     result.push_back(line);
   }
+  return result;
 }
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3 || argc != 4) {
+  if (argc != 3 && argc != 4) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: VinaGA [Number of populations]"
                  " [prob. of random poinmutation]"
@@ -99,7 +102,8 @@ int main(int argc, char *argv[])
 
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
-  int gen = 0;
+  // Standard number of randomly picked individuals: 10
+  int gen = 10;
   if (argc != 4) {
     // Size of initial gen not specified
     initialpdbs = "";
@@ -109,6 +113,10 @@ int main(int argc, char *argv[])
 
   // Get receptors
   std::vector<std::string> receptors;
+  std::vector<std::string> receptorfiles = getReceptors(receptorsPath);
+  for (auto s : receptorfiles) {
+    receptors.push_back(receptorsPath + "/" + s);
+  }
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
@@ -139,7 +147,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-  std::cout << genToStr(startingSequences, poolmgr) << std::endl;
 
   std::vector<std::string> curGen = startingSequences;
   for (int i = 0; i < atoi(argv[1]); i++) {
@@ -173,6 +180,8 @@ int main(int argc, char *argv[])
     // Output for best/entropy graph
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, atof(argv[2]));
+    // Temporary debug output
+    poolmgr.printSeqAff();
   }
 
   return 0;

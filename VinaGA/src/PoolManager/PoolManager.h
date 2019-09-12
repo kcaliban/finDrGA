@@ -90,7 +90,7 @@ class PoolMGR {
     // integer of number of rounds not accessed to
     std::unordered_map<std::string, std::tuple<std::string,
                                                std::string,
-                                               std::vector<int>,
+                                               std::vector<std::pair<std::string, float>>,
                                                int> > internalMap;
 
     // Generate PDB
