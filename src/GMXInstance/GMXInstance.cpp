@@ -1,3 +1,4 @@
+/* Copyright 2019 Fabian Krause */
 #include "GMXInstance.h"
 
 std::string GMXInstance::logStr() {
@@ -10,7 +11,7 @@ void GMXInstance::preparePDB() {
   std::string command;
   int success = setenv("GMXLIB", forcefieldPath.c_str(), 1);
   if (success != 0) {
-    throw (GMXException("Could not set GMXLib Path", ""));
+    throw(GMXException("Could not set GMXLib Path", ""));
   }
   command.clear();
   // Clean file from crystal water
@@ -87,7 +88,7 @@ void GMXInstance::preparePDB() {
   command.append("/solv.gro");
   command.append(" -p ");
   command.append(workDir);
-  command.append("/topol.top"); // Where will this file be?
+  command.append("/topol.top");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -131,7 +132,7 @@ void GMXInstance::preparePDB() {
   command.append("/solv_ions.gro");
   command.append(" -p ");
   command.append(workDir);
-  command.append("/topol.top"); // Where will this file be?
+  command.append("/topol.top");
   command.append(" -pname ");
   command.append("NA");
   command.append(" -nname ");
@@ -139,8 +140,8 @@ void GMXInstance::preparePDB() {
   command.append(" -neutral ");
   command.append(logStr());
   command.append(" ");
-  command.append("<<eof\n13\neof"); // group SOL, might have to change to 16 depending
-                                // on gromacs version
+  command.append("<<eof\n13\neof");  // group SOL, might have to change
+                                     // to 16 depending on gromacs version
   success = system(command.c_str());
   if (success != 0) {
     throw GMXException("Could not ionize for MD (2)", ligand);
@@ -486,7 +487,7 @@ void GMXInstance::extractTopCluster() {
   int max = - std::numeric_limits<int>::infinity();
   std::string line;
   std::stringstream clustSizeFileStream(buffer);
-  std::regex clusterSizeRegEx("^\\s*([0-9]+)\\s*([0-9]+)\\s*$");// Regex for number
+  std::regex clusterSizeRegEx("^\\s*([0-9]+)\\s*([0-9]+)\\s*$");
   std::smatch lineClusterMatch;
   while (std::getline(clustSizeFileStream, line, '\n')) {
     std::regex_search(line, lineClusterMatch, clusterSizeRegEx);
@@ -513,6 +514,7 @@ void GMXInstance::extractTopCluster() {
   command.append(logStr());
   int success = system(command.c_str());
   if (success != 0) {
-    throw GMXException("Could not extract top cluster from clustered MD", ligand);
+    throw GMXException("Could not extract top cluster from clustered MD",
+                       ligand);
   }
 }

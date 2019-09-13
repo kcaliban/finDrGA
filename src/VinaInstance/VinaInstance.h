@@ -1,10 +1,11 @@
-#ifndef VININS
-#define VININS
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_VINAINSTANCE_VINAINSTANCE_H_
+#define SRC_VINAINSTANCE_VINAINSTANCE_H_
 /* Interface to run Vina and read simulation results */
 #include <stdlib.h>
-#include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 #include <string>
 #include <regex>
 #include <sstream>
@@ -12,7 +13,7 @@
 #include <exception>
 #include "../Info.h"
 class VinaException : virtual public std::exception {
-  public:
+ public:
     std::string type;
     VinaException(const std::string msg1, const std::string file1) {
       msg = msg1;
@@ -28,7 +29,9 @@ class VinaException : virtual public std::exception {
       type = "";
     }
 
-    VinaException(const std::string msg1, const std::string file1, std::string type1) {
+    VinaException(const std::string msg1,
+                  const std::string file1,
+                  const std::string type1) {
       msg = msg1;
       file = file1;
       std::string error;
@@ -42,18 +45,18 @@ class VinaException : virtual public std::exception {
       type = type1;
     }
 
-    virtual const char * what () const throw () {
+    virtual const char * what() const throw() {
       return errorMsg.c_str();
     }
 
-  private:
+ private:
     std::string msg;
     std::string file;
     std::string errorMsg;
 };
 
 class VinaInstance {
-  public:
+ public:
     /* Docking instance using AutoDock Vina
      * Paths are self-explanatory, but beware:
      *    ALWAYS WITHOUT '/' AT THE END
@@ -73,11 +76,12 @@ class VinaInstance {
 
     float calculateBindingAffinity(int exhaustiveness, int energy_range);
 
-  private:
+ private:
     std::string vinaPath;
     std::string receptor;
     std::string ligand;
     Info * info;
 };
 
-#endif
+#endif  // SRC_VINAINSTANCE_VINAINSTANCE_H_
+

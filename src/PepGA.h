@@ -1,11 +1,11 @@
-#ifndef PEPGA
-#define PEPGA
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_PEPGA_H_
+#define SRC_PEPGA_H_
+#include <omp.h>
+#include <fstream>
 #include "lib/GenAlgInst.h"
 #include "PepGenome.h"
 #include "PepFitnessFunc.h"
 #include "PoolManager/PoolManager.h"
 #include "inih/INIReader.h"
-#include <fstream>
-#include <omp.h>
-
-#endif
+#endif  // SRC_PEPGA_H_

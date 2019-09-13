@@ -1,3 +1,4 @@
+/* Copyright 2019 Fabian Krause */
 #include "VinaInstance.h"
 
 float VinaInstance::calculateBindingAffinity(int exhaustiveness,

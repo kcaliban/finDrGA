@@ -1,23 +1,22 @@
-#ifndef VINGN
-#define VINGN
-#include "lib/Genome.h"
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_PEPGENOME_H_
+#define SRC_PEPGENOME_H_
 #include <string>
 #include <chrono>
 #include <random>
+#include "lib/Genome.h"
 class PepGenome : public Genome<std::string> {
-  private:
+ private:
     std::string alphabet = "ARNDCQEGHILKMFPSTWYV";
     std::mt19937 * mt;
 
-  public:
+ public:
     PepGenome(std::mt19937 * mt1) {
       mt = mt1;
     }
 
     std::string crossOver(std::string& , std::string& , ...);
-
     std::string mutate(std::string&, ...);
-
 };
 
-#endif
+#endif  // SRC_PEPGENOME_H_

@@ -1,14 +1,14 @@
-#ifndef GENOM
-#define GENOM
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_LIB_GENOME_H_
+#define SRC_LIB_GENOME_H_
 #include <vector>
-// Singleton? Then no coevolution possible.
 template <typename GenoType>
 class Genome {
-  public:
+ public:
     // Crossover Function
     virtual GenoType crossOver(GenoType &, GenoType &, ...) = 0;
     // Mutation
     virtual GenoType mutate(GenoType &, ...) = 0;
 };
 
-#endif
+#endif  // SRC_LIB_GENOME_H_

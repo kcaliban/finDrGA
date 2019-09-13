@@ -1,11 +1,12 @@
-#ifndef PEPNFO
-#define PEPNFO
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_INFO_H_
+#define SRC_INFO_H_
 #include <string>
 #include <iostream>
 #include <fstream>
 /* Logging, information and errors */
 class Info {
-  public:
+ public:
     Info(bool log1, bool console1, std::string logfile1) {
       log = log1;
       console = console1;
@@ -22,9 +23,9 @@ class Info {
 
     void infoMsg(std::string);
     void errorMsg(std::string, bool);
-  private:
+ private:
     bool log;
     bool console;
     std::ofstream * f;
 };
-#endif
+#endif  // SRC_INFO_H_

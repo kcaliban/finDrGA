@@ -1,10 +1,11 @@
-#ifndef FITNS
-#define FITNS
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_LIB_FITNESSFUNCTION_H_
+#define SRC_LIB_FITNESSFUNCTION_H_
 #include "Genome.h"
 template <typename GenoType>
 class FitnessFunction {
-  public:
+ public:
     virtual float calculateFitness(GenoType, ...) = 0;
 };
 
-#endif
+#endif  // SRC_LIB_FITNESSFUNCTION_H_

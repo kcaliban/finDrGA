@@ -1,5 +1,6 @@
-#ifndef GMXINST
-#define GMXINST
+/* Copyright 2019 Fabian Krause */
+#ifndef SRC_GMXINSTANCE_GMXINSTANCE_H_
+#define SRC_GMXINSTANCE_GMXINSTANCE_H_
 #include <string>
 #include <cstdlib>
 #include <iostream>
@@ -9,7 +10,7 @@
 #include <exception>
 #include "../Info.h"
 class GMXException : public std::exception {
-  public:
+ public:
     std::string type;
 
     GMXException(const std::string msg1, const std::string file1) {
@@ -41,18 +42,18 @@ class GMXException : public std::exception {
       errorMsg = error;
     }
 
-    const char * what () const throw () {
+    const char * what() const throw() {
       return errorMsg.c_str();
     }
 
-  private:
+ private:
     std::string msg;
     std::string file;
     std::string errorMsg;
 };
 
 class GMXInstance {
-  public:
+ public:
     GMXInstance(const char * ligand1, const char * gromacsPath1,
                 const char * pymolPath1,
                 const char * workDir1, const char * forcefield1,
@@ -81,7 +82,7 @@ class GMXInstance {
     void extractTopCluster();
     std::string logStr();
 
-  private:
+ private:
     std::string ligand;
     std::string workDir;
     std::string forcefield;
@@ -96,4 +97,4 @@ class GMXInstance {
     Info * info;
 };
 
-#endif
+#endif  // SRC_GMXINSTANCE_GMXINSTANCE_H_

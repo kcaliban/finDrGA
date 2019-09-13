@@ -1,3 +1,4 @@
+/* Copyright 2019 Fabian Krause */
 #include "PoolManager.h"
 
 void PoolMGR::preparePDBQT(std::string ligand) {
@@ -14,7 +15,9 @@ void PoolMGR::preparePDBQT(std::string ligand) {
   command.append("qt >/dev/null");
   int success = system(command.c_str());
   if (success != 0) {
-    throw VinaException("Could not generate pdbqt file for ligand", ligand, "PQT");
+    throw VinaException("Could not generate pdbqt file for ligand",
+                        ligand,
+                        "PQT");
   }
 }
 
@@ -22,21 +25,22 @@ std::string PoolMGR::PDBtoFASTA(std::string filename) {
   info->infoMsg("(POOLMGR) Getting FASTA from PDB: " + filename);
   std::ifstream file(filename);
   if (!file.is_open()) {
-    throw PoolManagerException("Could not open PDB file to convert to FASTA sequence",
-        filename);
+    throw PoolManagerException(
+          "Could not open PDB file to convert to FASTA sequence",
+          filename);
   }
   std::unordered_map<std::string, std::string> AA({
-    {"ALA","A"},{"ARG","R"},{"ASN","N"},{"ASP","D"},{"CYS","C"},
-    {"GLU","E"},{"GLN","Q"},{"GLY","G"},{"HIS","H"},{"ILE","I"},
-    {"LEU","L"},{"LYS","K"},{"MET","M"},{"PHE","F"},{"PRO","P"},
-    {"SER","S"},{"THR","T"},{"TRP","W"},{"TYR","Y"},{"VAL","V"}
+    {"ALA", "A"}, {"ARG", "R"}, {"ASN", "N"}, {"ASP", "D"}, {"CYS", "C"},
+    {"GLU", "E"}, {"GLN", "Q"}, {"GLY", "G"}, {"HIS", "H"}, {"ILE", "I"},
+    {"LEU", "L"}, {"LYS", "K"}, {"MET", "M"}, {"PHE", "F"}, {"PRO", "P"},
+    {"SER", "S"}, {"THR", "T"}, {"TRP", "W"}, {"TYR", "Y"}, {"VAL", "V"}
   });
 
   std::string FASTA;
   std::string line;
   int previd = -1;
   while (getline(file, line)) {
-    if (line.substr(0, 4) == "ATOM" or line.substr(0, 6) == "HETATM") {
+    if (line.substr(0, 4) == "ATOM" || line.substr(0, 6) == "HETATM") {
       std::string aa = line.substr(17, 3);
       int id = stoi(line.substr(22, 4));
       if (id != previd) {
@@ -95,18 +99,17 @@ std::string PoolMGR::addElementPDB(std::string file) {
     info->infoMsg("(POOLMGR) Initiating MD for: " + FASTASEQ);
     genMD(FASTASEQ);
   } catch (GMXException& e) {
-    // Remove from map
-    internalMap.erase(internalMap.find(FASTASEQ));
-    throw; // Throw upwards for handling in main
+    internalMap.erase(internalMap.find(FASTASEQ));  // Remove from map
+    throw;  // Throw upwards for handling in main
   }
   // Generate Docking
   try {
     info->infoMsg("(POOLMGR) Initiating Docking for: " + FASTASEQ);
     genDock(FASTASEQ);
   } catch (VinaException& e) {
-    // Remove from map
-    internalMap.erase(internalMap.find(FASTASEQ));
-    throw; // Throw upwards for handling in main
+    internalMap.erase(internalMap.find(FASTASEQ));  // Remove from map
+
+    throw;  // Throw upwards for handling in main
   }
   return FASTASEQ;
 }
@@ -156,12 +159,20 @@ void PoolMGR::addElement(std::string FASTASEQ) {
     #pragma omp critical
     internalMap[FASTASEQ] = std::make_tuple("", "", *blub, 0);
     // Generate PDB, MD and fitness function
-    genPDB(FASTASEQ);
-    genMD(FASTASEQ);
-    genDock(FASTASEQ);
+    try {
+      genPDB(FASTASEQ);
+      genMD(FASTASEQ);
+      genDock(FASTASEQ);
+    } catch (...) {
+      throw;
+    }
   } else {
+    try {
     genMD(FASTASEQ);
     genDock(FASTASEQ);
+    } catch (...) {
+      throw;
+    }
   }
 }
 
@@ -174,7 +185,8 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append(" 2>/dev/null 1>&2");
   int success = system(command.c_str());
   if (success != 0) {
-    throw PoolManagerException("Could not create directory for PDB file", FASTASEQ);
+    throw PoolManagerException("Could not create directory for PDB file",
+                               FASTASEQ);
   }
   command.clear();
   // Run Pymol to create ligand
@@ -183,7 +195,7 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   command.append(FASTASEQ);
   command.append(", ");
   command.append(FASTASEQ);
-  command.append(", ss=1;"); // Secondary structure
+  command.append(", ss=1;");  // Secondary structure
   command.append("save ");
   command.append(workDir);
   command.append("/");
@@ -198,7 +210,8 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
   }
   // Add path to map
   #pragma omp critical
-  std::get<0>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb";
+  std::get<0>(internalMap[FASTASEQ]) =
+                          workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb";
 }
 
 void PoolMGR::genMD(std::string FASTASEQ) {
@@ -210,25 +223,35 @@ void PoolMGR::genMD(std::string FASTASEQ) {
   if (prevMD == "") {
     #pragma omp critical
     mdinput = std::get<0>(internalMap[FASTASEQ]);
-  }
+  } else {
   // If there has, use it to do a further MD
-  else {
     #pragma omp critical
     mdinput = std::get<1>(internalMap[FASTASEQ]);
   }
   GMXInstance gmxInstance(mdinput.c_str(),
-                          gromacsPath.c_str(), pymolPath.c_str(),
+                          gromacsPath.c_str(),
+                          pymolPath.c_str(),
                           (workDir + "/" + FASTASEQ).c_str(),
-                          forcefield.c_str(), forcefieldPath.c_str(), water.c_str(),
-                          boundingboxtype.c_str(), clustercutoff,
-                          boxsize, mdpPath.c_str(), info);
-  gmxInstance.preparePDB();
-  gmxInstance.runMD();
-  gmxInstance.clusteredMD();
-  gmxInstance.extractTopCluster();
+                          forcefield.c_str(),
+                          forcefieldPath.c_str(),
+                          water.c_str(),
+                          boundingboxtype.c_str(),
+                          clustercutoff,
+                          boxsize,
+                          mdpPath.c_str(),
+                          info);
+  try {
+    gmxInstance.preparePDB();
+    gmxInstance.runMD();
+    gmxInstance.clusteredMD();
+    gmxInstance.extractTopCluster();
+  } catch (...) {
+    throw;
+  }
 
   #pragma omp critical
-  std::get<1>(internalMap[FASTASEQ]) = workDir + "/" + FASTASEQ + "/topcluster.pdb";
+  std::get<1>(internalMap[FASTASEQ]) =
+                                workDir + "/" + FASTASEQ + "/topcluster.pdb";
 }
 
 void PoolMGR::genDock(std::string FASTASEQ) {
@@ -240,7 +263,11 @@ void PoolMGR::genDock(std::string FASTASEQ) {
   */
   std::vector<std::pair<std::string, float>> affinities;
   // Prepare ligand
-  preparePDBQT(std::get<1>(internalMap[FASTASEQ]));
+  try {
+    preparePDBQT(std::get<1>(internalMap[FASTASEQ]));
+  } catch (...) {
+    throw;
+  }
   // Do a docking for each receptor
   #pragma omp parallel
   #pragma omp for
@@ -248,7 +275,8 @@ void PoolMGR::genDock(std::string FASTASEQ) {
     VinaInstance vinaInstance(vinaPath.c_str(), receptors.at(i).c_str(),
                               std::get<1>(internalMap[FASTASEQ]).c_str(),
                               info);
-    float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
+    float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness,
+                                                           energy_range);
     #pragma omp critical
     affinities.push_back(std::make_pair(receptors.at(i).c_str(), affinity));
   }
@@ -258,7 +286,6 @@ void PoolMGR::genDock(std::string FASTASEQ) {
 }
 
 void PoolMGR::update(std::vector<std::string> gen) {
-  // Set number of times not used to minus one for all elements that have been used
   for (auto FASTASEQ : gen) {
     std::get<3>(internalMap.at(FASTASEQ)) = -1;
   }
@@ -266,14 +293,14 @@ void PoolMGR::update(std::vector<std::string> gen) {
   for (auto it = internalMap.begin(); it != internalMap.end(); it++) {
     std::get<3>(it->second) += 1;
   }
-};
+}
 
 void PoolMGR::cleanUp(int x) {
   // Cleans all files of PDBs that have not been used for x generations
   for (auto it = internalMap.begin(); it != internalMap.end(); ) {
     if (std::get<3>(it->second) > x) {
       deleteElementData(it->first);
-      free(&std::get<2>(it->second)); // Free up heap space
+      free(&std::get<2>(it->second));  // Free up heap space
       internalMap.erase(it++);
     } else {
       it++;

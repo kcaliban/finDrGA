@@ -1,3 +1,4 @@
+/* Copyright 2019 Fabian Krause */
 #include "PepGA.h"
 
 std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
@@ -45,7 +46,7 @@ std::string getRandomPDB(std::string dir) {
 }
 
 // Get receptor filenames
-std::vector<std::string> getReceptors(std::string dir, bool prep=false) {
+std::vector<std::string> getReceptors(std::string dir, bool prep = false) {
   // Read all pdb files in a directory
   std::string command;
   command.append("ls ");
@@ -104,7 +105,7 @@ void prepareConfig(std::string receptor) {
   std::string line;
   std::stringstream receptorStream(buffer);
   while (std::getline(receptorStream, line, '\n')) {
-    if (line.substr(0, 4) == "ATOM" or line.substr(0, 6) == "HETATM") {
+    if (line.substr(0, 4) == "ATOM" || line.substr(0, 6) == "HETATM") {
       float x = stof(line.substr(31, 8));
       xmin = (x < xmin) ? x : xmin;
       xmax = (x > xmax) ? x : xmax;
@@ -169,14 +170,15 @@ int main(int argc, char *argv[]) {
     std::cout << "Usage: PepGA [Number of populations]"
                  " [prob. of random poinmutation]"
                  " [percentage of top individuals to copy each gen.]"
-                 " [optional: size of initial initial pop. (if initialpdbs specified)]"
+                 " [optional: size of initial initial pop."
+                 " (if initialpdbs specified)]"
       << std::endl;
     return 1;
   }
   unsigned int noPop = atoi(argv[1]);
   float mutateProb = atof(argv[2]);
   float genCpy = atof(argv[3]);
-  unsigned int gen = (argc == 5) ? atoi(argv[4]) : 10; // default size of init pop 10
+  unsigned int gen = (argc == 5) ? atoi(argv[4]) : 10;  // def. size 10
   /* Prepare random engine */
   std::random_device rd;
   std::mt19937 mt(rd());
@@ -184,13 +186,15 @@ int main(int argc, char *argv[]) {
   /* Read config */
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
-        std::cout << "Can't load 'config.ini'\nCheck if it exists in the same dir as PepGA";
+        std::cout << "Can't load 'config.ini'\n"
+                     "Check if it exists in the same dir as PepGA";
         return 1;
   }
   // AutoDock VINA
   std::string vinaPath = reader.Get("paths", "vina", "vina");
   std::string pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
-  std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities", "");
+  std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities",
+                                                "");
   std::string pymolPath = reader.Get("paths", "pymol", "pymol");
   std::string workDir = reader.Get("paths", "workingDir", "");
   std::string receptorsPath = reader.Get("paths", "receptors", "");
@@ -209,22 +213,27 @@ int main(int argc, char *argv[]) {
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
   /**************/
+  Info info(true, true, workDir + "/" + "PepLOG");
   /* Get receptors */
   std::vector<std::string> receptors;
-  std::vector<std::string> receptorfiles = getReceptors(receptorsPath, receptorsPrep);
+  std::vector<std::string> receptorfiles = getReceptors(receptorsPath,
+                                                        receptorsPrep);
   for (auto s : receptorfiles) {
     receptors.push_back(receptorsPath + "/" + s);
   }
   if (!receptorsPrep) {
     for (auto s : receptors) {
       prepareConfig(s);
-      preparePDBQT(s, pythonShPath, mgltoolstilitiesPath);
+      try {
+        preparePDBQT(s, pythonShPath, mgltoolstilitiesPath);
+      } catch (std::exception& e) {
+        info.errorMsg(e.what(), true);
+      }
     }
   }
   /**************/
   /* Generate ligands */
   // Initialization of key objects required
-  Info info(true, true, workDir + "/" + "PepLOG");
   GenAlgInst<std::string, PepGenome, PepFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
@@ -240,12 +249,10 @@ int main(int argc, char *argv[]) {
   if (initialpdbs == "") {
     // Just some random sequences for testing
     startingSequences = {
-         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG", "KPAG", "HAGF", "BYAH", "CYLA"};
+         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG",
+         "KPAG", "HAGF", "BYAH", "CYLA"};
   } else {
-    // Try to add PDB sequences until we have gen, some PDBs could fail => catch
     while (startingSequences.size() < gen) {
-      // Wait till every thread has read the number of elements
-      // This works by assumption that the threads don't all finish at the same time
       std::string filename = getRandomPDB(initialpdbs);
       std::string FASTA;
       try {
@@ -255,16 +262,18 @@ int main(int argc, char *argv[]) {
         if (e.type == "TOP") {
           continue;
         } else {
-          throw;
+          info.errorMsg(e.what(), true);
         }
       } catch (VinaException& e) {
         if (e.type == "PQT") {
-          // Problem with pdbqt generation is usually because of MAX_TORS exceeding
-          // default value, try another one
+          // Problem with pdbqt generation is usually because of
+          // MAX_TORS exceeding default value, try another one
           continue;
         } else {
-          throw;
+          info.errorMsg(e.what(), true);
         }
+      } catch (std::exception& e) {
+        info.errorMsg(e.what(), true);
       }
       if (!FASTA.empty()) {
         startingSequences.push_back(FASTA);
@@ -289,13 +298,19 @@ int main(int argc, char *argv[]) {
     curGenDistinct = curGen;
     // Sort and then remove consecutive duplicates
     std::sort(curGenDistinct.begin(), curGenDistinct.end());
-    curGenDistinct.erase(std::unique(curGenDistinct.begin(), curGenDistinct.end()),
+    curGenDistinct.erase(std::unique(curGenDistinct.begin(),
+                                     curGenDistinct.end()),
                           curGenDistinct.end());
-    // Add the new elements (PoolMGR only adds them if they don't exist already, does a new MD else)
+    // Add the new elements
+    // (PoolMGR only adds them if they don't exist already, does a new MD else)
     #pragma omp parallel
     #pragma omp for
     for (unsigned int i = 0; i < curGenDistinct.size(); i++) {
-      poolmgr.addElement(curGenDistinct.at(i));
+      try {
+        poolmgr.addElement(curGenDistinct.at(i));
+      } catch (std::exception& e) {
+        info.errorMsg(e.what(), true);
+      }
     }
   }
   /**************/

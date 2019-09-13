@@ -1,3 +1,4 @@
+/* Copyright 2019 Fabian Krause */
 #include "Info.h"
 
 void Info::infoMsg(std::string msg) {
@@ -9,7 +10,7 @@ void Info::infoMsg(std::string msg) {
   }
 }
 
-void Info::errorMsg(std::string msg, bool fatal=false) {
+void Info::errorMsg(std::string msg, bool fatal = false) {
   std::cout << "\033[1;31mERROR: " + msg << "\033[0m" << std::endl;
   if (log) {
     *f << "ERROR: " + msg << std::endl;
