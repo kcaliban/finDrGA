@@ -164,21 +164,29 @@ void preparePDBQT(std::string receptor,
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 3 && argc != 4) {
+  if (argc != 4 && argc != 5) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: VinaGA [Number of populations]"
                  " [prob. of random poinmutation]"
-                 " [optional: size of initial gen (if initialpdbs specified)]"
+                 " [percentage of top individuals to copy each gen.]"
+                 " [optional: size of initial initial pop. (if initialpdbs specified)]"
       << std::endl;
     return 1;
   }
-
+  unsigned int noPop = atoi(argv[1]);
+  float mutateProb = atof(argv[2]);
+  float genCpy = atof(argv[3]);
+  unsigned int gen = (argc == 5) ? atoi(argv[4]) : 10; // default size of init pop 10
+  /* Prepare random engine */
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  /**************/
+  /* Read config */
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
         std::cout << "Can't load 'config.ini'\n";
         return 1;
   }
-
   // AutoDock VINA
   std::string vinaPath = reader.Get("paths", "vina", "vina");
   std::string pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
@@ -189,7 +197,6 @@ int main(int argc, char *argv[]) {
   bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
-
   // GROMACS
   std::string gromacsPath = reader.Get("paths", "gromacs", "gmx");
   std::string mdpPath = reader.Get("paths", "mdp", "");
@@ -199,19 +206,10 @@ int main(int argc, char *argv[]) {
   std::string boundingboxtype = reader.Get("GROMACS", "bt", "");
   float boxsize = reader.GetReal("GROMACS", "bt", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
-
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
-  // Standard number of randomly picked individuals: 10
-  unsigned int gen = 10;
-  if (argc != 4) {
-    // Size of initial gen not specified
-    initialpdbs = "";
-  } else {
-    gen = atoi(argv[3]);
-  }
-
-  // Get receptors
+  /**************/
+  /* Get receptors */
   std::vector<std::string> receptors;
   std::vector<std::string> receptorfiles = getReceptors(receptorsPath, receptorsPrep);
   for (auto s : receptorfiles) {
@@ -223,9 +221,10 @@ int main(int argc, char *argv[]) {
       preparePDBQT(s, pythonShPath, mgltoolstilitiesPath);
     }
   }
-  // Receptors are prepared already
-
-  GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
+  /**************/
+  /* Generate ligands */
+  // Initialization of key objects required
+  GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
                   receptors,
@@ -234,8 +233,7 @@ int main(int argc, char *argv[]) {
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff);
   VinaFitnessFunc fitnessFunc(&poolmgr);
-  VinaGenome vinaGenome;
-
+  VinaGenome vinaGenome(&mt);
   // Gather elements
   std::vector<std::string> startingSequences;
   if (initialpdbs == "") {
@@ -264,9 +262,10 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-
+  /**************/
+  /* GA */
   std::vector<std::string> curGen = startingSequences;
-  for (int i = 0; i < atoi(argv[1]); i++) {
+  for (unsigned int i = 0; i < noPop; i++) {
     // Output to log file
     std::string output = "Generation: ";
     output.append(std::to_string(i));
@@ -280,7 +279,7 @@ int main(int argc, char *argv[]) {
     outputFileStream.close();
     // Output for best/entropy graph
     // Get new generation
-    curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, atof(argv[2]));
+    curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, mutateProb, genCpy);
     // Temporary debug output
     poolmgr.printSeqAff();
 
@@ -298,6 +297,6 @@ int main(int argc, char *argv[]) {
       poolmgr.addElement(curGenDistinct.at(i));
     }
   }
-
+  /**************/
   return 0;
 }

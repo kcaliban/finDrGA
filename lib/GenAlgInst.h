@@ -4,7 +4,6 @@
 #include "FitnessFunction.h"
 #include <vector>
 #include <random>
-#include <chrono>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -12,10 +11,17 @@
 template <typename GenoType, typename Genome, typename FitnessFunction>
 class GenAlgInst
 {
+  private:
+    std::mt19937 * mt;
   public:
+    GenAlgInst(std::mt19937 * mt1) {
+      mt = mt1;
+    }
+
     void simulate(Genome genome, FitnessFunction fitnessfunc,
                                      std::vector<GenoType> genotype, int n,
-                                     float mutateProb, bool debug=false,
+                                     float mutateProb, float copy,
+                                     bool debug=false,
                                      bool entropy=true,
                                      const char * entropyFile="entropy") {
       std::vector<GenoType> newGen = genotype;
@@ -23,14 +29,15 @@ class GenAlgInst
         if (debug) {
           std::cout << "Generation: " << (i + 1) << std::endl;
         }
-        newGen = nextGen(genome, fitnessfunc, newGen, mutateProb,
+        newGen = nextGen(genome, fitnessfunc, newGen, mutateProb, copy,
                           debug, entropy, entropyFile);
       }
     };
 
     std::vector<GenoType> nextGen(Genome genome, FitnessFunction fitnessfunc,
                                     std::vector<GenoType> genotypes,
-                                    float mutateProb, bool debug=false,
+                                    float mutateProb, float copy,
+                                    bool debug=false,
                                     bool entropy=true, const char * entropyFile="entropy") {
       std::vector<GenoType> newGen;
       // Required for selection and recombination
@@ -54,10 +61,7 @@ class GenAlgInst
         fitnesses.push_back(fitness);
       }
       */
-      // SELECTION (this should become "modular" aswell)
-      //           (the way selection and recombination is done should be
-      //            defined elsewhere)
-      // Copy the top 20%
+      // SELECTION
       // Requires them to be sorted; we need to keep the original order
       // of elements to associate them with genotypes vector (could also
       // use pairs)
@@ -69,11 +73,12 @@ class GenAlgInst
       sort(sortedindices.begin(), sortedindices.end(),
           [fitnesses](size_t i1, size_t i2) {
             return fitnesses[i1] > fitnesses[i2];});
-      unsigned int amount = (int) (0.1 * genotypes.size());
+      unsigned int amount = (int) (copy * genotypes.size());
       for (unsigned int i = 0; i < amount; i++) {
         newGen.push_back(genotypes[sortedindices[i]]);
       }
       if (debug) {
+        std::cout << std::endl;
         std::cout << "\tBest individual: " << genotypes[sortedindices[0]]
                   << ", " << fitnesses[sortedindices[0]]
                   << std::endl;
@@ -85,16 +90,16 @@ class GenAlgInst
       if (debug) {
         std::cout << "\tRecombination..." << std::endl;
       }
-      unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-      std::default_random_engine generator(seed);
+      // Discrete distribution: p(i) = w_i / sum(w_i), here fitness divided by sum
+      // of all fitnesses
       std::discrete_distribution<int> fitnessdistribution(fitnesses.begin(), fitnesses.end());
       // Pick two genotypes randomly, until we have a population as big as the initial
       while (amount < genotypes.size()) {
         if (debug) {
           std::cout << "\t\tPopulation size: " << amount << std::endl;
         }
-        GenoType inda = genotypes[fitnessdistribution(generator)];
-        GenoType indb = genotypes[fitnessdistribution(generator)];
+        GenoType inda = genotypes[fitnessdistribution(*mt)];
+        GenoType indb = genotypes[fitnessdistribution(*mt)];
         newGen.push_back(genome.crossOver(inda, indb));
         amount++;
       }
@@ -107,7 +112,7 @@ class GenAlgInst
       }
       std::uniform_real_distribution<float> uniformdistribution(0.0, 1.0);
       for (unsigned int i = 0; i < newGen.size(); i++) {
-        if (uniformdistribution(generator) <= mutateProb) {
+        if (uniformdistribution(*mt) <= mutateProb) {
           GenoType mutatedGen = genome.mutate(newGen[i]);
           /*
           // Save old genotype for deletion
