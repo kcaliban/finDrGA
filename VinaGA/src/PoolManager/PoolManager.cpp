@@ -85,6 +85,8 @@ std::string PoolMGR::addElementPDB(std::string file) {
   try {
     genMD(FASTASEQ);
   } catch (GMXException& e) {
+    // Remove from map
+    internalMap.erase(internalMap.find(FASTASEQ));
     throw; // Throw upwards for handling in main
   }
   genDock(FASTASEQ);
