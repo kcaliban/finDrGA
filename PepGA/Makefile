@@ -1,7 +1,7 @@
 # Specify compiler commands
 CXX = g++ -O3 -Wall -fopenmp
 # Specify name of file containing main function, without ext.
-BINARY = VinaGA
+BINARY = PepGA
 # Source files; ** wildcard does not work on my Make so just one level depth
 SRCFILES = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 SRCFILES := $(filter-out $(wildcard src/*/*Test.cpp), $(filter-out $(wildcard src/*Test.cpp),$(SRCFILES)))
