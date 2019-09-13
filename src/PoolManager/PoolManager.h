@@ -78,6 +78,7 @@ class PoolMGR {
     void update(std::vector<std::string>);
     void cleanUp(int);
     void printSeqAff();
+    void preparePDBQT(std::string);
     std::string toStr();
   private:
     int exhaustiveness;

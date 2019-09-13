@@ -10,6 +10,23 @@ void PoolMGR::printSeqAff() {
   }
 }
 
+void PoolMGR::preparePDBQT(std::string ligand) {
+  // Generate a PDBQT
+  std::string command;
+  command.append(pythonShPath);
+  command.append(" ");
+  command.append(mgltoolstilitiesPath);
+  command.append("/prepare_ligand4.py -l ");
+  command.append(ligand);
+  command.append(" -A bonds_hydrogens -U nphs -o ");
+  command.append(ligand);
+  command.append("qt");
+  int success = system(command.c_str());
+  if (success != 0) {
+    throw VinaException("Could not generate pdbqt file for ligand", ligand, "PQT");
+  }
+}
+
 std::string PoolMGR::PDBtoFASTA(std::string filename) {
   std::ifstream file(filename);
   if (!file.is_open()) {
@@ -91,7 +108,7 @@ std::string PoolMGR::addElementPDB(std::string file) {
   }
   // Generate Docking
   try {
-  genDock(FASTASEQ);
+    genDock(FASTASEQ);
   } catch (VinaException& e) {
     // Remove from map
     internalMap.erase(internalMap.find(FASTASEQ));
@@ -228,6 +245,8 @@ void PoolMGR::genDock(std::string FASTASEQ) {
   }
   */
   std::vector<std::pair<std::string, float>> affinities;
+  // Prepare ligand
+  preparePDBQT(std::get<1>(internalMap[FASTASEQ]));
   // Do a docking for each receptor
   #pragma omp parallel
   #pragma omp for
@@ -239,7 +258,6 @@ void PoolMGR::genDock(std::string FASTASEQ) {
                               receptors.at(i).c_str(),
                               std::get<1>(internalMap[FASTASEQ]).c_str(),
                               true, true);
-    vinaInstance.generatePDBQT();
     float affinity = vinaInstance.calculateBindingAffinity(exhaustiveness, energy_range);
     #pragma omp critical
     affinities.push_back(std::make_pair(receptors.at(i).c_str(), affinity));

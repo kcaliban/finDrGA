@@ -14,43 +14,6 @@ void VinaInstance::debugPrint(const char * str) {
   }
 }
 
-void VinaInstance::generatePDBQT() {
-  debugPrint("Generating pdbqts...");
-  // Generate receptor PDBQT
-  std::string command;
-  /* Done in VinaGA
-  command.append(pythonShPath);
-  command.append(" ");
-  command.append(mgltoolstilitiesPath);
-  command.append("/prepare_receptor4.py -r ");
-  command.append(receptor);
-  command.append(" -A bonds_hydrogens -U nphs -o ");
-  command.append(receptor);
-  command.append("qt");
-  command.append(logStr());
-  int success = system(command.c_str());
-  if (success != 0) {
-    throw VinaException("Could not generate pdbqt file for receptor", receptor);
-  }
-  command.clear();
-  */
-
-  // Generate ligand PDBQT
-  command.append(pythonShPath);
-  command.append(" ");
-  command.append(mgltoolstilitiesPath);
-  command.append("/prepare_ligand4.py -l ");
-  command.append(ligand);
-  command.append(" -A bonds_hydrogens -U nphs -o ");
-  command.append(ligand);
-  command.append("qt");
-  command.append(logStr());
-  int success = system(command.c_str());
-
-  if (success != 0) {
-    throw VinaException("Could not generate pdbqt file for ligand", ligand, "PQT");
-  }
-}
 
 float VinaInstance::calculateBindingAffinity(int exhaustiveness,
                                               int energy_range) {
