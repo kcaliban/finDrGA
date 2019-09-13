@@ -48,7 +48,7 @@ void VinaInstance::generatePDBQT() {
   int success = system(command.c_str());
 
   if (success != 0) {
-    throw VinaException("Could not generate pdbqt file for ligand", ligand);
+    throw VinaException("Could not generate pdbqt file for ligand", ligand, "PQT");
   }
 }
 

@@ -256,6 +256,14 @@ int main(int argc, char *argv[]) {
         } else {
           throw;
         }
+      } catch (VinaException& e) {
+        if (e.type == "PQT") {
+          // Problem with pdbqt generation is usually because of MAX_TORS exceeding
+          // default value, try another one
+          continue;
+        } else {
+          throw;
+        }
       }
       if (!FASTA.empty()) {
         startingSequences.push_back(FASTA);

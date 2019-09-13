@@ -59,7 +59,7 @@ std::string PoolMGR::addElementPDB(std::string file) {
   }
   command.clear();
   // Move file
-  command.append("mv ");
+  command.append("mv -f ");
   command.append(file);
   command.append(" ");
   command.append(workDir);
@@ -89,7 +89,14 @@ std::string PoolMGR::addElementPDB(std::string file) {
     internalMap.erase(internalMap.find(FASTASEQ));
     throw; // Throw upwards for handling in main
   }
+  // Generate Docking
+  try {
   genDock(FASTASEQ);
+  } catch (VinaException& e) {
+    // Remove from map
+    internalMap.erase(internalMap.find(FASTASEQ));
+    throw; // Throw upwards for handling in main
+  }
   return FASTASEQ;
 }
 
