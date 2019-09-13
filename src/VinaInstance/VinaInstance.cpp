@@ -1,20 +1,5 @@
 #include "VinaInstance.h"
 
-std::string VinaInstance::logStr() {
-  if (log) {
-    return " >> " + ligand.substr(0,
-        ligand.size() - 15) + "/VINAINSTLOG" + " 2>&1";
-  }
-  return " > /dev/null 2>&1";
-}
-
-void VinaInstance::debugPrint(const char * str) {
-  if (debug) {
-    std::cout << "\033[1;32mINFO (DOCKING, " << ligand << "): " << str << "\033[0m" << std::endl;
-  }
-}
-
-
 float VinaInstance::calculateBindingAffinity(int exhaustiveness,
                                               int energy_range) {
   // Create command
@@ -37,8 +22,7 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   command.append(" --energy_range ");
   command.append(std::to_string(energy_range));
 
-  std::string out = "Docking against " + receptor + "...";
-  debugPrint(out.c_str());
+  info->infoMsg("(VINA) Docking " + ligand + " against: " + receptor);
 
   // Execute command and stream using popen
   std::string vinaOutput;

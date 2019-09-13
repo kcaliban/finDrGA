@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
   /* Read config */
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
-        std::cout << "Can't load 'config.ini'\n";
+        std::cout << "Can't load 'config.ini'\nCheck if it exists in the same dir as PepGA";
         return 1;
   }
   // AutoDock VINA
@@ -224,6 +224,7 @@ int main(int argc, char *argv[]) {
   /**************/
   /* Generate ligands */
   // Initialization of key objects required
+  Info info(true, true, workDir + "/" + "PepLOG");
   GenAlgInst<std::string, PepGenome, PepFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
@@ -231,7 +232,7 @@ int main(int argc, char *argv[]) {
                   exhaustiveness, energy_range, gromacsPath.c_str(),
                   mdpPath.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
-                  clustercutoff);
+                  clustercutoff, &info);
   PepFitnessFunc fitnessFunc(&poolmgr);
   PepGenome vinaGenome(&mt);
   // Gather elements
@@ -279,17 +280,9 @@ int main(int argc, char *argv[]) {
     output.append(std::to_string(i));
     output.append("\n");
     output.append(genToStr(curGen, poolmgr));
-    output.append("\n");
-    std::string outputFileDir = workDir;
-    outputFileDir.append("/VINAGALOG");
-    std::ofstream outputFileStream(outputFileDir,  std::ios::out | std::ios::app);
-    outputFileStream << output;
-    outputFileStream.close();
-    // Output for best/entropy graph
+    info.infoMsg(output);
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, mutateProb, genCpy);
-    // Temporary debug output
-    poolmgr.printSeqAff();
 
     // Remove duplicates for adding
     std::vector<std::string> curGenDistinct;

@@ -1,21 +1,12 @@
 #include "GMXInstance.h"
 
 std::string GMXInstance::logStr() {
-  if (log) {
-    return " >> " + workDir + "/GMXINSTLOG" + " 2>&1";
-  }
-  return " > /dev/null 2>&1";
-}
-
-void GMXInstance::debugPrint(const char * str) {
-  if (debug) {
-    std::cout << "\033[1;32mINFO (MD, " << ligand << "): " << str << "\033[0m" << std::endl;
-  }
+  return " >> " + workDir + "/GMXINSTLOG" + " 2>&1";
 }
 
 void GMXInstance::preparePDB() {
   // Export path to forcefield
-  debugPrint("Setting env forcefield value...");
+  info->infoMsg("(GMX, " + ligand + ") Setting env forcefield value...");
   std::string command;
   int success = setenv("GMXLIB", forcefieldPath.c_str(), 1);
   if (success != 0) {
@@ -23,7 +14,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Clean file from crystal water
-  debugPrint("Cleaning ligand from crystal water...");
+  info->infoMsg("(GMX, " + ligand + ") Cleaning ligand from crystal water...");
   command.append("grep -v HOH ");
   command.append(ligand);
   command.append(" > ");
@@ -36,7 +27,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Create topology using force field
-  debugPrint("Creating topology...");
+  info->infoMsg("(GMX, " + ligand + ") Creating topology...");
   command.append(gromacsPath);
   command.append(" pdb2gmx -f ");
   command.append(workDir);
@@ -62,7 +53,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Define the bounding box
-  debugPrint("Defining the bounding box...");
+  info->infoMsg("(GMX, " + ligand + ") Defining the bounding box...");
   command.append(gromacsPath);
   command.append(" editconf");
   command.append(" -f ");
@@ -83,7 +74,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Solvate
-  debugPrint("Solvating...");
+  info->infoMsg("(GMX, " + ligand + ") Solvating...");
   command.append(gromacsPath);
   command.append(" solvate");
   command.append(" -cp ");
@@ -104,7 +95,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Add ions
-  debugPrint("Adding ions...");
+  info->infoMsg("(GMX, " + ligand + ") Adding ions...");
   // Step one
   command.append(gromacsPath);
   command.append(" grompp");
@@ -156,7 +147,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Energy minimization
-  debugPrint("Minimzing energy...");
+  info->infoMsg("(GMX, " + ligand + ") Minimzing energy...");
   // Prepare
   command.append(gromacsPath);
   command.append(" grompp");
@@ -208,7 +199,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Temperature Equilibrium
-  debugPrint("Equilibriating temperature...");
+  info->infoMsg("(GMX, " + ligand + ") Equilibriating temperature...");
   // Preparation
   command.append(gromacsPath);
   command.append(" grompp");
@@ -266,7 +257,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Pressure Equilibrium
-  debugPrint("Equilibriating pressure...");
+  info->infoMsg("(GMX, " + ligand + ") Equilibriating pressure...");
   // Preparation
   command.append(gromacsPath);
   command.append(" grompp");
@@ -327,7 +318,7 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Final preparation
-  debugPrint("Final preparation for MD...");
+  info->infoMsg("(GMX, " + ligand + ") Final preparation for MD...");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
@@ -358,7 +349,7 @@ void GMXInstance::preparePDB() {
 
 void GMXInstance::runMD() {
   // Run MD
-  debugPrint("Running the MD...");
+  info->infoMsg("(GMX, " + ligand + ") Running the MD...");
   std::string command;
   command.append(gromacsPath);
   command.append(" mdrun");
@@ -390,10 +381,10 @@ void GMXInstance::runMD() {
     throw GMXException("Could not run the MD", ligand);
   }
   command.clear();
-  debugPrint("MD successful!");
+  info->infoMsg("(GMX, " + ligand + ") MD successful!");
   // Generate .pdb file
   // Step one
-  debugPrint("Generating PDB file...");
+  info->infoMsg("(GMX, " + ligand + ") Generating PDB file...");
   command.append(gromacsPath);
   command.append(" trjconv");
   command.append(" -s ");
@@ -439,7 +430,7 @@ void GMXInstance::runMD() {
 
 void GMXInstance::clusteredMD() {
   std::string command;
-  debugPrint("Clustering PDB...");
+  info->infoMsg("(GMX, " + ligand + ") Clustering PDB...");
   command.append(gromacsPath);
   command.append(" cluster");
   command.append(" -f ");
@@ -476,7 +467,7 @@ void GMXInstance::clusteredMD() {
 }
 
 void GMXInstance::extractTopCluster() {
-  debugPrint("Extracting the top cluster...");
+  info->infoMsg("(GMX, " + ligand + ") Extracting the top cluster...");
   std::string clustSizeFile;
   clustSizeFile.append(workDir);
   clustSizeFile.append("/clust-size.xvg");

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <regex>
 #include <exception>
+#include "../Info.h"
 class GMXException : public std::exception {
   public:
     std::string type;
@@ -59,7 +60,7 @@ class GMXInstance {
                 const char * water1, const char * bt1,
                 float clustercutoff1,
                 float boxsize1, const char * mdpPath1,
-                bool debug1, bool log1) {
+                Info * info1) {
       ligand = ligand1;
       gromacsPath = gromacsPath1;
       workDir = workDir1;
@@ -71,8 +72,7 @@ class GMXInstance {
       mdpPath = mdpPath1;
       forcefieldPath = forcefieldPath1;
       pymolPath = pymolPath1;
-      debug = debug1;
-      log = log1;
+      info = info1;
     }
 
     void preparePDB();
@@ -93,11 +93,7 @@ class GMXInstance {
     std::string forcefieldPath;
     float boxsize;
     float clustercutoff;
-    bool debug;
-    bool log;
-
-    void debugPrint(const char *);
-    void errorPrint(const char *);
+    Info * info;
 };
 
 #endif

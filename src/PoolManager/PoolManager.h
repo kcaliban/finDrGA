@@ -52,7 +52,7 @@ class PoolMGR {
             const char * gromacsPath1, const char * mdpPath1,
             const char * forcefield1, const char * forcefieldPath1,
             const char * water1, const char * boundingboxtype1,
-            float boxsize1, float clustercutoff1) {
+            float boxsize1, float clustercutoff1, Info * info1) {
       workDir = workDir1;
       receptors = receptors1;
       nReceptors = receptors1.size();
@@ -70,6 +70,7 @@ class PoolMGR {
       boundingboxtype = boundingboxtype1;
       boxsize = boxsize1;
       clustercutoff = clustercutoff1;
+      info = info1;
     };
 
     std::string addElementPDB(std::string);
@@ -77,7 +78,6 @@ class PoolMGR {
     float getAffinity(std::string);
     void update(std::vector<std::string>);
     void cleanUp(int);
-    void printSeqAff();
     void preparePDBQT(std::string);
     std::string toStr();
   private:
@@ -90,6 +90,7 @@ class PoolMGR {
     std::string pythonShPath;
     std::string mgltoolstilitiesPath;
     std::string pymolPath;
+    Info * info;
 
     std::string gromacsPath;
     std::string mdpPath;
