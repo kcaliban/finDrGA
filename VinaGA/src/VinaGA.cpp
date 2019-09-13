@@ -45,12 +45,17 @@ std::string getRandomPDB(std::string dir) {
 }
 
 // Get receptor filenames
-std::vector<std::string> getReceptors(std::string dir) {
+std::vector<std::string> getReceptors(std::string dir, bool prep=false) {
   // Read all pdb files in a directory
   std::string command;
   command.append("ls ");
   command.append(dir);
-  command.append(" | cat | grep -v .pdbqt | grep -v conf");
+  command.append(" | cat ");
+  if (!prep) {
+    command.append("| grep -v .pdbqt | grep -v conf");
+  } else {
+    command.append("| grep -v conf");
+  }
   std::string output;
   FILE * lsOutputStream = popen(command.c_str(), "r");
   char buf[1024];
@@ -139,8 +144,26 @@ void prepareConfig(std::string receptor) {
   confFile.close();
 }
 
-int main(int argc, char *argv[])
-{
+void preparePDBQT(std::string receptor,
+                   std::string pythonShPath,
+                   std::string mgltoolstilitiesPath) {
+  // Generate a PDBQT
+  std::string command;
+  command.append(pythonShPath);
+  command.append(" ");
+  command.append(mgltoolstilitiesPath);
+  command.append("/prepare_receptor4.py -r ");
+  command.append(receptor);
+  command.append(" -A bonds_hydrogens -U nphs -o ");
+  command.append(receptor);
+  command.append("qt");
+  int success = system(command.c_str());
+  if (success != 0) {
+    throw VinaException("Could not generate pdbqt file for receptor", receptor);
+  }
+}
+
+int main(int argc, char *argv[]) {
   if (argc != 3 && argc != 4) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: VinaGA [Number of populations]"
@@ -163,6 +186,7 @@ int main(int argc, char *argv[])
   std::string pymolPath = reader.Get("paths", "pymol", "pymol");
   std::string workDir = reader.Get("paths", "workingDir", "");
   std::string receptorsPath = reader.Get("paths", "receptors", "");
+  bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
 
@@ -176,7 +200,6 @@ int main(int argc, char *argv[])
   float boxsize = reader.GetReal("GROMACS", "bt", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
 
-  std::cout << gromacsPath << std::endl;
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
   // Standard number of randomly picked individuals: 10
@@ -190,14 +213,17 @@ int main(int argc, char *argv[])
 
   // Get receptors
   std::vector<std::string> receptors;
-  std::vector<std::string> receptorfiles = getReceptors(receptorsPath);
+  std::vector<std::string> receptorfiles = getReceptors(receptorsPath, receptorsPrep);
   for (auto s : receptorfiles) {
     receptors.push_back(receptorsPath + "/" + s);
   }
-  // Generate config files
-  for (auto s : receptors) {
-    prepareConfig(s);
+  if (!receptorsPrep) {
+    for (auto s : receptors) {
+      prepareConfig(s);
+      preparePDBQT(s, pythonShPath, mgltoolstilitiesPath);
+    }
   }
+  // Receptors are prepared already
 
   GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst;
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),

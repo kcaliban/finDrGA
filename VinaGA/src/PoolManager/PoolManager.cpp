@@ -17,9 +17,10 @@ std::string PoolMGR::PDBtoFASTA(std::string filename) {
         filename);
   }
   std::unordered_map<std::string, std::string> AA({
-    {"ALA","A"},{"ARG","R"},{"ASN","N"},{"ASP","D"},{"CYS","C"},{"GLU","E"},{"GLN","Q"},{"GLY","G"},{"HIS","H"},
-     {"ILE","I"},{"LEU","L"},{"LYS","K"},{"MET","M"},{"PHE","F"},{"PRO","P"},{"SER","S"},{"THR","T"},{"TRP","W"},
-     {"TYR","Y"},{"VAL","V"}
+    {"ALA","A"},{"ARG","R"},{"ASN","N"},{"ASP","D"},{"CYS","C"},
+    {"GLU","E"},{"GLN","Q"},{"GLY","G"},{"HIS","H"},{"ILE","I"},
+    {"LEU","L"},{"LYS","K"},{"MET","M"},{"PHE","F"},{"PRO","P"},
+    {"SER","S"},{"THR","T"},{"TRP","W"},{"TYR","Y"},{"VAL","V"}
   });
 
   std::string FASTA;
@@ -254,8 +255,8 @@ void PoolMGR::cleanUp(int x) {
   // Cleans all files of PDBs that have not been used for x generations
   for (auto it = internalMap.begin(); it != internalMap.end(); ) {
     if (std::get<3>(it->second) > x) {
-      std::cout << "CLEANUP\t\tRemoving: " << it->first << std::endl;
       deleteElementData(it->first);
+      free(&std::get<2>(it->second)); // Free up heap space
       internalMap.erase(it++);
     } else {
       it++;
