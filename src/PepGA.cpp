@@ -166,7 +166,7 @@ void preparePDBQT(std::string receptor,
 int main(int argc, char *argv[]) {
   if (argc != 4 && argc != 5) {
     std::cout << "Wrong number of arguments!" << std::endl;
-    std::cout << "Usage: VinaGA [Number of populations]"
+    std::cout << "Usage: PepGA [Number of populations]"
                  " [prob. of random poinmutation]"
                  " [percentage of top individuals to copy each gen.]"
                  " [optional: size of initial initial pop. (if initialpdbs specified)]"
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
   /**************/
   /* Generate ligands */
   // Initialization of key objects required
-  GenAlgInst<std::string, VinaGenome, VinaFitnessFunc> inst(&mt);
+  GenAlgInst<std::string, PepGenome, PepFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
                   receptors,
@@ -232,8 +232,8 @@ int main(int argc, char *argv[]) {
                   mdpPath.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff);
-  VinaFitnessFunc fitnessFunc(&poolmgr);
-  VinaGenome vinaGenome(&mt);
+  PepFitnessFunc fitnessFunc(&poolmgr);
+  PepGenome vinaGenome(&mt);
   // Gather elements
   std::vector<std::string> startingSequences;
   if (initialpdbs == "") {

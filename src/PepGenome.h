@@ -4,13 +4,13 @@
 #include <string>
 #include <chrono>
 #include <random>
-class VinaGenome : public Genome<std::string> {
+class PepGenome : public Genome<std::string> {
   private:
     std::string alphabet = "ARNDCQEGHILKMFPSTWYV";
     std::mt19937 * mt;
 
   public:
-    VinaGenome(std::mt19937 * mt1) {
+    PepGenome(std::mt19937 * mt1) {
       mt = mt1;
     }
 

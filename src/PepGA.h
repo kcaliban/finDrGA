@@ -1,5 +1,5 @@
-#ifndef VINAGA
-#define VINAGA
+#ifndef PEPGA
+#define PEPGA
 #include "lib/GenAlgInst.h"
 #include "PepGenome.h"
 #include "PepFitnessFunc.h"

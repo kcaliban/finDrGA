@@ -3,13 +3,13 @@
 #include "lib/FitnessFunction.h"
 #include "PoolManager/PoolManager.h"
 #include <string>
-class VinaFitnessFunc {
+class PepFitnessFunc {
   private:
     // Pointer to the pool manager
     PoolMGR * poolmgr;
 
   public:
-    VinaFitnessFunc(PoolMGR * poolmgr1) {
+    PepFitnessFunc(PoolMGR * poolmgr1) {
       poolmgr = poolmgr1;
     };
 
