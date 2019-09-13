@@ -1,6 +1,6 @@
 #ifndef VINFF
 #define VINFF
-#include "../../lib/FitnessFunction.h"
+#include "lib/FitnessFunction.h"
 #include "PoolManager/PoolManager.h"
 #include <string>
 class VinaFitnessFunc {

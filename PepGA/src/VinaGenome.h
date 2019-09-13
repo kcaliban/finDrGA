@@ -1,6 +1,6 @@
 #ifndef VINGN
 #define VINGN
-#include "../../lib/Genome.h"
+#include "lib/Genome.h"
 #include <string>
 #include <chrono>
 #include <random>
