@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
   std::string forcefield = reader.Get("GROMACS", "forcefield", "");
   std::string water = reader.Get("GROMACS", "water", "");
   std::string boundingboxtype = reader.Get("GROMACS", "bt", "");
-  float boxsize = reader.GetReal("GROMACS", "bt", 1.0);
+  float boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");

@@ -29,19 +29,18 @@ void GMXInstance::preparePDB() {
   command.clear();
   // Create topology using force field
   info->infoMsg("(GMX, " + ligand + ") Creating topology...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" pdb2gmx -f ");
-  command.append(workDir);
-  command.append("/clean.pdb");
+  command.append("clean.pdb");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/processed.gro");
+  command.append("processed.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -i ");
-  command.append(workDir);
-  command.append("/posre.itp");
+  command.append("posre.itp");
   command.append(" -water ");
   command.append(water);
   command.append(" -ff ");
@@ -55,14 +54,15 @@ void GMXInstance::preparePDB() {
   command.clear();
   // Define the bounding box
   info->infoMsg("(GMX, " + ligand + ") Defining the bounding box...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" editconf");
   command.append(" -f ");
-  command.append(workDir);
-  command.append("/processed.gro");
+  command.append("processed.gro");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/newbox.gro");
+  command.append("newbox.gro");
   command.append(" -c ");
   command.append(" -d ");
   command.append(std::to_string(boxsize));
@@ -76,19 +76,19 @@ void GMXInstance::preparePDB() {
   command.clear();
   // Solvate
   info->infoMsg("(GMX, " + ligand + ") Solvating...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" solvate");
   command.append(" -cp ");
-  command.append(workDir);
-  command.append("/newbox.gro");
+  command.append("newbox.gro");
   command.append(" -cs ");
   command.append("spc216.gro");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/solv.gro");
+  command.append("solv.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -98,23 +98,22 @@ void GMXInstance::preparePDB() {
   // Add ions
   info->infoMsg("(GMX, " + ligand + ") Adding ions...");
   // Step one
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
   command.append(mdpPath);
   command.append("/ions.mdp");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/solv.gro");
+  command.append("solv.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/ions.tpr");
+  command.append("ions.tpr");
   command.append(" -po ");
-  command.append(workDir);
-  command.append("/mdout.mdp");
+  command.append("mdout.mdp");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -122,17 +121,17 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Step two
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" genion");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/ions.tpr");
+  command.append("ions.tpr");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/solv_ions.gro");
+  command.append("solv_ions.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -pname ");
   command.append("NA");
   command.append(" -nname ");
@@ -150,23 +149,22 @@ void GMXInstance::preparePDB() {
   // Energy minimization
   info->infoMsg("(GMX, " + ligand + ") Minimzing energy...");
   // Prepare
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
   command.append(mdpPath);
   command.append("/minim.mdp");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/solv_ions.gro");
+  command.append("solv_ions.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/em.tpr");
+  command.append("em.tpr");
   command.append(" -po ");
-  command.append(workDir);
-  command.append("/mdout.mdp");
+  command.append("mdout.mdp");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -174,25 +172,23 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Run MD for enery minimization
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
   command.append(" -gcom 2");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/em.tpr");
+  command.append("em.tpr");
   command.append(" -deffnm em");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/em.gro");
+  command.append("em.gro");
   command.append(" -e ");
-  command.append(workDir);
-  command.append("/em.edr");
+  command.append("em.edr");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/em.trr");
+  command.append("em.trr");
   command.append(" -g ");
-  command.append(workDir);
-  command.append("/em.log");
+  command.append("em.log");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -202,26 +198,24 @@ void GMXInstance::preparePDB() {
   // Temperature Equilibrium
   info->infoMsg("(GMX, " + ligand + ") Equilibriating temperature...");
   // Preparation
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
   command.append(mdpPath);
   command.append("/nvt.mdp");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/em.gro");
+  command.append("em.gro");
   command.append(" -r ");
-  command.append(workDir);
-  command.append("/em.gro");
+  command.append("em.gro");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/nvt.tpr");
+  command.append("nvt.tpr");
   command.append(" -po ");
-  command.append(workDir);
-  command.append("/mdout.mdp");
+  command.append("mdout.mdp");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -229,28 +223,25 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Run MD for equilibrium
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
   command.append(" -gcom 2");
   command.append(" -deffnm nvt");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/nvt.tpr");
+  command.append("nvt.tpr");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/nvt.gro");
+  command.append("nvt.gro");
   command.append(" -e ");
-  command.append(workDir);
-  command.append("/nvt.edr");
+  command.append("nvt.edr");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/nvt.trr");
+  command.append("nvt.trr");
   command.append(" -cpo ");
-  command.append(workDir);
-  command.append("/nvt.cpt");
+  command.append("nvt.cpt");
   command.append(" -g ");
-  command.append(workDir);
-  command.append("/nvt.log");
+  command.append("nvt.log");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -260,29 +251,26 @@ void GMXInstance::preparePDB() {
   // Pressure Equilibrium
   info->infoMsg("(GMX, " + ligand + ") Equilibriating pressure...");
   // Preparation
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
   command.append(mdpPath);
   command.append("/npt.mdp");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/nvt.gro");
+  command.append("nvt.gro");
   command.append(" -r ");
-  command.append(workDir);
-  command.append("/nvt.gro");
+  command.append("nvt.gro");
   command.append(" -t ");
-  command.append(workDir);
-  command.append("/nvt.cpt");
+  command.append("nvt.cpt");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/npt.tpr");
+  command.append("npt.tpr");
   command.append(" -po ");
-  command.append(workDir);
-  command.append("/mdout.mdp");
+  command.append("mdout.mdp");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -290,28 +278,25 @@ void GMXInstance::preparePDB() {
   }
   command.clear();
   // Run MD for equilibrium
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
   command.append(" -gcom 2");
   command.append(" -deffnm npt");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/npt.tpr");
+  command.append("npt.tpr");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/npt.gro");
+  command.append("npt.gro");
   command.append(" -e ");
-  command.append(workDir);
-  command.append("/npt.edr");
+  command.append("npt.edr");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/npt.trr");
+  command.append("npt.trr");
   command.append(" -g ");
-  command.append(workDir);
-  command.append("/npt.log");
+  command.append("npt.log");
   command.append(" -cpo ");
-  command.append(workDir);
-  command.append("/npt.cpt");
+  command.append("npt.cpt");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -320,26 +305,24 @@ void GMXInstance::preparePDB() {
   command.clear();
   // Final preparation
   info->infoMsg("(GMX, " + ligand + ") Final preparation for MD...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" grompp");
   command.append(" -f ");
   command.append(mdpPath);
   command.append("/md.mdp");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/npt.gro");
+  command.append("npt.gro");
   command.append(" -t ");
-  command.append(workDir);
-  command.append("/npt.cpt");
+  command.append("npt.cpt");
   command.append(" -p ");
-  command.append(workDir);
-  command.append("/topol.top");
+  command.append("topol.top");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/md_0_1.tpr");
+  command.append("md_0_1.tpr");
   command.append(" -po ");
-  command.append(workDir);
-  command.append("/mdout.mdp");
+  command.append("mdout.mdp");
   command.append(logStr());
   success = system(command.c_str());
   if (success != 0) {
@@ -352,30 +335,26 @@ void GMXInstance::runMD() {
   // Run MD
   info->infoMsg("(GMX, " + ligand + ") Running the MD...");
   std::string command;
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
   command.append(" -deffnm md_0_1");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/md_0_1.tpr");
+  command.append("md_0_1.tpr");
   command.append(" -c ");
-  command.append(workDir);
-  command.append("/md_0_1.gro");
+  command.append("md_0_1.gro");
   command.append(" -e ");
-  command.append(workDir);
-  command.append("/md_0_1.edr");
+  command.append("md_0_1.edr");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/md_0_1.trr");
+  command.append("md_0_1.trr");
   command.append(" -g ");
-  command.append(workDir);
-  command.append("/md_0_1.log");
+  command.append("md_0_1.log");
   command.append(" -cpo ");
-  command.append(workDir);
-  command.append("/md_0_1.cpt");
+  command.append("md_0_1.cpt");
   command.append(" -x ");
-  command.append(workDir);
-  command.append("/md_0_1.xtc");
+  command.append("md_0_1.xtc");
   command.append(logStr());
   int success = system(command.c_str());
   if (success != 0) {
@@ -386,17 +365,17 @@ void GMXInstance::runMD() {
   // Generate .pdb file
   // Step one
   info->infoMsg("(GMX, " + ligand + ") Generating PDB file...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" trjconv");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/md_0_1.tpr");
+  command.append("md_0_1.tpr");
   command.append(" -f ");
-  command.append(workDir);
-  command.append("/md_0_1.xtc");
+  command.append("md_0_1.xtc");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/md_0_1_noPBC.xtc");
+  command.append("md_0_1_noPBC.xtc");
   command.append(" -pbc mol ");
   command.append(" -center ");
   command.append(logStr());
@@ -408,17 +387,17 @@ void GMXInstance::runMD() {
   }
   command.clear();
   // Step two
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" trjconv");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/md_0_1.tpr");
+  command.append("md_0_1.tpr");
   command.append(" -f ");
-  command.append(workDir);
-  command.append("/md_0_1_noPBC.xtc");
+  command.append("md_0_1_noPBC.xtc");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/MD.pdb");
+  command.append("MD.pdb");
   command.append(logStr());
   command.append(" ");
   command.append(" <<eof\n1\neof");
@@ -432,29 +411,25 @@ void GMXInstance::runMD() {
 void GMXInstance::clusteredMD() {
   std::string command;
   info->infoMsg("(GMX, " + ligand + ") Clustering PDB...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
   command.append(gromacsPath);
   command.append(" cluster");
   command.append(" -f ");
-  command.append(workDir);
-  command.append("/MD.pdb");
+  command.append("MD.pdb");
   command.append(" -o ");
-  command.append(workDir);
-  command.append("/rmsd-clust.xpm");
+  command.append("rmsd-clust.xpm");
   command.append(" -g ");
-  command.append(workDir);
-  command.append("/clust.log");
+  command.append("clust.log");
   command.append(" -s ");
-  command.append(workDir);
-  command.append("/md_0_1.tpr");
+  command.append("md_0_1.tpr");
   command.append(" -dist ");
-  command.append(workDir);
-  command.append("/rmsd-dist.xvg");
+  command.append("rmsd-dist.xvg");
   command.append(" -cl ");
-  command.append(workDir);
-  command.append("/clusters.pdb");
+  command.append("clusters.pdb");
   command.append(" -sz ");
-  command.append(workDir);
-  command.append("/clust-size.xvg");
+  command.append("clust-size.xvg");
   command.append(" -cutoff ");
   command.append(std::to_string(clustercutoff));
   command.append(" ");

@@ -1,5 +1,5 @@
 # Specify compiler commands
-CXX = g++ -O3 -Wall -fopenmp
+CXX = g++ -O3 -Wall -fopenmp -std=c++11
 # Specify name of file containing main function, without ext.
 BINARY = PepGA
 # Source files; ** wildcard does not work on my Make so just one level depth
@@ -17,7 +17,7 @@ OBJTEST = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCTEST)))
 
 $(info    Source files: $(SRCFILES))
 $(info    Object files: $(OBJFILES))
-all: folders compile test
+all: folders compile
 
 # Create required folders
 folders:
