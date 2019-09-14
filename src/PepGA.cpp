@@ -329,6 +329,7 @@ int main(int argc, char *argv[]) {
     output.append("\n");
     output.append(genToStr(curGen, poolmgr));
     info.infoMsg(output);
+    info.infoMsg(poolmgr.toStr());
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, mutateProb, genCpy);
 
