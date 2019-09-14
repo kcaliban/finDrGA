@@ -8,7 +8,8 @@ picked from helices extracted from [RCSB](http://mgltools.scripps.edu/),
 PepGA prepares and executes a molecular dynamics simulation using GROMACS.
 The result is clustered, the biggest cluster extracted and subsequently
 docked against the input receptors. After selection, recombination and
-mutation this process is repeated.
+mutation using the docking results, the process is repeated with the new
+resulting generation of peptides.
 
 ## Dependencies
 * [AutoDock Vina](http://vina.scripps.edu/), for binding affinity calculations
