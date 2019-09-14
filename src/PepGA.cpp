@@ -1,6 +1,34 @@
 /* Copyright 2019 Fabian Krause */
 #include "PepGA.h"
 
+void check(const std::string p) {
+  struct stat st;
+  if (stat(p.c_str(), &st) != 0) {
+    std::cout << "File or path \"" + p + "\" does not exist\n"
+                   "Check your config.ini" << std::endl;
+    exit(-1);
+  }
+}
+
+void checkExecutable(const std::string e, const std::string progr) {
+  std::string command;
+  command.append(e);
+  if (progr == "pymol") {
+    command.append(" -kcq");
+  } else if (progr == "vina") {
+    command.append(" --help");
+  } else if (progr == "pythonsh") {
+    command.append(" -h");
+  }
+  command.append(" 2>/dev/null 1>&2");
+  int success = system(command.c_str());
+  if (success != 0) {
+    std::cout << "Executable \"" + e + "\" does not exist or returns an error\n"
+                   "Check your config.ini" << std::endl;
+    exit(-1);
+  }
+}
+
 std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
   std::string returnStr;
   returnStr.append("[");
@@ -190,21 +218,31 @@ int main(int argc, char *argv[]) {
                      "Check if it exists in the same dir as PepGA";
         return 1;
   }
-  // AutoDock VINA
+  // Executables
   std::string vinaPath = reader.Get("paths", "vina", "vina");
+  checkExecutable(vinaPath, "vina");
   std::string pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
+  checkExecutable(pythonShPath, "pythonsh");
+  std::string pymolPath = reader.Get("paths", "pymol", "pymol");
+  checkExecutable(pymolPath, "pymol");
+  std::string gromacsPath = reader.Get("paths", "gromacs", "gmx");
+  checkExecutable(gromacsPath, "");
+  // Required by Vina/preparation for Vina
   std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities",
                                                 "");
-  std::string pymolPath = reader.Get("paths", "pymol", "pymol");
+  check(mgltoolstilitiesPath);
   std::string workDir = reader.Get("paths", "workingDir", "");
+  check(workDir);
   std::string receptorsPath = reader.Get("paths", "receptors", "");
+  check(receptorsPath);
   bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
-  // GROMACS
-  std::string gromacsPath = reader.Get("paths", "gromacs", "gmx");
-  std::string mdpPath = reader.Get("paths", "mdp", "");
+  // Required by gromacs
+  std::string settings = reader.Get("paths", "settings", "");
+  check(settings);
   std::string forcefieldPath = reader.Get("paths", "forcefieldpath", "");
+  check(forcefieldPath);
   std::string forcefield = reader.Get("GROMACS", "forcefield", "");
   std::string water = reader.Get("GROMACS", "water", "");
   std::string boundingboxtype = reader.Get("GROMACS", "bt", "");
@@ -212,6 +250,7 @@ int main(int argc, char *argv[]) {
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
+  check(initialpdbs);
   /**************/
   Info info(true, true, workDir + "/" + "PepLOG");
   /* Get receptors */
@@ -239,7 +278,7 @@ int main(int argc, char *argv[]) {
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
                   receptors,
                   exhaustiveness, energy_range, gromacsPath.c_str(),
-                  mdpPath.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
+                  settings.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff, &info);
   PepFitnessFunc fitnessFunc(&poolmgr);

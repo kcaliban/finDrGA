@@ -2,6 +2,7 @@
 #ifndef SRC_PEPGA_H_
 #define SRC_PEPGA_H_
 #include <omp.h>
+#include <sys/stat.h>
 #include <fstream>
 #include "lib/GenAlgInst.h"
 #include "PepGenome.h"
