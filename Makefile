@@ -34,7 +34,7 @@ objs: $(OBJFILES)
 
 # Test
 test: testobjs
-	$(CXX) $(OBJTEST) -o $(TEST) -lgtest -lgtest_main -lpthread
+	$(CXX) $(OBJTEST) $(filter-out $(wildcard obj/PepGA.o),$(OBJFILES)) -o $(TEST) -lgtest -lgtest_main -lpthread
 	./$(TEST)
 
 testobjs: $(OBJTEST)

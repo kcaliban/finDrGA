@@ -327,9 +327,8 @@ int main(int argc, char *argv[]) {
     std::string output = "Generation: ";
     output.append(std::to_string(i));
     output.append("\n");
-    output.append(genToStr(curGen, poolmgr));
+    output.append(poolmgr.toStr());
     info.infoMsg(output);
-    info.infoMsg(poolmgr.toStr());
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, mutateProb, genCpy);
 

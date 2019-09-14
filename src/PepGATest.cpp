@@ -22,6 +22,7 @@ class TestFitnessFunctionCpy : public FitnessFunction<int> {
      return x;
    }
 };
+
 TEST(GenAlgInst, topIndividuals50) {
   std::random_device rd;
   std::mt19937 mt(rd());
@@ -97,7 +98,7 @@ TEST(GenAlgInst, recomb1) {
 
   std::vector<int> initialPop = {1, 1, 1, 10};
   int numberAllTens = 0;
-  int n = 50000;
+  int n = 500;
   for (int i = 0; i < n; i++) {
     std::vector<int> nextgen = genAlgInst.nextGen(testGenome,
                                       testFitnessFunction,
@@ -119,6 +120,7 @@ TEST(GenAlgInst, recomb1) {
   // Ergo roughly 80% of all generations should have all tens
   ASSERT_NEAR(0.8, (float) numberAllTens / (float) n, 0.05);
 }
+
 /** TEST #3: Probability of mutation is correct **/
 class TestGenomeMut : public Genome<int> {
  public:
@@ -146,7 +148,7 @@ TEST(GenAlgInst, mutate50) {
 
   std::vector<int> initialPop = {10, 10, 10, 10, 10, 10, 10, 10};
   int numberMut = 0;
-  int n = 50000;
+  int n = 500;
   for (int i = 0; i < n; i++) {
     std::vector<int> nextgen = genAlgInst.nextGen(testGenome,
                                       testFitnessFunction,
@@ -171,7 +173,7 @@ TEST(GenAlgInst, mutate25) {
 
   std::vector<int> initialPop = {10, 10, 10, 10, 10, 10, 10, 10};
   int numberMut = 0;
-  int n = 50000;
+  int n = 500;
   for (int i = 0; i < n; i++) {
     std::vector<int> nextgen = genAlgInst.nextGen(testGenome,
                                       testFitnessFunction,
@@ -187,14 +189,37 @@ TEST(GenAlgInst, mutate25) {
   ASSERT_NEAR(2, (float) numberMut / (float) n, 0.1);
 }
 
+/**** PDB to FASTA tests ****/
+#include "PoolManager/PoolManager.h"
+#include "Info.h"
+
+TEST(PoolMGR, PDBtoFASTA) {
+  std::vector<std::string> blub;
+  std::vector<std::pair<std::string, std::string>> PDBs;
+  Info * info = new Info(false, false, "");
+  PoolMGR poolmgr("", "", "", "", "", blub, 0, 0, "", "", "", "", "", "", 0, 0, info);
+  PDBs.push_back(std::make_pair("SEAHTLLYGT", "src/testpdbs/10_5zop_D_6.pdb"));
+  PDBs.push_back(std::make_pair("SLYPAQMYSR", "src/testpdbs/10_pdb2pyj_D_25.pdb"));
+  PDBs.push_back(std::make_pair("PKFFRYISERY", "src/testpdbs/11_2y35_D_1.pdb"));
+  PDBs.push_back(std::make_pair("SFYKNFTIDCS", "src/testpdbs/11_pdb1pd0_D_15.pdb"));
+  PDBs.push_back(std::make_pair("GVLGKELIDVLD", "src/testpdbs/12_2r8j_D_17.pdb"));
+  PDBs.push_back(std::make_pair("MHESMKLFDSIC", "src/testpdbs/12_pdb2g83_D_14.pdb"));
+  PDBs.push_back(std::make_pair("GDGVEEAF", "src/testpdbs/8_5icn_D_18.pdb"));
+  PDBs.push_back(std::make_pair("LVLLLRVL", "src/testpdbs/8_5vo8_D_14.pdb"));
+  PDBs.push_back(std::make_pair("LPDLFEEQ", "src/testpdbs/8_5yko_D_16.pdb"));
+  PDBs.push_back(std::make_pair("WDEHDFYCR", "src/testpdbs/9_5usn_D_2.pdb"));
+  // PDBs.push_back(std::make_pair("
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator it = PDBs.begin();
+      it != PDBs.end(); it++) {
+    std::string fasta = it->first;
+    std::string pdb = it->second;
+    std::string out = poolmgr.PDBtoFASTA(it->second);
+    ASSERT_EQ(fasta, out);
+  }
+  free(info);
+}
+
 int main(int argc, char ** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
-/*
-TEST(StrToLowerTest, someChars) {
-  ASSERT_EQ("abc", StrToLower("ABC"));
-  ASSERT_EQ("bah", StrToLower("bAH"));
-}
-*/

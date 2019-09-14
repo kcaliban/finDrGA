@@ -40,10 +40,6 @@ class PoolMGR {
    *               FASTA sequence.
    *               Also keeps track of their MD simulation and docking
    *               results, if applicable.
-   *
-   *               If a certain FASTA sequence has not been used for
-   *               X
-   *               generations, delete the files and entry in PoolMGR
    */
  public:
     PoolMGR(const char * workDir1, const char * vinaPath1,
@@ -83,6 +79,7 @@ class PoolMGR {
     void cleanUp(int);
     void preparePDBQT(std::string);
     std::string toStr();
+    std::string PDBtoFASTA(std::string);
 
  private:
     int exhaustiveness;
@@ -114,7 +111,6 @@ class PoolMGR {
     void genMD(std::string);
     void genDock(std::string);
     void deleteElementData(std::string);
-    std::string PDBtoFASTA(std::string);
 };
 
 #endif  // SRC_POOLMANAGER_POOLMANAGER_H_
