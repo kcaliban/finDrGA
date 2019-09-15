@@ -42,12 +42,12 @@ After putting all your receptors into the directory you specified in
 `config.ini`, simply change into the folder of PepGA, pray to the gods
 of probability and enter:
 ```bash
-./PepGA n p1 p2 m
+./PepGA n p1 pc m
 ```
 Where:
 * `n` is the number of generations as an integer
 * `p1` is the probability of a mutation at each sequence of each individual as a floating point number
-* `p2` is the percentage of best-performing individuals to be copied at each generation as a floating point number
+* `pc` is the percentage of best-performing individuals to be copied at each generation as a floating point number
 * `m` is the number of individuals to pick randomly from the initialpdbs folder specified in `config.ini`, if applicable
 
 ### Initial PDBs: Helices
