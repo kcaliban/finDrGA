@@ -34,7 +34,7 @@ make
 
 Before you can use PepGA you have to configure it. Take a look at `config.ini`
 and change the settings accordingly, making sure all directories you
-specify exit.
+specify exist.
 
 ## Usage
 
@@ -48,7 +48,13 @@ Where:
 * `n` is the number of generations as an integer
 * `p1` is the probability of a mutation at each sequence of each individual as a floating point number
 * `p2` is the percentage of best-performing individuals to be copied at each generation as a floating point number
-* `m` is the number of individuals to pick randomly from the initialpdbs folder specified in `config.ini`
+* `m` is the number of individuals to pick randomly from the initialpdbs folder specified in `config.ini`, if applicable
+
+### Initial PDBs: Helices
+
+In the psmalpha folder you will find an example of settings, multiple conformations
+of a receptor (Phenol-soluble modulin Alpha 3 in D-form) and a tarball containing
+all naturally occuring alpha helices of size 12 extracted from RCSB.
 
 ## License
 
