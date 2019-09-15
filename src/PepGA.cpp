@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
   if (argc != 4 && argc != 5) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: PepGA [number of generations]"
-                 " [prob. of random point mutation]"
+                 " [prob. of random point mutation for each individual]"
                  " [percentage of top individuals to copy each gen.]"
                  " [optional: size of initial initial pop."
                  " (if initialpdbs specified), default 10]"

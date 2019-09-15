@@ -46,7 +46,7 @@ of probability and enter:
 ```
 Where:
 * `n` is the number of generations as an integer
-* `p1` is the probability of a mutation at each sequence of each individual as a floating point number
+* `p1` is the probability of a mutation at a random uniformly picked sequence for each individual
 * `pc` is the percentage of best-performing individuals to be copied at each generation as a floating point number
 * `m` is the number of individuals to pick randomly from the initialpdbs folder specified in `config.ini`, if applicable
 
