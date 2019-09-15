@@ -12,6 +12,7 @@ mutation using the docking results, the process is repeated with the new
 resulting generation of peptides.
 
 ## Dependencies
+
 * [AutoDock Vina](http://vina.scripps.edu/), for binding affinity calculations
 * [GROMACS](http://www.gromacs.org/), for molecular dynamics
 * [MGLTools](http://mgltools.scripps.edu/), for generation of files required by AutoDock Vina
@@ -19,7 +20,38 @@ resulting generation of peptides.
 
 ## Installation
 
+PepGA is written for Linux. Make sure you have all dependencies installed, then
+move on to the following steps:
+
+Go to any directory you like and clone this repository, change into its directory
+and compile using make
+```bash
+cd ilikethisdirectory
+git clone https://github.com/kcaliban/PepGA.git
+cd PepGA
+make
+```
+
+Before you can use PepGA you have to configure it. Take a look at `config.ini`
+and change the settings accordingly, making sure all directories you
+specify exit.
+
 ## Usage
 
-Logging
-Config
+After putting all your receptors into the directory you specified in
+`config.ini`, simply change into the folder of PepGA, pray to the gods
+of probability and enter:
+```bash
+./PepGA n p1 p2 m
+```
+Where:
+* `n` is the number of generations as an integer
+* `p1` is the probability of a mutation at each sequence of each individual as a floating point number
+* `p2` is the percentage of best-performing individuals to be copied at each generation as a floating point number
+* `m` is the number of individuals to pick randomly from the initialpdbs folder specified in `config.ini`
+
+## License
+
+See LICENSE file
+
+inih is written by Ben Hoyt, see src/inih/LICENSE

@@ -195,11 +195,11 @@ void preparePDBQT(std::string receptor,
 int main(int argc, char *argv[]) {
   if (argc != 4 && argc != 5) {
     std::cout << "Wrong number of arguments!" << std::endl;
-    std::cout << "Usage: PepGA [Number of populations]"
-                 " [prob. of random poinmutation]"
+    std::cout << "Usage: PepGA [number of generations]"
+                 " [prob. of random point mutation]"
                  " [percentage of top individuals to copy each gen.]"
                  " [optional: size of initial initial pop."
-                 " (if initialpdbs specified)]"
+                 " (if initialpdbs specified), default 10]"
       << std::endl;
     return 1;
   }
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDB files to take random sample from
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
-  check(initialpdbs);
+  if (!initialpdbs.empty()) {check(initialpdbs);}
   /**************/
   Info info(true, true, workDir + "/" + "PepLOG");
   /* Get receptors */
@@ -288,8 +288,12 @@ int main(int argc, char *argv[]) {
   if (initialpdbs == "") {
     // Just some random sequences for testing
     startingSequences = {
-         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG",
-         "KPAG", "HAGF", "BYAH", "CYLA"};
+         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG"};
+    #pragma omp parallel
+    #pragma omp for
+    for (unsigned int i = 0; i < startingSequences.size(); i++) {
+      poolmgr.addElement(startingSequences.at(i));
+    }
   } else {
     while (startingSequences.size() < gen) {
       std::string filename = getRandomPDB(initialpdbs);
