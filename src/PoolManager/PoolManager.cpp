@@ -243,7 +243,7 @@ void PoolMGR::genMD(std::string FASTASEQ) {
   try {
     gmxInstance.preparePDB();
     gmxInstance.runMD();
-    gmxInstance.clusteredMD();
+    gmxInstance.clusterMD();
     gmxInstance.extractTopCluster();
   } catch (...) {
     throw;

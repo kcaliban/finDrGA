@@ -408,7 +408,7 @@ void GMXInstance::runMD() {
   command.clear();
 }
 
-void GMXInstance::clusteredMD() {
+void GMXInstance::clusterMD() {
   std::string command;
   info->infoMsg("(GMX, " + ligand + ") Clustering PDB...");
   command.append("cd ");

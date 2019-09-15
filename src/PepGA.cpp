@@ -29,13 +29,13 @@ void checkExecutable(const std::string e, const std::string progr) {
   }
 }
 
-std::string genToStr(std::vector<std::string> gen, PoolMGR poolmgr) {
+std::string genToStr(std::vector<std::string> gen, PoolMGR * poolmgr) {
   std::string returnStr;
   returnStr.append("[");
   for (auto g : gen) {
     returnStr.append(g);
     returnStr.append(": ");
-    returnStr.append(std::to_string(poolmgr.getAffinity(g)));
+    returnStr.append(std::to_string(poolmgr->getAffinity(g)));
     returnStr.append(", ");
   }
   returnStr.pop_back(); returnStr.pop_back();
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
     std::string output = "Generation: ";
     output.append(std::to_string(i));
     output.append("\nIndividuals:\n");
-    output.append(genToStr(curGen));
+    output.append(genToStr(curGen, &poolmgr));
     output.append("\nItems in Pool Manager:\n");
     output.append(poolmgr.toStr());
     info.infoMsg(output);

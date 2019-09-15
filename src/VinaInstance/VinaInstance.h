@@ -1,7 +1,13 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * AutoDock Vina Interface class
+ *
+ * Provides functionality to prepare and execute an AutoDock Vina docking
+ * using system() calls.
+ *
+*/
 #ifndef SRC_VINAINSTANCE_VINAINSTANCE_H_
 #define SRC_VINAINSTANCE_VINAINSTANCE_H_
-/* Interface to run Vina and read simulation results */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -57,24 +63,24 @@ class VinaException : virtual public std::exception {
 
 class VinaInstance {
  public:
-    /* Docking instance using AutoDock Vina
-     * Paths are self-explanatory, but beware:
-     *    ALWAYS WITHOUT '/' AT THE END
-     *    NEVER STARTING WITH '~'
-     *
-     * workDir ~ working directory, programm will create subdirectory
-     *           with name of ligand
-     * receptor, ligand ~ absolute path to files
-     */
-    VinaInstance(const char *  vinaPath1, const char * receptor1,
-                 const char * ligand1, Info * info1) {
+    VinaInstance(const char * vinaPath1,
+                 const char * receptor1,
+                 const char * ligand1,
+                 Info * info1) {
       vinaPath = vinaPath1;
       receptor = receptor1;
       ligand = ligand1;
       info = info1;
     }
 
-    float calculateBindingAffinity(int exhaustiveness, int energy_range);
+    /* calculateBindingAffinity(exhaustiveness, energy_range):
+     *
+     * Does a docking with specified receptor and ligand using
+     * exhaustiveness and energy_range settings.
+     * Returns the best docking result.
+     *
+    */
+    float calculateBindingAffinity(int, int);
 
  private:
     std::string vinaPath;

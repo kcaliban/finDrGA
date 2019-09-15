@@ -1,4 +1,10 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * PepGA Tests
+ *
+ * Testing only internal functionality, the heavy IO using other programs
+ * is too time-consuming to test at this point.
+*/
 #include <gtest/gtest.h>
 
 /**** Tests for GenAlgInst ****/

@@ -1,4 +1,10 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * PepGA Fitness function
+ *
+ * Returns negated binding affinities for the use of the genetic algorithm,
+ * requires a PoolMGR for the affinities
+*/
 #ifndef SRC_PEPFITNESSFUNC_H_
 #define SRC_PEPFITNESSFUNC_H_
 #include <string>
@@ -6,7 +12,6 @@
 #include "PoolManager/PoolManager.h"
 class PepFitnessFunc {
  private:
-    // Pointer to the pool manager
     PoolMGR * poolmgr;
 
  public:
@@ -16,4 +21,5 @@ class PepFitnessFunc {
 
     float calculateFitness(std::string &, ...);
 };
+
 #endif  // SRC_PEPFITNESSFUNC_H_

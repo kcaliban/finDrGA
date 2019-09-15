@@ -1,4 +1,15 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * GROMACS Interface class
+ *
+ * Provides functionality to prepare and run a molecular dynamics
+ * simulation using system() calls.
+ *
+ * Preparation and settings follow the steps from the tutorial
+ * "Lysozyme in Water" by Justin A. Lemkuhl, Ph.D.
+ * http://www.mdtutorials.com/gmx/lysozyme/index.html
+ *
+*/
 #ifndef SRC_GMXINSTANCE_GMXINSTANCE_H_
 #define SRC_GMXINSTANCE_GMXINSTANCE_H_
 #include <string>
@@ -27,7 +38,8 @@ class GMXException : public std::exception {
       errorMsg = error;
     }
 
-    GMXException(const std::string msg1, const std::string file1,
+    GMXException(const std::string msg1,
+                 const std::string file1,
                  const std::string type1) {
       msg = msg1;
       file = file1;
@@ -54,13 +66,17 @@ class GMXException : public std::exception {
 
 class GMXInstance {
  public:
-    GMXInstance(const char * ligand1, const char * gromacsPath1,
+    GMXInstance(const char * ligand1,
+                const char * gromacsPath1,
                 const char * pymolPath1,
-                const char * workDir1, const char * forcefield1,
+                const char * workDir1,
+                const char * forcefield1,
                 const char * forcefieldPath1,
-                const char * water1, const char * bt1,
+                const char * water1,
+                const char * bt1,
                 float clustercutoff1,
-                float boxsize1, const char * mdpPath1,
+                float boxsize1,
+                const char * mdpPath1,
                 Info * info1) {
       ligand = ligand1;
       gromacsPath = gromacsPath1;
@@ -76,11 +92,38 @@ class GMXInstance {
       info = info1;
     }
 
+    /* preparePDB():
+     * Prepares the ligand for molecular dynamics simulation by performing:
+     * 1) Cleansing from crystal water
+     * 2) Creation of a topology using specified force-field
+     * 3) Solvating
+     * 4) Ionizing
+     * 5) Minimizing energy by a short MD specified in minim.mdp
+     * 6) Equilibrating temperature and pressure doing short MDs specified
+     *    in npt.mdp & nvt.mdp
+     *
+     * Relevant output: md_0_1.tpr
+    */
     void preparePDB();
+    /* runMD():
+     * Runs a molecular dynamics simulation using the settings specified in
+     * MD.mdp using the prepared PDB file from preparePDB()
+     *
+     * Relevant output: MD.pdb
+    */
     void runMD();
-    void clusteredMD();
+    /* clusterMD():
+     * Clusters the result of molecular dynamics simulation using gmx cluster
+     *
+     * Relevant output: clusters.pdb
+    */
+    void clusterMD();
+    /* extractTopCluster():
+     * Extracts the biggest cluster from clustering result
+     *
+     * Relevant output: topcluster.pdb
+    */
     void extractTopCluster();
-    std::string logStr();
 
  private:
     std::string ligand;
@@ -95,6 +138,11 @@ class GMXInstance {
     float boxsize;
     float clustercutoff;
     Info * info;
+
+    /* logStr():
+     * Returns command-line string to redirect stdout and stderr to log file
+     */
+    std::string logStr();
 };
 
 #endif  // SRC_GMXINSTANCE_GMXINSTANCE_H_

@@ -1,4 +1,7 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * Defines how individuals of GenoType are recombined and mutated in GA
+*/
 #ifndef SRC_LIB_GENOME_H_
 #define SRC_LIB_GENOME_H_
 #include <vector>

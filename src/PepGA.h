@@ -1,4 +1,10 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * PepGA Main class
+ *
+ * Tries to find a optimal ligand for given receptor(s) or multiple
+ * conformations of receptor(s) using genetic algorithm strategies
+*/
 #ifndef SRC_PEPGA_H_
 #define SRC_PEPGA_H_
 #include <omp.h>

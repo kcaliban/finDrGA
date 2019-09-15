@@ -1,4 +1,9 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * PepGA Genome
+ *
+ * Defines possible mutations and crossover, requires a random engine
+*/
 #ifndef SRC_PEPGENOME_H_
 #define SRC_PEPGENOME_H_
 #include <string>

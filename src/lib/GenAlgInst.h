@@ -1,4 +1,11 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 Fabian Krause
+ *
+ * Genetic algorithm functionality using
+ *  GenoType: A class to define properties of an individual, e.g. std::string
+ *            for AA sequence
+ *  Genome: A class to define recombination and mutation of individuals
+ *  FitnessFunction: A class that defines how fitness is calculated
+*/
 #ifndef SRC_LIB_GENALGINST_H_
 #define SRC_LIB_GENALGINST_H_
 #include "Genome.h"
@@ -16,14 +23,19 @@ class GenAlgInst {
       mt = mt1;
     }
 
-    void simulate(Genome genome, FitnessFunction fitnessfunc,
-                                     std::vector<GenoType> genotype,
-                                     int n,
-                                     float mutateProb,
-                                     float copy,
-                                     bool debug = false,
-                                     bool entropy = true,
-                                     const char * entropyFile = "entropy") {
+    /* simulate(...):
+     *
+     * Performs genetic algorithm for n steps
+    */
+    void simulate(Genome genome,
+                  FitnessFunction fitnessfunc,
+                  std::vector<GenoType> genotype,
+                  int n,
+                  float mutateProb,
+                  float copy,
+                  bool debug = false,
+                  bool entropy = true,
+                  const char * entropyFile = "entropy") {
       std::vector<GenoType> newGen = genotype;
       for (int i = 0; i < n; i++) {
         if (debug) {
@@ -34,6 +46,10 @@ class GenAlgInst {
       }
     }
 
+    /* nextGen(...):
+     *
+     * Performs genetic algorithm procedure for one step
+    */
     std::vector<GenoType> nextGen(Genome genome,
                                   FitnessFunction fitnessfunc,
                                   std::vector<GenoType> genotypes,
@@ -57,12 +73,6 @@ class GenAlgInst {
         float fitness = fitnessfunc.calculateFitness(genotypes.at(i));
         fitnesses.at(i) = fitness;
       }
-      /*
-      for (GenoType genotype : genotypes) {
-        float fitness = fitnessfunc.calculateFitness(genotype);
-        fitnesses.push_back(fitness);
-      }
-      */
       // SELECTION
       // Requires them to be sorted; we need to keep the original order
       // of elements to associate them with genotypes vector (could also
@@ -118,10 +128,6 @@ class GenAlgInst {
       for (unsigned int i = 0; i < newGen.size(); i++) {
         if (uniformdistribution(*mt) <= mutateProb) {
           GenoType mutatedGen = genome.mutate(newGen[i]);
-          /*
-          // Save old genotype for deletion
-          GenoType old = newGen.at(i);
-          */
           // Insert the new one
           newGen.at(i) = mutatedGen;
           // delete old;
@@ -144,6 +150,11 @@ class GenAlgInst {
  private:
     std::mt19937 * mt;
 
+    /* calculateEntropy(vector of genotypes):
+     *
+     * Returns number of different individuals in generation,
+     * requires a "==" relation on GenoType
+    */
     int calculateEntropy(std::vector<GenoType> genotypes) {
       unsigned int entropy = 0;
       // O(n log n) could be possible with sort and unique, but then
