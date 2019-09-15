@@ -22,6 +22,11 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   command.append("qt");
   command.append(" --energy_range ");
   command.append(std::to_string(energy_range));
+  command.append(" --out ");
+  std::string outName = receptor.substr(receptor.find_last_of("/") + 1,
+                                        receptor.size() -
+                                        receptor.find_last_of("/") - 1);
+  command.append(ligand + outName);
 
   info->infoMsg("(VINA) Docking " + ligand + " against: " + receptor);
 

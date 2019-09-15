@@ -326,7 +326,9 @@ int main(int argc, char *argv[]) {
     // Output to log file
     std::string output = "Generation: ";
     output.append(std::to_string(i));
-    output.append("\n");
+    output.append("\nIndividuals:\n");
+    output.append(genToStr(curGen));
+    output.append("\nItems in Pool Manager:\n");
     output.append(poolmgr.toStr());
     info.infoMsg(output);
     // Get new generation
