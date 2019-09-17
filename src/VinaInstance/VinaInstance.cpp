@@ -42,7 +42,11 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   // Use a regex to find the best affinity
   std::regex affinityRegEx("\n   1[ ]*([-.0-9]+)");
   std::smatch affinityMatch;
-  std::regex_search(vinaOutput, affinityMatch, affinityRegEx);
+  try {
+    std::regex_search(vinaOutput, affinityMatch, affinityRegEx);
+  } catch (std::regex_error &e) {
+    info->errorMsg("Error in VINA output. Output:\n" + vinaOutput, true);
+  }
 
   return stof(affinityMatch.str(1));
 }

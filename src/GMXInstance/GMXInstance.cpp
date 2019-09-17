@@ -460,20 +460,25 @@ void GMXInstance::extractTopCluster() {
   // Get the biggest cluster
   int maxNo;
   int max = - std::numeric_limits<int>::infinity();
-  std::string line;
-  std::stringstream clustSizeFileStream(buffer);
-  std::regex clusterSizeRegEx("^\\s*([0-9]+)\\s*([0-9]+)\\s*$");
-  std::smatch lineClusterMatch;
-  while (std::getline(clustSizeFileStream, line, '\n')) {
-    std::regex_search(line, lineClusterMatch, clusterSizeRegEx);
-    if (lineClusterMatch.empty()) {continue;}
-    int cur = stoi(lineClusterMatch.str(2));
-    int curNo = stoi(lineClusterMatch.str(1));
-    if (cur > max) {
-      max = cur;
-      maxNo = curNo;
+  try {
+    std::string line;
+    std::stringstream clustSizeFileStream(buffer);
+    std::regex clusterSizeRegEx("^\\s*([0-9]+)\\s*([0-9]+)\\s*$");
+    std::smatch lineClusterMatch;
+    while (std::getline(clustSizeFileStream, line, '\n')) {
+      std::regex_search(line, lineClusterMatch, clusterSizeRegEx);
+      if (lineClusterMatch.empty()) {continue;}
+      int cur = stoi(lineClusterMatch.str(2));
+      int curNo = stoi(lineClusterMatch.str(1));
+      if (cur > max) {
+        max = cur;
+        maxNo = curNo;
+      }
     }
+  } catch (std::regex_error &e) {
+    info->errorMsg("Error in extracting the top cluster. Check clust-size.xvg and readjust your settings.", true);
   }
+
 
   // Extract biggest cluster
   std::string command;
