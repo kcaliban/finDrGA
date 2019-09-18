@@ -65,7 +65,7 @@ std::string PoolMGR::addElementPDB(std::string file, bool isMD) {
   count = internalMap.count(FASTASEQ);
   if (count != 0) { return "";}
   // Make required directory
-  std::string command = "mkdir ";
+  std::string command = "mkdir -p ";
   command.append(workDir);
   command.append("/");
   command.append(FASTASEQ);
@@ -184,7 +184,7 @@ void PoolMGR::addElement(std::string FASTASEQ) {
 
 void PoolMGR::genPDB(std::string FASTASEQ) {
   // Create directory
-  std::string command = "mkdir ";
+  std::string command = "mkdir -p ";
   command.append(workDir);
   command.append("/");
   command.append(FASTASEQ);

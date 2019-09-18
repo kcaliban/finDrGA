@@ -316,8 +316,9 @@ int main(int argc, char *argv[]) {
   if (initialpdbs != "") {
     info.infoMsg("Adding peptides from initialpdbs to the gene pool...");
     std::vector<std::string> initPop = getInitialPop(initialpdbs);
+    #pragma omp parallel
+    #pragma omp for
     for (unsigned int i = 0; i < initPop.size(); i++) {
-      if (startingSequences.size() >= gen) {break;}
       std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + initPop.at(i), initialpdbsMD);
       if (FASTA.empty()) {
         info.errorMsg("One of the initialpdbs does not allow MD or Docking"
