@@ -61,12 +61,13 @@ std::string PoolMGR::addElementPDB(std::string file, bool isMD) {
   }
   // If FASTA is already in pool we can return
   int count;
+  bool ret = false;
   // If the same file gets picked twice we could add it twice and then the
   // universe will explode, hence the critical region
   #pragma omp critical
   {
     count = internalMap.count(FASTASEQ);
-    if (count != 0) { return "";}
+    if (count == 0) {
     // Add file to internal map
     // Generate new vector on the heap
     auto blub = new std::vector<std::pair<std::string, float>>();
@@ -74,7 +75,11 @@ std::string PoolMGR::addElementPDB(std::string file, bool isMD) {
                                             workDir + "/" + FASTASEQ + "/" +
                                             FASTASEQ + ".pdb",
                                             *blub, 0);
+    } else {
+      ret = true;
+    }
   }
+  if (ret) {return "";}
   // Make required directory
   std::string command = "mkdir -p ";
   command.append(workDir);
