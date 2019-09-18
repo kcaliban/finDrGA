@@ -91,7 +91,7 @@ class PoolMGR {
      *
      * Returns FASTASEQ if MD and Docking successful, else empty string
     */
-    std::string addElementPDB(std::string);
+    std::string addElementPDB(std::string, bool);
     /* addElemennt(FASTA):
      *
      * Creates a PDB in alpha-helical structure using pymol from FASTA sequence

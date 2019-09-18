@@ -476,6 +476,7 @@ void GMXInstance::extractTopCluster() {
       }
     }
   } catch (std::regex_error &e) {
+    info->errorMsg(e.what(), false);
     info->errorMsg("Error in extracting the top cluster. Check clust-size.xvg and readjust your settings.", true);
   }
 

@@ -44,6 +44,29 @@ std::string genToStr(std::vector<std::string> gen, PoolMGR * poolmgr) {
   return returnStr;
 }
 
+// Get PDBs from initialpop folder
+std::vector<std::string> getInitialPop(std::string dir) {
+  std::string command;
+  command.append("ls ");
+  command.append(dir);
+  command.append(" | cat");
+  std::string output;
+  FILE * lsOutputStream = popen(command.c_str(), "r");
+  char buf[1024];
+  while (fgets(buf, 1024, lsOutputStream)) {
+    output += buf;
+  }
+  pclose(lsOutputStream);
+
+  std::vector<std::string> result;
+  std::string line;
+  std::stringstream outputStream(output);
+  while (std::getline(outputStream, line, '\n')) {
+    result.push_back(line);
+  }
+  return result;
+}
+
 // Get a random sample of PDB filenames from specified folder
 std::vector<std::string> getRandomSample(std::string dir, int amount) {
   std::string command;
@@ -193,13 +216,13 @@ void preparePDBQT(std::string receptor,
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 4 && argc != 5) {
+  if (argc != 5) {
     std::cout << "Wrong number of arguments!" << std::endl;
     std::cout << "Usage: PepGA [number of generations]"
                  " [prob. of random point mutation for each individual]"
                  " [percentage of top individuals to copy each gen.]"
-                 " [optional: size of initial initial pop."
-                 " (if initialpdbs specified), default 10]"
+                 " [size of initial pop., taken from initialpdbs"
+                 " and randompdbs if initialpdbs does not suffice]"
       << std::endl;
     return 1;
   }
@@ -248,9 +271,13 @@ int main(int argc, char *argv[]) {
   std::string boundingboxtype = reader.Get("GROMACS", "bt", "");
   float boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
-  // Path to PDB files to take random sample from
+  // Path to PDBs for first generation
   std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
+  bool initialpdbsMD = reader.GetBoolean("paths", "initialpdbsisMD", false);
+  // Path to PDB files to take random sample from
+  std::string randompdbs = reader.Get("paths", "randompdbs", "");
   if (!initialpdbs.empty()) {check(initialpdbs);}
+  if (!randompdbs.empty()) {check(randompdbs);}
   /**************/
   Info info(true, true, workDir + "/" + "PepLOG");
   /* Get receptors */
@@ -283,44 +310,49 @@ int main(int argc, char *argv[]) {
                   clustercutoff, &info);
   PepFitnessFunc fitnessFunc(&poolmgr);
   PepGenome vinaGenome(&mt);
-  // Gather elements
+  // Initial pdbs
+  info.infoMsg("Gathering the initial population...");
   std::vector<std::string> startingSequences;
-  if (initialpdbs == "") {
-    // Just some random sequences for testing
-    startingSequences = {
-         "HLYE", "LAFY", "IAGY", "YHVL", "AHGG"};
-    #pragma omp parallel
-    #pragma omp for
-    for (unsigned int i = 0; i < startingSequences.size(); i++) {
-      poolmgr.addElement(startingSequences.at(i));
+  if (initialpdbs != "") {
+    info.infoMsg("Adding peptides from initialpdbs to the gene pool...");
+    std::vector<std::string> initPop = getInitialPop(initialpdbs);
+    for (unsigned int i = 0; i < initPop.size(); i++) {
+      if (startingSequences.size() >= gen) {break;}
+      std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + initPop.at(i), initialpdbsMD);
+      if (FASTA.empty()) {
+        info.errorMsg("One of the initialpdbs does not allow MD or Docking"
+                      "\nCheck the following file:" + initPop.at(i), true);
+      }
+      startingSequences.push_back(FASTA);
     }
-  } else {
-    while (startingSequences.size() < gen) {
-      std::string filename = getRandomPDB(initialpdbs);
-      std::string FASTA;
-      try {
-        FASTA = poolmgr.addElementPDB(initialpdbs + "/" + filename);
-      } catch (GMXException& e) {
-        // Problem with topology is usually because of problem with PDB file
-        if (e.type == "TOP") {
-          continue;
-        } else {
-          info.errorMsg(e.what(), true);
-        }
-      } catch (VinaException& e) {
-        if (e.type == "PQT") {
-          // Problem with pdbqt generation is usually because of
-          // MAX_TORS exceeding default value, try another one
-          continue;
-        } else {
-          info.errorMsg(e.what(), true);
-        }
-      } catch (std::exception& e) {
+  }
+  // Random pdbs if initial were not enough
+  info.infoMsg("Adding random peptides to the gene pool...");
+  while (startingSequences.size() < gen) {
+    std::string filename = getRandomPDB(randompdbs);
+    std::string FASTA;
+    try {
+      FASTA = poolmgr.addElementPDB(randompdbs + "/" + filename, false);
+    } catch (GMXException& e) {
+      // Problem with topology is usually because of problem with PDB file
+      if (e.type == "TOP") {
+        continue;
+      } else {
         info.errorMsg(e.what(), true);
       }
-      if (!FASTA.empty()) {
-        startingSequences.push_back(FASTA);
+    } catch (VinaException& e) {
+      if (e.type == "PQT") {
+        // Problem with pdbqt generation is usually because of
+        // MAX_TORS exceeding default value, try another one
+        continue;
+      } else {
+        info.errorMsg(e.what(), true);
       }
+    } catch (std::exception& e) {
+      info.errorMsg(e.what(), true);
+    }
+    if (!FASTA.empty()) {
+      startingSequences.push_back(FASTA);
     }
   }
   /**************/

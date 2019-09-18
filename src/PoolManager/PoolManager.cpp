@@ -52,9 +52,13 @@ std::string PoolMGR::PDBtoFASTA(std::string filename) {
   return FASTA;
 }
 
-std::string PoolMGR::addElementPDB(std::string file) {
+std::string PoolMGR::addElementPDB(std::string file, bool isMD) {
   // Get FASTA sequence
   std::string FASTASEQ = PDBtoFASTA(file);
+  // If there was an error getting the FASTA sequence, we can return
+  if (FASTASEQ.empty()) {
+    return "";
+  }
   // If FASTA is already in pool we can return
   int count;
   #pragma omp critical
@@ -71,8 +75,8 @@ std::string PoolMGR::addElementPDB(std::string file) {
     PoolManagerException("Could not create directory for PDB file", FASTASEQ);
   }
   command.clear();
-  // Move file
-  command.append("mv -f ");
+  // Copy file
+  command.append("cp -f ");
   command.append(file);
   command.append(" ");
   command.append(workDir);
@@ -94,13 +98,15 @@ std::string PoolMGR::addElementPDB(std::string file) {
                                           workDir + "/" + FASTASEQ + "/" +
                                           FASTASEQ + ".pdb",
                                           *blub, 0);
-  // Generate MD and dock
-  try {
-    info->infoMsg("(POOLMGR) Initiating MD for: " + FASTASEQ);
-    genMD(FASTASEQ);
-  } catch (GMXException& e) {
-    internalMap.erase(internalMap.find(FASTASEQ));  // Remove from map
-    throw;  // Throw upwards for handling in main
+  // Generate MD if none exists
+  if (!isMD) {
+    try {
+      info->infoMsg("(POOLMGR) Initiating MD for: " + FASTASEQ);
+      genMD(FASTASEQ);
+    } catch (GMXException& e) {
+      internalMap.erase(internalMap.find(FASTASEQ));  // Remove from map
+      throw;  // Throw upwards for handling in main
+    }
   }
   // Generate Docking
   try {
