@@ -10,7 +10,7 @@ void PoolMGR::preparePDBQT(std::string ligand) {
   command.append(mgltoolstilitiesPath);
   command.append("/prepare_ligand4.py -l ");
   command.append(ligand);
-  command.append(" -A bonds_hydrogens -U nphs -o ");
+  command.append(" -Z -A bonds_hydrogens -U nphs -o ");
   command.append(ligand);
   command.append("qt >/dev/null");
   int success = system(command.c_str());

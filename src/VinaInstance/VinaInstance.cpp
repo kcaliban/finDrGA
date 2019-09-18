@@ -29,6 +29,9 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
                                         receptor.find_last_of("/") - 1);
   command.append(ligand + outName);
 
+  command.append(" --log ");
+  command.append(ligand + "VINALOG");
+
   info->infoMsg("(VINA) Docking " + ligand + " against: " + receptor);
 
   // Execute command and stream using popen
