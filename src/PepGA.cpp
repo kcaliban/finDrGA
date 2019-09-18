@@ -329,31 +329,45 @@ int main(int argc, char *argv[]) {
   }
   // Random pdbs if initial were not enough
   info.infoMsg("Adding random peptides to the gene pool...");
-  while (startingSequences.size() < gen) {
-    std::string filename = getRandomPDB(randompdbs);
-    std::string FASTA;
-    try {
-      FASTA = poolmgr.addElementPDB(randompdbs + "/" + filename, false);
-    } catch (GMXException& e) {
-      // Problem with topology is usually because of problem with PDB file
-      if (e.type == "TOP") {
-        continue;
-      } else {
-        info.errorMsg(e.what(), true);
+  while (true) {
+    unsigned int n = startingSequences.size();
+    if (n < gen) {
+      // Some PDBs do not work, hence we skip them.
+      // OpenMP does not allow while loops; to get around this we do
+      // repeated for loops until we have enough pdbs.
+      unsigned int m = gen - n;
+      #pragma omp parallel
+      #pragma omp for
+      for (unsigned int i = 0; i < m; i++)  {
+        std::string filename = getRandomPDB(randompdbs);
+        std::string FASTA;
+        try {
+          FASTA = poolmgr.addElementPDB(randompdbs + "/" + filename, false);
+        } catch (GMXException& e) {
+          // Problem with topology is usually because of problem with PDB file
+          if (e.type == "TOP") {
+            continue;
+          } else {
+            info.errorMsg(e.what(), true);
+          }
+        } catch (VinaException& e) {
+          if (e.type == "PQT") {
+            // Problem with pdbqt generation is usually because of
+            // MAX_TORS exceeding default value, try another one
+            continue;
+          } else {
+            info.errorMsg(e.what(), true);
+          }
+        } catch (std::exception& e) {
+          info.errorMsg(e.what(), true);
+        }
+        if (!FASTA.empty()) {
+          #pragma omp critical
+          startingSequences.push_back(FASTA);
+        }
       }
-    } catch (VinaException& e) {
-      if (e.type == "PQT") {
-        // Problem with pdbqt generation is usually because of
-        // MAX_TORS exceeding default value, try another one
-        continue;
-      } else {
-        info.errorMsg(e.what(), true);
-      }
-    } catch (std::exception& e) {
-      info.errorMsg(e.what(), true);
-    }
-    if (!FASTA.empty()) {
-      startingSequences.push_back(FASTA);
+    } else {
+      break;
     }
   }
   /**************/
