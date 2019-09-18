@@ -106,9 +106,9 @@ class GenAlgInst {
       // here fitness divided by sum of all fitnesses
       std::discrete_distribution<int> fitnessdistribution(fitnesses.begin(),
                                                           fitnesses.end());
-      // Pick two genotypes randomly
+      // Pick two genotypes randomly and recombine
       // until we have a population as big as the initial
-      while (amount < genotypes.size()) {
+      while (amount < genotypes.size() - 2) {
         if (debug) {
           std::cout << "\t\tPopulation size: " << amount << std::endl;
         }
@@ -133,6 +133,12 @@ class GenAlgInst {
           // delete old;
         }
       }
+      // COPY WITHOUT MUTATION: In this case two
+      newGen.push_back(genotypes[sortedindices[0]]);
+      std::cout << "Copying without mutation: " << genotypes[sortedindices[0]];
+      newGen.push_back(genotypes[sortedindices[1]]);
+      std::cout << "Copying without mutation: " << genotypes[sortedindices[1]];
+      newGen.push_back(genotypes[sortedindices[1]]);
       if (entropy) {
           std::ofstream outfile;
 

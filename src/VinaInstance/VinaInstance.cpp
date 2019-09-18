@@ -20,6 +20,7 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   command.append(" --ligand ");
   command.append(ligand);
   command.append("qt");
+  command.append(" --cpu 1");
   command.append(" --energy_range ");
   command.append(std::to_string(energy_range));
   command.append(" --out ");

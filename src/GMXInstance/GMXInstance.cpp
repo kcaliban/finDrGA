@@ -177,7 +177,7 @@ void GMXInstance::preparePDB() {
   command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
-  command.append(" -gcom 2");
+  command.append(" -nt 1");
   command.append(" -s ");
   command.append("em.tpr");
   command.append(" -deffnm em");
@@ -228,7 +228,7 @@ void GMXInstance::preparePDB() {
   command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
-  command.append(" -gcom 2");
+  command.append(" -nt 1");
   command.append(" -deffnm nvt");
   command.append(" -s ");
   command.append("nvt.tpr");
@@ -283,7 +283,7 @@ void GMXInstance::preparePDB() {
   command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
-  command.append(" -gcom 2");
+  command.append(" -nt 1");
   command.append(" -deffnm npt");
   command.append(" -s ");
   command.append("npt.tpr");
@@ -340,6 +340,7 @@ void GMXInstance::runMD() {
   command.append("; ");
   command.append(gromacsPath);
   command.append(" mdrun");
+  command.append(" -nt 1");
   command.append(" -deffnm md_0_1");
   command.append(" -s ");
   command.append("md_0_1.tpr");

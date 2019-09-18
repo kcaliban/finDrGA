@@ -11,9 +11,7 @@ std::string PepGenome::crossOver(std::string & str1, std::string & str2, ...) {
 
 std::string PepGenome::mutate(std::string & str1, ...) {
   std::uniform_int_distribution<int> distribution(0, str1.size() - 1);
-  std::uniform_int_distribution<int> distributionalphabet(0,
-                                                          alphabet.size() - 1);
   std::string newString = str1;
-  newString.at(distribution(*mt)) = alphabet.at(distributionalphabet(*mt));
+  newString.at(distribution(*mt)) = alphabet.at(distr(*mt));
   return newString;
 }
