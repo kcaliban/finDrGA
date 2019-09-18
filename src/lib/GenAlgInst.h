@@ -138,7 +138,6 @@ class GenAlgInst {
       std::cout << "Copying without mutation: " << genotypes[sortedindices[0]];
       newGen.push_back(genotypes[sortedindices[1]]);
       std::cout << "Copying without mutation: " << genotypes[sortedindices[1]];
-      newGen.push_back(genotypes[sortedindices[1]]);
       if (entropy) {
           std::ofstream outfile;
 
