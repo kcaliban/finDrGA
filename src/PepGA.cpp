@@ -127,12 +127,7 @@ std::vector<std::string> getReceptors(std::string dir, bool prep = false) {
 
 void prepareConfig(std::string receptor) {
   // Generate conf file for docking
-  // Size x,y,z are simply the max minus the min
 
-  /*
-  std::cout << "Trying to read receptor file: "
-            << receptor << std::endl;
-            */
   // Read receptor file
   std::ifstream t(receptor);
   t.seekg(0, std::ios::end);
@@ -169,6 +164,10 @@ void prepareConfig(std::string receptor) {
     }
   }
 
+  std::cout << xmax << ", " << xmin << std::endl;
+  std::cout << ymax << ", " << ymin << std::endl;
+  std::cout << zmax << ", " << zmin << std::endl;
+
   float sizex = xmax - xmin;
   float sizey = ymax - ymin;
   float sizez = zmax - zmin;
@@ -190,9 +189,9 @@ void prepareConfig(std::string receptor) {
   confFile << "center_y = " << offsety << std::endl;
   confFile << "center_z = " << offsetz << std::endl;
   confFile << std::endl;
-  confFile << "size_x = " << sizex + 10 << std::endl;
-  confFile << "size_y = " << sizey + 10 << std::endl;
-  confFile << "size_z = " << sizez + 10 << std::endl;
+  confFile << "size_x = " << sizex + 30 << std::endl;
+  confFile << "size_y = " << sizey + 30 << std::endl;
+  confFile << "size_z = " << sizez + 30 << std::endl;
   confFile.close();
 }
 
