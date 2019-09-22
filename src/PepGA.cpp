@@ -318,12 +318,32 @@ int main(int argc, char *argv[]) {
     #pragma omp parallel
     #pragma omp for
     for (unsigned int i = 0; i < initPop.size(); i++) {
-      std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + initPop.at(i), initialpdbsMD);
-      if (FASTA.empty()) {
-        info.errorMsg("One of the initialpdbs does not allow MD or Docking"
-                      "\nCheck the following file:" + initPop.at(i), true);
+      try {
+        std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + initPop.at(i), initialpdbsMD);
+        if (FASTA.empty()) {
+          info.errorMsg("One of the initialpdbs does not allow MD or Docking"
+                        "\nCheck the following file: " + initPop.at(i), false);
+        } else {
+          #pragma omp critical
+          startingSequences.push_back(FASTA);
+        }
+      } catch (GMXException& e) {
+        if (e.type == "TOP") {
+          info.errorMsg("Skipping file: " + initPop.at(i), false);
+          continue;
+        } else {
+          info.errorMsg(e.what(), true);
+        }
+      } catch (VinaException& e) {
+        if (e.type == "PQT") {
+          info.errorMsg("Skipping file: " + initPop.at(i), false);
+          continue;
+        } else {
+          info.errorMsg(e.what(), true);
+        }
+      } catch (std::exception& e) {
+        info.errorMsg(e.what(), true);
       }
-      startingSequences.push_back(FASTA);
     }
   }
   // Random pdbs if initial were not enough
