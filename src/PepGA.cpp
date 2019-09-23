@@ -97,7 +97,7 @@ std::string getRandomPDB(std::string dir) {
 }
 
 // Get receptor filenames
-std::vector<std::string> getReceptors(std::string dir, bool prep = false) {
+std::vector<std::string> getReceptorsM(std::string dir, bool prep = false) {
   // Read all pdb files in a directory
   std::string command;
   command.append("ls ");
@@ -164,10 +164,6 @@ void prepareConfig(std::string receptor) {
     }
   }
 
-  std::cout << xmax << ", " << xmin << std::endl;
-  std::cout << ymax << ", " << ymin << std::endl;
-  std::cout << zmax << ", " << zmin << std::endl;
-
   float sizex = xmax - xmin;
   float sizey = ymax - ymin;
   float sizez = zmax - zmin;
@@ -229,6 +225,15 @@ int main(int argc, char *argv[]) {
   float mutateProb = atof(argv[2]);
   float genCpy = atof(argv[3]);
   unsigned int gen = (argc == 5) ? atoi(argv[4]) : 10;  // def. size 10
+  /* Initialize OpenMPI */
+  int world_size, world_rank;
+  // Initialize the MPI environment
+  MPI_Init(&argc , &argv);
+  // Get the number of processes
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+  // Get the rank of the process
+  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  /**************/
   /* Prepare random engine */
   std::random_device rd;
   std::mt19937 mt(rd());
@@ -281,7 +286,7 @@ int main(int argc, char *argv[]) {
   Info info(true, true, workDir + "/" + "PepLOG");
   /* Get receptors */
   std::vector<std::string> receptors;
-  std::vector<std::string> receptorfiles = getReceptors(receptorsPath,
+  std::vector<std::string> receptorfiles = getReceptorsM(receptorsPath,
                                                         receptorsPrep);
   for (auto s : receptorfiles) {
     receptors.push_back(receptorsPath + "/" + s);
@@ -310,83 +315,31 @@ int main(int argc, char *argv[]) {
   PepFitnessFunc fitnessFunc(&poolmgr);
   PepGenome vinaGenome(&mt);
   // Initial pdbs
-  info.infoMsg("Gathering the initial population...");
   std::vector<std::string> startingSequences;
+  info.infoMsg("Gathering the initial population...");
+  std::vector<std::string> initPop = getInitialPop(initialpdbs);
   if (initialpdbs != "") {
     info.infoMsg("Adding peptides from initialpdbs to the gene pool...");
     std::vector<std::string> initPop = getInitialPop(initialpdbs);
-    #pragma omp parallel
-    #pragma omp for
-    for (unsigned int i = 0; i < initPop.size(); i++) {
-      try {
-        std::string FASTA = poolmgr.addElementPDB(initialpdbs + "/" + initPop.at(i), initialpdbsMD);
-        if (FASTA.empty()) {
-          info.errorMsg("One of the initialpdbs does not allow MD or Docking"
-                        "\nCheck the following file: " + initPop.at(i), false);
-        } else {
-          #pragma omp critical
-          startingSequences.push_back(FASTA);
-        }
-      } catch (GMXException& e) {
-        if (e.type == "TOP") {
-          info.errorMsg("Skipping file: " + initPop.at(i), false);
-          continue;
-        } else {
-          info.errorMsg(e.what(), true);
-        }
-      } catch (VinaException& e) {
-        if (e.type == "PQT") {
-          info.errorMsg("Skipping file: " + initPop.at(i), false);
-          continue;
-        } else {
-          info.errorMsg(e.what(), true);
-        }
-      } catch (std::exception& e) {
-        info.errorMsg(e.what(), true);
-      }
+    std::vector<std::string> initPopPaths;
+    for (auto i : initPop) {
+      initPopPaths.push_back(initialpdbs + "/" + i);
     }
+    startingSequences = poolmgr.addElementsFromPDBs(initPopPaths, world_size);
   }
   // Random pdbs if initial were not enough
   info.infoMsg("Adding random peptides to the gene pool...");
-  while (true) {
-    unsigned int n = startingSequences.size();
-    if (n < gen) {
-      // Some PDBs do not work, hence we skip them.
-      // OpenMP does not allow while loops; to get around this we do
-      // repeated for loops until we have enough pdbs.
-      unsigned int m = gen - n;
-      #pragma omp parallel
-      #pragma omp for
-      for (unsigned int i = 0; i < m; i++)  {
-        std::string filename = getRandomPDB(randompdbs);
-        std::string FASTA;
-        try {
-          FASTA = poolmgr.addElementPDB(randompdbs + "/" + filename, false);
-        } catch (GMXException& e) {
-          // Problem with topology is usually because of problem with PDB file
-          if (e.type == "TOP") {
-            continue;
-          } else {
-            info.errorMsg(e.what(), true);
-          }
-        } catch (VinaException& e) {
-          if (e.type == "PQT") {
-            // Problem with pdbqt generation is usually because of
-            // MAX_TORS exceeding default value, try another one
-            continue;
-          } else {
-            info.errorMsg(e.what(), true);
-          }
-        } catch (std::exception& e) {
-          info.errorMsg(e.what(), true);
-        }
-        if (!FASTA.empty()) {
-          #pragma omp critical
-          startingSequences.push_back(FASTA);
-        }
-      }
-    } else {
-      break;
+  if (randompdbs != "" && gen - initPop.size() > 0) {
+    std::vector<std::string> randomSample = getRandomSample(randompdbs,
+                                                         gen - initPop.size());
+    std::vector<std::string> randomSamplePaths;
+    for (auto i : randomSample) {
+      randomSamplePaths.push_back(randompdbs + "/" + i);
+    }
+    std::vector<std::string> FASTAS = poolmgr.addElementsFromPDBs(randomSamplePaths,
+                                                                  world_size);
+    for (auto i : FASTAS) {
+      startingSequences.push_back(i);
     }
   }
   /**************/
@@ -413,17 +366,13 @@ int main(int argc, char *argv[]) {
                                      curGenDistinct.end()),
                           curGenDistinct.end());
     // Add the new elements
-    // (PoolMGR only adds them if they don't exist already, does a new MD else)
-    #pragma omp parallel
-    #pragma omp for
-    for (unsigned int i = 0; i < curGenDistinct.size(); i++) {
-      try {
-        poolmgr.addElement(curGenDistinct.at(i));
-      } catch (std::exception& e) {
-        info.errorMsg(e.what(), true);
-      }
+    try {
+      poolmgr.addElementsFromFASTAs(curGenDistinct, world_size);
+    } catch (std::exception& e) {
+      info.errorMsg(e.what(), true);
     }
   }
   /**************/
+  MPI_Finalize();
   return 0;
 }

@@ -19,6 +19,11 @@
 #include <utility>
 #include "../VinaInstance/VinaInstance.h"
 #include "../GMXInstance/GMXInstance.h"
+#include <omp.h>
+#include <mpi.h>
+#include "../Serialization/Serialization.h"
+#include <math.h>
+#include "../Communication.h"
 class PoolManagerException : virtual public std::exception {
  public:
     PoolManagerException(const std::string msg1, const std::string file1) {
@@ -129,6 +134,8 @@ class PoolMGR {
      * Returns FASTA sequence of specified file
     */
     std::string PDBtoFASTA(std::string);
+    std::vector<std::string> addElementsFromFASTAs(std::vector<std::string>&, int);
+    std::vector<std::string> addElementsFromPDBs(std::vector<std::string>&, int);
 
  private:
     int exhaustiveness;
@@ -153,8 +160,7 @@ class PoolMGR {
     std::unordered_map<std::string,
                        std::tuple<std::string,
                                   std::string,
-                                  std::vector<std::pair<std::string,
-                                                        float>>,
+                                  float,
                                   int> > internalMap;
 
     /* genPDB(FASTA):

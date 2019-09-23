@@ -1,7 +1,8 @@
 # Specify compiler commands
-CXX = g++ -O3 -Wall -fopenmp -std=c++11
+CXX = mpic++ -O3 -Wall -fopenmp -std=c++11
 # Specify name of file containing main function, without ext.
 BINARY = PepGA
+BINARY2 = PoolWorker
 # Source files; ** wildcard does not work on my Make so just one level depth
 SRCFILES = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
 # Filter out Test files
@@ -25,9 +26,11 @@ folders:
 	mkdir -p obj/VinaInstance
 	mkdir -p obj/PoolManager
 	mkdir -p obj/GMXInstance
+	mkdir -p obj/Serialization
 # Link everything together 
 compile: objs
-	$(CXX) $(OBJFILES) -o $(BINARY)
+	$(CXX) $(filter-out $(wildcard obj/PoolManager/PoolWorker.o),$(OBJFILES)) -o $(BINARY) -lm
+	$(CXX) $(filter-out $(wildcard obj/PepGA.o),$(OBJFILES)) -o $(BINARY2) -lm
 
 # Generate all object files
 objs: $(OBJFILES)
@@ -45,4 +48,5 @@ obj/%.o: src/%.cpp
 
 clean:
 	rm -rf $(BINARY)
+	rm -rf $(BINARY2)
 	rm -rf obj
