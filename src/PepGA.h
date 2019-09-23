@@ -7,7 +7,6 @@
 */
 #ifndef SRC_PEPGA_H_
 #define SRC_PEPGA_H_
-#include <omp.h>
 #include <mpi.h>
 #include <fstream>
 #include <sys/stat.h>

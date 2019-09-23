@@ -9,6 +9,7 @@
 #include "../GMXInstance/GMXInstance.h"
 #include "../Communication.h"
 #include "../inih/INIReader.h"
+#include "../VinaInstance/VinaInstance.h"
 std::string pymolPath;
 std::string gromacsPath;
 std::string forcefield;

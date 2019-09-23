@@ -2,7 +2,7 @@
  *
  * Receives vector of FILES to perform Docking and MD on,
  * using OpenMP calculates affinities on available processors, returns
- * vector of FILES, Affinity pairs
+ * vector of <file, affinity> pairs
  *
  */
 #include "PoolWorker.h"
@@ -39,7 +39,7 @@ float genDock(std::string file) {
   try {
     preparePDBQT(fileCluster);
   } catch (...) {
-    return affinity;
+    throw;
   }
   // Do a docking for each receptor
   for (unsigned int i = 0; i < receptors.size(); i++) {
@@ -170,12 +170,18 @@ int main (int argc, char **argv) {
       try {
         genMD(FILES.at(j));
       } catch (...) {
-        continue;
+        info->errorMsg("MD for " + FILES.at(j) +
+                       " failed, skipping...", false);
       }
       // Do Docking
       float aff = genDock(FILES.at(j));
       // Add result
-      results.push_back(std::make_pair(FILES.at(j), aff));
+      try {
+        results.push_back(std::make_pair(FILES.at(j), aff));
+      } catch (...) {
+        info->errorMsg("Docking for " + FILES.at(j) +
+                       " failed, skipping...", false);
+      }
     }
     info->infoMsg("Worker #" + std::to_string(world_rank)
                              + " is sending back the results now!");

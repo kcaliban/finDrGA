@@ -317,31 +317,23 @@ int main(int argc, char *argv[]) {
   // Initial pdbs
   std::vector<std::string> startingSequences;
   info.infoMsg("Gathering the initial population...");
-  std::vector<std::string> initPop = getInitialPop(initialpdbs);
+  std::vector<std::string> initPopulation;
   if (initialpdbs != "") {
-    info.infoMsg("Adding peptides from initialpdbs to the gene pool...");
-    std::vector<std::string> initPop = getInitialPop(initialpdbs);
-    std::vector<std::string> initPopPaths;
-    for (auto i : initPop) {
-      initPopPaths.push_back(initialpdbs + "/" + i);
+    info.infoMsg("Adding peptides from initialpdbs & "
+                 "randompdbs to the gene pool...");
+    std::vector<std::string> initPDB = getInitialPop(initialpdbs);
+    for (auto i : initPDB) {
+      initPopulation.push_back(initialpdbs + "/" + i);
     }
-    startingSequences = poolmgr.addElementsFromPDBs(initPopPaths, world_size);
   }
-  // Random pdbs if initial were not enough
-  info.infoMsg("Adding random peptides to the gene pool...");
-  if (randompdbs != "" && gen - initPop.size() > 0) {
+  if (randompdbs != "" && gen - initPopulation.size() > 0) {
     std::vector<std::string> randomSample = getRandomSample(randompdbs,
-                                                         gen - initPop.size());
-    std::vector<std::string> randomSamplePaths;
+                                                 gen - initPopulation.size());
     for (auto i : randomSample) {
-      randomSamplePaths.push_back(randompdbs + "/" + i);
-    }
-    std::vector<std::string> FASTAS = poolmgr.addElementsFromPDBs(randomSamplePaths,
-                                                                  world_size);
-    for (auto i : FASTAS) {
-      startingSequences.push_back(i);
+      initPopulation.push_back(randompdbs + "/" + i);
     }
   }
+  startingSequences = poolmgr.addElementsFromPDBs(initPopulation, world_size);
   /**************/
   /* GA */
   std::vector<std::string> curGen = startingSequences;

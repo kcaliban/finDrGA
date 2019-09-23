@@ -10,7 +10,6 @@
 #define SRC_LIB_GENALGINST_H_
 #include "Genome.h"
 #include "FitnessFunction.h"
-#include <omp.h>
 #include <vector>
 #include <random>
 #include <algorithm>
@@ -67,8 +66,6 @@ class GenAlgInst {
       for (unsigned int i = 0; i < genotypes.size(); i++) {
         fitnesses.push_back(0.0);
       }
-      #pragma omp parallel
-      #pragma omp for
       for (unsigned int i = 0; i < genotypes.size(); i++) {
         float fitness = fitnessfunc.calculateFitness(genotypes.at(i));
         fitnesses.at(i) = fitness;

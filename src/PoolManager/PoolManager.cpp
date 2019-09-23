@@ -1,10 +1,6 @@
 /* Copyright 2019 Fabian Krause */
 #include "PoolManager.h"
 
-void PoolMGR::genMD(std::string) {
-  return;
-}
-
 void PoolMGR::preparePDBQT(std::string ligand) {
   info->infoMsg("(POOLMGR) Preparing PDBQT of ligand: " + ligand);
   // Generate a PDBQT
@@ -78,7 +74,8 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
     command.append(" 2>/dev/null 1>&2");
     int success = system(command.c_str());
     if (success != 0) {
-      PoolManagerException("Could not create directory for PDB file", FASTASEQ);
+      throw PoolManagerException("Could not create directory for PDB file",
+                                 FASTASEQ);
     }
     command.clear();
     // Copy file
@@ -101,7 +98,8 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
   // Do MD and get docking results from PoolWorker
   // Spread files to available subprocesses
   // Exclude main process from calculation hence world_size - 1
-  unsigned int perNode = ceil((float) newFiles.size() / (float) (world_size - 1));
+  unsigned int perNode = ceil((float) newFiles.size() /
+                              (float) (world_size - 1));
   std::vector<std::vector<std::string>> buckets;
   for (int i = 0; i < world_size - 1; i++) {
     std::vector<std::string> bucket;
@@ -126,15 +124,19 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
   // Get results of each bucket
   std::vector<std::vector<std::pair<std::string, float>>> bucketResults;
   for (int i = 1; i < world_size; i++) {
+    info->infoMsg("Bossman is waiting for results...");
     std::vector<std::pair<std::string, float>> results;
     unsigned int resultsSize;
 
-    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     char * tmp = new char[resultsSize];
-    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     deserialize(results, tmp, resultsSize);
     bucketResults.push_back(results);
     free(tmp);
+    info->infoMsg("Bossman got his results!");
   }
   // Add the results to map and return FASTA sequences of add results
   std::vector<std::string> returnVal;
@@ -174,7 +176,8 @@ std::vector<std::string> PoolMGR::addElementsFromFASTAs(
   // Do MD and get docking results from PoolWorker
   // Spread files to available subprocesses
   // Exclude main process from calculation hence world_size - 1
-  unsigned int perNode = ceil((float) newFiles.size() / (float) (world_size - 1));
+  unsigned int perNode = ceil((float) newFiles.size() /
+                              (float) (world_size - 1));
   std::vector<std::vector<std::string>> buckets;
   for (int i = 0; i < world_size - 1; i++) {
     std::vector<std::string> bucket;
@@ -199,15 +202,19 @@ std::vector<std::string> PoolMGR::addElementsFromFASTAs(
   // Get results of each bucket
   std::vector<std::vector<std::pair<std::string, float>>> bucketResults;
   for (int i = 1; i < world_size; i++) {
+    info->infoMsg("Bossman is waiting for results...");
     std::vector<std::pair<std::string, float>> results;
     unsigned int resultsSize;
 
-    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     char * tmp = new char[resultsSize];
-    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT,
+             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     deserialize(results, tmp, resultsSize);
     bucketResults.push_back(results);
     free(tmp);
+    info->infoMsg("Bossman got his results!");
   }
   // Add the results to map and return FASTA sequences of added results
   std::vector<std::string> returnVal;
@@ -279,7 +286,6 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
     throw PoolManagerException("Could not create PDB file", FASTASEQ);
   }
   // Add path to map
-  #pragma omp critical
   std::get<0>(internalMap[FASTASEQ]) =
                           workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb";
   // This will later be overwritten with MD'ed file

@@ -19,7 +19,6 @@
 #include <utility>
 #include "../VinaInstance/VinaInstance.h"
 #include "../GMXInstance/GMXInstance.h"
-#include <omp.h>
 #include <mpi.h>
 #include "../Serialization/Serialization.h"
 #include <math.h>
