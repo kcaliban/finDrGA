@@ -1,6 +1,22 @@
 /* Copyright 2019 Fabian Krause */
 #include "PoolManager.h"
 
+/* GENMD: HAS THERE BEEN PREVIOUS MD? */
+/*
+  #pragma omp critical
+  prevMD = std::get<1>(internalMap[FASTASEQ]);
+  std::string mdinput;
+  // If there has not been an MD yet, we simply take the original pdb
+  if (prevMD == "") {
+    #pragma omp critical
+    mdinput = std::get<0>(internalMap[FASTASEQ]);
+  } else {
+  // If there has, use it to do a further MD
+    #pragma omp critical
+    mdinput = std::get<1>(internalMap[FASTASEQ]);
+ }
+*/
+
 void PoolMGR::preparePDBQT(std::string ligand) {
   info->infoMsg("(POOLMGR) Preparing PDBQT of ligand: " + ligand);
   // Generate a PDBQT
@@ -228,45 +244,6 @@ void PoolMGR::genPDB(std::string FASTASEQ) {
                           workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb";
 }
 
-void PoolMGR::genMD(std::string FASTASEQ) {
-  std::string prevMD;
-  #pragma omp critical
-  prevMD = std::get<1>(internalMap[FASTASEQ]);
-  std::string mdinput;
-  // If there has not been an MD yet, we simply take the original pdb
-  if (prevMD == "") {
-    #pragma omp critical
-    mdinput = std::get<0>(internalMap[FASTASEQ]);
-  } else {
-  // If there has, use it to do a further MD
-    #pragma omp critical
-    mdinput = std::get<1>(internalMap[FASTASEQ]);
-  }
-  GMXInstance gmxInstance(mdinput.c_str(),
-                          gromacsPath.c_str(),
-                          pymolPath.c_str(),
-                          (workDir + "/" + FASTASEQ).c_str(),
-                          forcefield.c_str(),
-                          forcefieldPath.c_str(),
-                          water.c_str(),
-                          boundingboxtype.c_str(),
-                          clustercutoff,
-                          boxsize,
-                          mdpPath.c_str(),
-                          info);
-  try {
-    gmxInstance.preparePDB();
-    gmxInstance.runMD();
-    gmxInstance.clusterMD();
-    gmxInstance.extractTopCluster();
-  } catch (...) {
-    throw;
-  }
-
-  #pragma omp critical
-  std::get<1>(internalMap[FASTASEQ]) =
-                                workDir + "/" + FASTASEQ + "/topcluster.pdb";
-}
 
 void PoolMGR::genDock(std::string FASTASEQ) {
   // Debug: print out all receptors
