@@ -95,17 +95,39 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
     command.clear();
     newFiles.push_back(workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb");
   }
+  std::vector<unsigned int> threadsPerWorker;
+  // Get the number of available threads for each worker to distribute
+  // accordingly
+  unsigned int allThreads = 0;
+  for (int i = 1; i < world_size; i++) {
+    unsigned int availThreads = 0;
+    MPI_Recv(&availThreads, 1, MPI_INT, i,
+             SENDNMTHREADS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    threadsPerWorker.push_back(availThreads);
+    allThreads += availThreads;
+  }
+  // Amount of jobs per worker is weighted according to amount of
+  // threads available to OpenMP
+  float avgThreads = (float) allThreads / (float) (world_size - 1);
   // Do MD and get docking results from PoolWorker
   // Spread files to available subprocesses
   // Exclude main process from calculation hence world_size - 1
-  unsigned int perNode = ceil((float) newFiles.size() /
-                              (float) (world_size - 1));
+  std::vector<unsigned int> jobsPerWorker;
+  // Amount of jobs per node if equally distributed
+  float perNode = (float) newFiles.size() / (float) (world_size - 1);
+  for (int i = 0; i < world_size - 1; i++) {
+    float jobweight = (float) threadsPerWorker.at(i) / avgThreads;
+    unsigned int jobs = round(jobweight * perNode);
+    jobsPerWorker.push_back(jobs);
+  }
   std::vector<std::vector<std::string>> buckets;
+  unsigned int vecPos = 0;
   for (int i = 0; i < world_size - 1; i++) {
     std::vector<std::string> bucket;
-    for (unsigned int j = 0; j < perNode; j++) {
-      if (i * perNode + j < newFiles.size()) {
-        bucket.push_back(newFiles.at(i * perNode + j));
+
+    for (unsigned int j = 0; j < jobsPerWorker.at(i); j++) {
+      if (vecPos < newFiles.size()) {
+        bucket.push_back(newFiles.at(vecPos++));
       } else {
         break;
       }

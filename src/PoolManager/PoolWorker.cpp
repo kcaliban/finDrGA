@@ -145,6 +145,9 @@ int main (int argc, char **argv) {
   for (auto i : oldRec) {
     receptors.push_back(receptorsPath + "/" + i);
   }
+  // Send Master the number of available threads
+  unsigned int numThreads = omp_get_max_threads();
+  MPI_Send(&numThreads, 1, MPI_INT, 0, SENDNMTHREADS, MPI_COMM_WORLD);
   while (42) {
     // Wait to receive a vector of files
     info->infoMsg("Worker #" + std::to_string(world_rank)

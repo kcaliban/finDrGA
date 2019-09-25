@@ -6,5 +6,6 @@
 #define SENDAFFINSIZE 2
 #define SENDAFFINCONT 3
 #define SENDRECEPTORS 4
+#define SENDNMTHREADS 5
 
 #endif /* ifndef SRC_COMMUNICATION_H_ */
