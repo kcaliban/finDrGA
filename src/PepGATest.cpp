@@ -225,6 +225,52 @@ TEST(PoolMGR, PDBtoFASTA) {
   free(info);
 }
 
+#include "Serialization/Serialization.h"
+TEST(Serialization, Pairs) {
+  std::vector<std::pair<std::string, float>> test;
+  std::string a = "blub";
+  float a_ = 2.013f;
+  std::string b = "blab";
+  float b_ = -223323.231f;
+  std::string c = "blab";
+  float c_ = -122312312;
+  test.push_back(std::make_pair(a, a_));
+  test.push_back(std::make_pair(b, b_));
+  test.push_back(std::make_pair(c, c_));
+
+  unsigned int resultsSize;
+  char * seri = serialize(test, &resultsSize);
+
+  std::vector<std::pair<std::string, float>> out;
+  deserialize(out, seri, resultsSize);
+  ASSERT_EQ(test, out);
+
+}
+
+/*
+TEST(CustomMutation, UniformDistr) {
+  std::string alphabet = "ARNDCQEGHILKMFPSTWYV";
+  std::vector<float> probs;
+  for (unsigned int i = 0; i < alphabet.size(); i++) {
+    if (alphabet.at(i) == 'E' || alphabet.at(i) == 'D') {
+      probs.push_back(1.3);
+    } else {
+      probs.push_back(1.0);
+    }
+  }
+  std::discrete_distribution<int> distr = std::discrete_distribution<int>(probs.begin(), probs.end());
+
+  std::random_device rd;
+  std::mt19937 mt(rd());
+  std::string str1 = "A";
+  for (int i = 0; i < 5000; i++) {
+    std::uniform_int_distribution<int> distribution(0, str1.size() - 1);
+    std::string newString = str1;
+    newString.at(distribution(mt)) = alphabet.at(distr(*mt));
+  }
+}
+*/
+
 int main(int argc, char ** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -20,7 +20,7 @@ class PepGenome : public Genome<std::string> {
  public:
     PepGenome(std::mt19937 * mt1) {
       mt = mt1;
-      for (int i = 0; probs.size(); i++) {
+      for (unsigned int i = 0; i < alphabet.size(); i++) {
         if (alphabet.at(i) == 'E' || alphabet.at(i) == 'D') {
           probs.push_back(1.3);
         } else {

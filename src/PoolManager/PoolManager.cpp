@@ -52,6 +52,16 @@ std::string PoolMGR::PDBtoFASTA(std::string filename) {
   return FASTA;
 }
 
+std::vector<unsigned int> distributeJobs(int * threads, int world_size) {
+  // threads ~ number of avail threads per worker_i, i in (1, world_size - 1)
+  // Simple approach: every computer gets as many as threads
+  std::vector<unsigned int> jobDistr;
+  for (int j = 0; j < world_size - 1; j++) {
+    jobDistr.push_back(threads[j]);
+  }
+  return jobDistr;
+}
+
 std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &files,
                                   int world_size) {
   // Prepare internal map and directory structure
@@ -95,7 +105,9 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
     command.clear();
     newFiles.push_back(workDir + "/" + FASTASEQ + "/" + FASTASEQ + ".pdb");
   }
-  std::vector<unsigned int> threadsPerWorker;
+  info->errorMsg("Jobs to be distributed after reduncancy removal: "
+                 + std::to_string(newFiles.size()), false);
+  int threadsPerWorker[world_size - 1];
   // Get the number of available threads for each worker to distribute
   // accordingly
   unsigned int allThreads = 0;
@@ -103,62 +115,87 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
     unsigned int availThreads = 0;
     MPI_Recv(&availThreads, 1, MPI_INT, i,
              SENDNMTHREADS, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    threadsPerWorker.push_back(availThreads);
+    threadsPerWorker[i - 1] = availThreads;
     allThreads += availThreads;
   }
-  // Amount of jobs per worker is weighted according to amount of
-  // threads available to OpenMP
-  float avgThreads = (float) allThreads / (float) (world_size - 1);
-  // Do MD and get docking results from PoolWorker
-  // Spread files to available subprocesses
-  // Exclude main process from calculation hence world_size - 1
-  std::vector<unsigned int> jobsPerWorker;
-  // Amount of jobs per node if equally distributed
-  float perNode = (float) newFiles.size() / (float) (world_size - 1);
-  for (int i = 0; i < world_size - 1; i++) {
-    float jobweight = (float) threadsPerWorker.at(i) / avgThreads;
-    unsigned int jobs = round(jobweight * perNode);
-    jobsPerWorker.push_back(jobs);
-  }
+  info->infoMsg("Total number of available threads: "
+                + std::to_string(allThreads));
+  jobDistribution = distributeJobs(threadsPerWorker, world_size);
   std::vector<std::vector<std::string>> buckets;
   unsigned int vecPos = 0;
   for (int i = 0; i < world_size - 1; i++) {
+    int worker = i + 1;
     std::vector<std::string> bucket;
 
-    for (unsigned int j = 0; j < jobsPerWorker.at(i); j++) {
+    for (unsigned int j = 0; j < jobDistribution.at(i); j++) {
       if (vecPos < newFiles.size()) {
         bucket.push_back(newFiles.at(vecPos++));
       } else {
         break;
       }
     }
+    info->errorMsg("Worker #" + std::to_string(worker) + "got so many jobs: "
+                   + std::to_string(bucket.size()), false);
     buckets.push_back(bucket);
   }
   // Send buckets to subprocesses
+  info->infoMsg("Master is sending his work...");
+  MPI_Request requests[world_size - 1];
+  unsigned int bucketSizes[world_size - 1];
+  char * bucketBin[world_size - 1];
+  // Send size in bytes
   for (int i = 1; i < world_size; i++) {
-    info->infoMsg("Bossman is sending his work...");
-    unsigned int bucketSize;
-    char * tmp = serialize(buckets.at(i - 1), &bucketSize);
-    MPI_Send(&bucketSize, 1, MPI_INT, i, SENDFILESSIZE, MPI_COMM_WORLD);
-    MPI_Send(&tmp[0], bucketSize, MPI_BYTE, i, SENDFILESCONT, MPI_COMM_WORLD);
-    free(tmp);
+    bucketBin[i - 1] = serialize(buckets.at(i - 1), &bucketSizes[i - 1]);
+    MPI_Isend(&bucketSizes[i - 1], 1, MPI_INT, i,
+              SENDFILESSIZE, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  // Send binary data
+  for (int i = 1; i < world_size; i++) {
+    MPI_Isend(&bucketBin[i - 1][0], bucketSizes[i - 1], MPI_BYTE, i,
+              SENDFILESCONT, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  // Free memory
+  for (int i = 1; i < world_size; i++) {
+    free(bucketBin[i - 1]);
   }
   // Get results of each bucket
   std::vector<std::vector<std::pair<std::string, float>>> bucketResults;
+  // Inexplicable stack smashing error, maybe separating the steps fixes it
+  info->infoMsg("Master waiting for all results...");
+  // Get filesize from each
+  unsigned int resSize[world_size - 1];
   for (int i = 1; i < world_size; i++) {
-    info->infoMsg("Bossman is waiting for results...");
+    MPI_Irecv(&resSize[i - 1], 1, MPI_INT, i,
+              SENDAFFINSIZE, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  info->infoMsg("Master got all filesizes");
+  // Get contents from each
+  char * resBin[world_size - 1];
+  for (int i = 1; i < world_size; i++) {
+    resBin[i - 1] = new char[resSize[i - 1]];
+    MPI_Irecv(&resBin[i - 1][0], resSize[i - 1], MPI_BYTE, i, SENDAFFINCONT,
+              MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  info->infoMsg("Master got all binary data");
+  // Deserialize binary messages
+  for (int i = 1; i < world_size; i++) {
+    info->errorMsg("Deserializing " + std::to_string(i), false);
     std::vector<std::pair<std::string, float>> results;
-    unsigned int resultsSize;
-
-    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    char * tmp = new char[resultsSize];
-    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    deserialize(results, tmp, resultsSize);
+    deserialize(results, resBin[i - 1], resSize[i - 1]);
     bucketResults.push_back(results);
-    free(tmp);
-    info->infoMsg("Bossman got his results!");
+    free(resBin[i - 1]);
+  }
+  info->infoMsg("Master deserialized everything");
+  std::cout << "Master got following results:" << std::endl;
+  for (int i = 1; i < world_size; i++) {
+    std::cout << "From Worker #" << i << ":" << std::endl;
+    for (auto j : bucketResults.at(i - 1)) {
+      std::cout << j.first << ": " << j.second << std::endl;
+    }
   }
   // Add the results to map and return FASTA sequences of add results
   std::vector<std::string> returnVal;
@@ -166,10 +203,16 @@ std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &
     for (unsigned int j = 0; j < bucketResults.at(i - 1).size(); j++) {
       std::string path = bucketResults.at(i - 1).at(j).first;
       size_t lastSlash = path.find_last_of("/");
+      std::string prePath = path.substr(0, lastSlash);
+      size_t secondToLastSlash = prePath.find_last_of("/");
+      std::string fasta = prePath.substr(secondToLastSlash + 1,
+                                         prePath.size() - secondToLastSlash);
+      /*
       size_t dot = path.find_last_of(".");
       std::string fasta = path.substr(lastSlash + 1,
                                       path.size() - lastSlash
                                       - (path.size() - dot + 1));
+                                      */
       returnVal.push_back(fasta);
       float aff = bucketResults.at(i - 1).at(j).second;
       // Next MD continues where previous MD has left off
@@ -196,16 +239,14 @@ std::vector<std::string> PoolMGR::addElementsFromFASTAs(
     newFiles.push_back(std::get<1>(internalMap[i]));
   }
   // Do MD and get docking results from PoolWorker
-  // Spread files to available subprocesses
-  // Exclude main process from calculation hence world_size - 1
-  unsigned int perNode = ceil((float) newFiles.size() /
-                              (float) (world_size - 1));
   std::vector<std::vector<std::string>> buckets;
+  unsigned int vecPos = 0;
   for (int i = 0; i < world_size - 1; i++) {
     std::vector<std::string> bucket;
-    for (unsigned int j = 0; j < perNode; j++) {
-      if (i * perNode + j < newFiles.size()) {
-        bucket.push_back(newFiles.at(i * perNode + j));
+
+    for (unsigned int j = 0; j < jobDistribution.at(i); j++) {
+      if (vecPos < newFiles.size()) {
+        bucket.push_back(newFiles.at(vecPos++));
       } else {
         break;
       }
@@ -213,30 +254,63 @@ std::vector<std::string> PoolMGR::addElementsFromFASTAs(
     buckets.push_back(bucket);
   }
   // Send buckets to subprocesses
+  info->infoMsg("Master is sending his work...");
+  MPI_Request requests[world_size - 1];
+  unsigned int bucketSizes[world_size - 1];
+  char * bucketBin[world_size - 1];
+  // Send size in bytes
   for (int i = 1; i < world_size; i++) {
-    info->infoMsg("Bossman is sending his work...");
-    unsigned int bucketSize;
-    char * tmp = serialize(buckets.at(i - 1), &bucketSize);
-    MPI_Send(&bucketSize, 1, MPI_INT, i, SENDFILESSIZE, MPI_COMM_WORLD);
-    MPI_Send(&tmp[0], bucketSize, MPI_BYTE, i, SENDFILESCONT, MPI_COMM_WORLD);
-    free(tmp);
+    bucketBin[i - 1] = serialize(buckets.at(i - 1), &bucketSizes[i - 1]);
+    MPI_Isend(&bucketSizes[i - 1], 1, MPI_INT, i,
+              SENDFILESSIZE, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  // Send binary data
+  for (int i = 1; i < world_size; i++) {
+    MPI_Isend(&bucketBin[i - 1][0], bucketSizes[i - 1], MPI_BYTE, i,
+              SENDFILESCONT, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  // Free memory
+  for (int i = 1; i < world_size; i++) {
+    free(bucketBin[i - 1]);
   }
   // Get results of each bucket
   std::vector<std::vector<std::pair<std::string, float>>> bucketResults;
+  // Inexplicable stack smashing error, maybe separating the steps fixes it
+  info->infoMsg("Master waiting for all results...");
+  // Get filesize from each
+  unsigned int resSize[world_size - 1];
   for (int i = 1; i < world_size; i++) {
-    info->infoMsg("Bossman is waiting for results...");
+    MPI_Irecv(&resSize[i - 1], 1, MPI_INT, i,
+              SENDAFFINSIZE, MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  info->infoMsg("Master got all filesizes");
+  // Get contents from each
+  char * resBin[world_size - 1];
+  for (int i = 1; i < world_size; i++) {
+    resBin[i - 1] = new char[resSize[i - 1]];
+    MPI_Irecv(&resBin[i - 1][0], resSize[i - 1], MPI_BYTE, i, SENDAFFINCONT,
+              MPI_COMM_WORLD, &requests[i - 1]);
+  }
+  MPI_Waitall(world_size - 1, requests, MPI_STATUS_IGNORE);
+  info->infoMsg("Master got all binary data");
+  // Deserialize binary messages
+  for (int i = 1; i < world_size; i++) {
+    info->errorMsg("Deserializing " + std::to_string(i), false);
     std::vector<std::pair<std::string, float>> results;
-    unsigned int resultsSize;
-
-    MPI_Recv(&resultsSize, 1, MPI_INT, i, SENDAFFINSIZE,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    char * tmp = new char[resultsSize];
-    MPI_Recv(&tmp[0], resultsSize, MPI_BYTE, i, SENDAFFINCONT,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    deserialize(results, tmp, resultsSize);
+    deserialize(results, resBin[i - 1], resSize[i - 1]);
     bucketResults.push_back(results);
-    free(tmp);
-    info->infoMsg("Bossman got his results!");
+    free(resBin[i - 1]);
+  }
+  info->infoMsg("Master deserialized everything");
+  std::cout << "Master got following results:" << std::endl;
+  for (int i = 1; i < world_size; i++) {
+    std::cout << "From Worker #" << i << ":" << std::endl;
+    for (auto j : bucketResults.at(i - 1)) {
+      std::cout << j.first << ": " << j.second << std::endl;
+    }
   }
   // Add the results to map and return FASTA sequences of added results
   std::vector<std::string> returnVal;
@@ -244,10 +318,10 @@ std::vector<std::string> PoolMGR::addElementsFromFASTAs(
     for (unsigned int j = 0; j < bucketResults.at(i - 1).size(); j++) {
       std::string path = bucketResults.at(i - 1).at(j).first;
       size_t lastSlash = path.find_last_of("/");
-      size_t dot = path.find_last_of(".");
-      std::string fasta = path.substr(lastSlash + 1,
-                                      path.size() - lastSlash
-                                      - (path.size() - dot + 1));
+      std::string prePath = path.substr(0, lastSlash);
+      size_t secondToLastSlash = prePath.find_last_of("/");
+      std::string fasta = prePath.substr(secondToLastSlash + 1,
+                                         prePath.size() - secondToLastSlash);
       returnVal.push_back(fasta);
       float aff = bucketResults.at(i - 1).at(j).second;
       std::get<2>(internalMap[fasta]) = aff;

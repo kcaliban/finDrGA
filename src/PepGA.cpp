@@ -233,6 +233,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &world_size);
   // Get the rank of the process
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  // Print out information about main process
   /**************/
   /* Prepare random engine */
   std::random_device rd;
@@ -284,6 +285,8 @@ int main(int argc, char *argv[]) {
   if (!randompdbs.empty()) {check(randompdbs);}
   /**************/
   Info info(true, true, workDir + "/" + "PepLOG");
+  /* Print info about master node */
+  info.infoMsg("Master has rank " + std::to_string(world_rank) + "(should be 0)");
   /* Get receptors */
   std::vector<std::string> receptors;
   std::vector<std::string> receptorfiles = getReceptorsM(receptorsPath,
@@ -333,10 +336,12 @@ int main(int argc, char *argv[]) {
       initPopulation.push_back(randompdbs + "/" + i);
     }
   }
+  info.errorMsg("Population size in PoolMGR: " + std::to_string(initPopulation.size()), false);
   startingSequences = poolmgr.addElementsFromPDBs(initPopulation, world_size);
   /**************/
   /* GA */
   std::vector<std::string> curGen = startingSequences;
+  info.infoMsg("POPULATION SIZE: " + std::to_string(curGen.size()));
   for (unsigned int i = 0; i < noPop; i++) {
     // Output to log file
     std::string output = "Generation: ";

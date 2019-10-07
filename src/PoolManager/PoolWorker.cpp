@@ -47,7 +47,7 @@ float genDock(std::string file) {
                               fileCluster.c_str(),
                               info);
     float recaffinity = vinaInstance.calculateBindingAffinity(exhaustiveness,
-                                                           energy_range);
+                                                              energy_range);
     if (recaffinity < affinity) { affinity = recaffinity; }
   }
 
@@ -116,6 +116,10 @@ int main (int argc, char **argv) {
   // Get the rank of the process
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
+  char processor_name[MPI_MAX_PROCESSOR_NAME];
+  int name_len;
+  MPI_Get_processor_name(processor_name, &name_len);
+
   // Read in relevant parameters
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
@@ -138,34 +142,47 @@ int main (int argc, char **argv) {
   pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
   mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities",
                                                 "");
+  bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   std::string receptorsPath = reader.Get("paths", "receptors", "");
   info = new Info(false, true, ""); // Console output
 
-  std::vector<std::string> oldRec = getReceptors(receptorsPath, false);
+  std::vector<std::string> oldRec = getReceptors(receptorsPath, receptorsPrep);
   for (auto i : oldRec) {
     receptors.push_back(receptorsPath + "/" + i);
   }
   // Send Master the number of available threads
   unsigned int numThreads = omp_get_max_threads();
   MPI_Send(&numThreads, 1, MPI_INT, 0, SENDNMTHREADS, MPI_COMM_WORLD);
+  std::string inReport;
+  inReport.append("Worker number #" + std::to_string(world_rank) + " with " +
+                  std::to_string(numThreads) + " threads");
+  inReport.append(" reporting for duty from computer ");
+  inReport.append(processor_name);
+  info->infoMsg(inReport);
   while (42) {
     // Wait to receive a vector of files
     info->infoMsg("Worker #" + std::to_string(world_rank)
                              + " waiting for a job...");
     std::vector<std::string> FILES;
-    unsigned int FILESSize;
+    unsigned int FILESSize = 0;
 
-    MPI_Recv(&FILESSize, 1, MPI_INT, 0, SENDFILESSIZE,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Request request;
+    MPI_Irecv(&FILESSize, 1, MPI_INT, 0, SENDFILESSIZE,
+             MPI_COMM_WORLD, &request);
+    MPI_Wait(&request, MPI_STATUS_IGNORE);
+
     char * tmp = new char[FILESSize];
-    MPI_Recv(&tmp[0], FILESSize, MPI_BYTE, 0, SENDFILESCONT,
-             MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Irecv(&tmp[0], FILESSize, MPI_BYTE, 0, SENDFILESCONT,
+             MPI_COMM_WORLD, &request);
+    MPI_Wait(&request, MPI_STATUS_IGNORE);
     deserialize(FILES, tmp, FILESSize);
     free(tmp);
 
     // Do the right thing
     info->infoMsg("Worker #" + std::to_string(world_rank) + " got a job!");
     std::vector<std::pair<std::string, float>> results;
+    info->infoMsg("Worker #" + std::to_string(world_rank) + "'s workload: "
+                  + std::to_string(FILES.size()));
     #pragma omp parallel
     #pragma omp for
     for (unsigned int j = 0; j < FILES.size(); j++) {
@@ -175,25 +192,34 @@ int main (int argc, char **argv) {
       } catch (...) {
         info->errorMsg("MD for " + FILES.at(j) +
                        " failed, skipping...", false);
+        continue;
       }
       // Do Docking
-      float aff = genDock(FILES.at(j));
-      // Add result
       try {
+        float aff = genDock(FILES.at(j));
+        // Add result
         results.push_back(std::make_pair(FILES.at(j), aff));
       } catch (...) {
         info->errorMsg("Docking for " + FILES.at(j) +
                        " failed, skipping...", false);
+        continue;
       }
     }
     info->infoMsg("Worker #" + std::to_string(world_rank)
                              + " is sending back the results now!");
 
+    // Debug print of workers results
+    std::cout << "Worker # " << std::to_string(world_rank) << " sending: " << std::endl;
+    for (auto i : results) {
+      std::cout << i.first << ": " << i.second << std::endl;
+    }
     // Send back the results
     unsigned int resultsSize;
     tmp = serialize(results, &resultsSize);
-    MPI_Send(&resultsSize, 1, MPI_INT, 0, SENDAFFINSIZE, MPI_COMM_WORLD);
-    MPI_Send(&tmp[0], resultsSize, MPI_BYTE, 0, SENDAFFINCONT, MPI_COMM_WORLD);
+    MPI_Isend(&resultsSize, 1, MPI_INT, 0, SENDAFFINSIZE, MPI_COMM_WORLD, &request);
+    MPI_Wait(&request, MPI_STATUS_IGNORE);
+    MPI_Isend(&tmp[0], resultsSize, MPI_BYTE, 0, SENDAFFINCONT, MPI_COMM_WORLD, &request);
+    MPI_Wait(&request, MPI_STATUS_IGNORE);
     free(tmp);
   }
 

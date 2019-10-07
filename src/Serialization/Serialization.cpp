@@ -1,4 +1,5 @@
 #include "Serialization.h"
+#include <iostream>
 
 using namespace std;
 
@@ -41,31 +42,30 @@ void deserialize(vector<string> &restore,  char* buffer, unsigned int size) {
 
 /********************************************/
 char * serialize(vector<pair<string, float>> &v, unsigned int *size) {
-  // Floats can have \0, \3 (fittingly "end of text") is unused
-  // STR1\3FL1\3STR2\3FL2\3...STRN\3FLN\3
+  // STR1\0FL1STR2\0FL2...STRN\0FLN
   unsigned int totalSize = 0;
 
-  // Length of string, +1 for \0, size of float, +1 for \0
-  for (auto p : v) {
-    totalSize += p.first.size() + 1 + sizeof(float) + 1;
+  // Length of string, +1 for \0, size of float
+  for (auto it = v.begin(); it != v.end(); it++) {
+    totalSize += it->first.size() + 1 + sizeof(float);
   }
+  totalSize++; // Why though? Without this there is always one byte missing
 
   char * buffer = new char[totalSize];
   unsigned int bufpt = 0;
 
-  for (auto p : v) {
-    for (unsigned int j = 0; j < p.first.size(); j++) {
-      buffer[bufpt++] = p.first[j];
+  for (auto it = v.begin(); it != v.end(); it++) {
+    for (unsigned int j = 0; j < it->first.size(); j++) {
+      buffer[bufpt++] = it->first[j];
     }
-    buffer[bufpt++] = '\3';
+    buffer[bufpt++] = '\0';
 
     char flt[sizeof(float)];
-    float val = p.second;
+    float val = it->second;
     memcpy(&flt, &val, sizeof(float));
     for (unsigned int j = 0; j < sizeof(float); j++) {
       buffer[bufpt++] = flt[j];
     }
-    buffer[bufpt++] = '\3';
   }
 
   * size = totalSize;
@@ -73,31 +73,34 @@ char * serialize(vector<pair<string, float>> &v, unsigned int *size) {
 }
 
 void deserialize(vector<pair<string, float>> &restore, char * buffer, unsigned int size) {
-  bool firstterm = false;
+  bool term = false;
   string curStr;
   char flt[sizeof(float)];
   unsigned int fltptr = 0;
 
   for (unsigned int j = 0; j < size; j++) {
     const char c = buffer[j];
-    if (c != '\3') {
-      if (!firstterm) {
+    if (!term) { // Read in string before first appearence of '\0'
+      if (c != '\0') {
         curStr.push_back(c);
-      }   // Read in string
-      else {
-        flt[fltptr++] = buffer[j];
-      }   // Read in float
-    } else {
-      if (firstterm) {
+      } else {
+        term = true;
+      }
+    } else { // Read in float
+      if (fltptr < sizeof(float)) {
+        flt[fltptr] = buffer[j];
+        fltptr++;
+      } else {
         float number;
         memcpy(&number, &flt, sizeof(float));
+        std::cout << "Deserialized: " << curStr << ": " << number << std::endl;
         restore.push_back(make_pair(curStr, number));
 
-        curStr.clear();
+        // Reset vars
+        term = false;
         fltptr = 0;
-        firstterm = false;
-      } else {
-        firstterm = true;
+        curStr.clear();
+        curStr.push_back(c);
       }
     }
   }

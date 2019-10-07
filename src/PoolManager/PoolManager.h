@@ -140,6 +140,7 @@ class PoolMGR {
     int exhaustiveness;
     int energy_range;
     std::vector<std::string> receptors;
+    std::vector<unsigned int> jobDistribution;
     int nReceptors;
     std::string workDir;
     std::string vinaPath;

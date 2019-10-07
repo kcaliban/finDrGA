@@ -30,7 +30,7 @@ float VinaInstance::calculateBindingAffinity(int exhaustiveness,
   command.append(ligand + outName);
 
   command.append(" --log ");
-  command.append(ligand + "VINALOG");
+  command.append(ligand + outName + "VINALOG");
 
   info->infoMsg("(VINA) Docking " + ligand + " against: " + receptor);
 
