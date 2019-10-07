@@ -79,5 +79,6 @@ mpirun -np 1 Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES PoolWorker
 
 See LICENSE file
 
-inih is written by Ben Hoyt, see src/inih/LICENSE
-cxxopts is written by Jarryd Beck, see src/cxxopts/LICENSE
+Used libraries:
+* inih is written by Ben Hoyt, see src/inih/LICENSE
+* cxxopts is written by Jarryd Beck, see src/cxxopts/LICENSE
