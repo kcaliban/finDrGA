@@ -15,4 +15,5 @@
 #include "PepFitnessFunc.h"
 #include "PoolManager/PoolManager.h"
 #include "inih/INIReader.h"
+#include "cxxopts/cxxopts.hpp"
 #endif  // SRC_PEPGA_H_

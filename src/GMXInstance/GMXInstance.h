@@ -124,6 +124,7 @@ class GMXInstance {
      * Relevant output: topcluster.pdb
     */
     void extractTopCluster();
+    void energyMinim();
 
  private:
     std::string ligand;

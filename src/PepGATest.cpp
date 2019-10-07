@@ -203,7 +203,7 @@ TEST(PoolMGR, PDBtoFASTA) {
   std::vector<std::string> blub;
   std::vector<std::pair<std::string, std::string>> PDBs;
   Info * info = new Info(false, false, "");
-  PoolMGR poolmgr("", "", "", "", "", blub, 0, 0, "", "", "", "", "", "", 0, 0, info);
+  PoolMGR poolmgr("", "", "", "", "", blub, 0, 0, "", "", "", "", "", "", 0, 0, info, false);
   PDBs.push_back(std::make_pair("SEAHTLLYGT", "src/testpdbs/10_5zop_D_6.pdb"));
   PDBs.push_back(std::make_pair("SLYPAQMYSR", "src/testpdbs/10_pdb2pyj_D_25.pdb"));
   PDBs.push_back(std::make_pair("PKFFRYISERY", "src/testpdbs/11_2y35_D_1.pdb"));
@@ -247,29 +247,6 @@ TEST(Serialization, Pairs) {
 
 }
 
-/*
-TEST(CustomMutation, UniformDistr) {
-  std::string alphabet = "ARNDCQEGHILKMFPSTWYV";
-  std::vector<float> probs;
-  for (unsigned int i = 0; i < alphabet.size(); i++) {
-    if (alphabet.at(i) == 'E' || alphabet.at(i) == 'D') {
-      probs.push_back(1.3);
-    } else {
-      probs.push_back(1.0);
-    }
-  }
-  std::discrete_distribution<int> distr = std::discrete_distribution<int>(probs.begin(), probs.end());
-
-  std::random_device rd;
-  std::mt19937 mt(rd());
-  std::string str1 = "A";
-  for (int i = 0; i < 5000; i++) {
-    std::uniform_int_distribution<int> distribution(0, str1.size() - 1);
-    std::string newString = str1;
-    newString.at(distribution(mt)) = alphabet.at(distr(*mt));
-  }
-}
-*/
 
 int main(int argc, char ** argv) {
   ::testing::InitGoogleTest(&argc, argv);

@@ -93,7 +93,6 @@ void deserialize(vector<pair<string, float>> &restore, char * buffer, unsigned i
       } else {
         float number;
         memcpy(&number, &flt, sizeof(float));
-        std::cout << "Deserialized: " << curStr << ": " << number << std::endl;
         restore.push_back(make_pair(curStr, number));
 
         // Reset vars

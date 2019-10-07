@@ -66,7 +66,8 @@ class PoolMGR {
             const char * boundingboxtype1,
             float boxsize1,
             float clustercutoff1,
-            Info * info1) {
+            Info * info1,
+            bool pymolgen1) {
       workDir = workDir1;
       receptors = receptors1;
       nReceptors = receptors1.size();
@@ -85,6 +86,7 @@ class PoolMGR {
       boxsize = boxsize1;
       clustercutoff = clustercutoff1;
       info = info1;
+      pymolgen = pymolgen1;
     }
 
     /* addElementPDB(path):
@@ -135,6 +137,8 @@ class PoolMGR {
     std::string PDBtoFASTA(std::string);
     std::vector<std::string> addElementsFromFASTAs(std::vector<std::string>&, int);
     std::vector<std::string> addElementsFromPDBs(std::vector<std::string>&, int);
+    std::vector<std::string> addElementsFromFiles(std::vector<std::string>&, int);
+    std::vector<std::string> getFASTAS(std::vector<std::string> &);
 
  private:
     int exhaustiveness;
@@ -162,6 +166,7 @@ class PoolMGR {
                                   std::string,
                                   float,
                                   int> > internalMap;
+    bool pymolgen;
 
     /* genPDB(FASTA):
      *

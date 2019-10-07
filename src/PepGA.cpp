@@ -211,20 +211,30 @@ void preparePDBQT(std::string receptor,
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 5) {
-    std::cout << "Wrong number of arguments!" << std::endl;
-    std::cout << "Usage: PepGA [number of generations]"
-                 " [prob. of random point mutation for each individual]"
-                 " [percentage of top individuals to copy each gen.]"
-                 " [size of initial pop., taken from initialpdbs"
-                 " and randompdbs if initialpdbs does not suffice]"
-      << std::endl;
-    return 1;
+  /* Get command line arguments */
+  cxxopts::Options options("PepGA", "Find the best ligands");
+  options.add_options()
+    ("n", "Number of generations", cxxopts::value<unsigned int>())
+    ("m", "Size of population", cxxopts::value<unsigned int>())
+    ("p", "Probability of random point mutation for each individual", cxxopts::value<float>())
+    ("c", "Percentage of individuals to copy for each generation as a float (0.1 for 10%)", cxxopts::value<float>())
+    ;
+  unsigned int gen;
+  unsigned int noPop;
+  float mutateProb;
+  float genCpy;
+  try {
+    auto result = options.parse(argc, argv);
+    gen = result["n"].as<unsigned int>();
+    noPop = result["m"].as<unsigned int>();
+    mutateProb = result["p"].as<float>();
+    genCpy = result["c"].as<float>();
+  } catch (std::exception& e) {
+    std::cout << e.what() << std::endl;
+    std::cout << options.help() << std::endl;
+    exit(-1);
   }
-  unsigned int noPop = atoi(argv[1]);
-  float mutateProb = atof(argv[2]);
-  float genCpy = atof(argv[3]);
-  unsigned int gen = (argc == 5) ? atoi(argv[4]) : 10;  // def. size 10
+  /**************/
   /* Initialize OpenMPI */
   int world_size, world_rank;
   // Initialize the MPI environment
@@ -235,7 +245,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
   // Print out information about main process
   /**************/
-  /* Prepare random engine */
+  /* Prepare global random engine */
   std::random_device rd;
   std::mt19937 mt(rd());
   /**************/
@@ -247,29 +257,29 @@ int main(int argc, char *argv[]) {
         return 1;
   }
   // Executables
-  std::string vinaPath = reader.Get("paths", "vina", "vina");
+  std::string vinaPath = reader.Get("VINA", "vina", "vina");
   checkExecutable(vinaPath, "vina");
-  std::string pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
+  std::string pythonShPath = reader.Get("PepGA", "pythonsh", "pythonsh");
   checkExecutable(pythonShPath, "pythonsh");
-  std::string pymolPath = reader.Get("paths", "pymol", "pymol");
+  std::string pymolPath = reader.Get("PepGA", "pymol", "pymol");
   checkExecutable(pymolPath, "pymol");
-  std::string gromacsPath = reader.Get("paths", "gromacs", "gmx");
+  std::string gromacsPath = reader.Get("GROMACS", "gromacs", "gmx");
   checkExecutable(gromacsPath, "");
   // Required by Vina/preparation for Vina
-  std::string mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities",
+  std::string mgltoolstilitiesPath = reader.Get("PepGA", "MGLToolsUtilities",
                                                 "");
   check(mgltoolstilitiesPath);
-  std::string workDir = reader.Get("paths", "workingDir", "");
+  std::string workDir = reader.Get("PepGA", "workingDir", "");
   check(workDir);
-  std::string receptorsPath = reader.Get("paths", "receptors", "");
+  std::string receptorsPath = reader.Get("PepGA", "receptors", "");
   check(receptorsPath);
-  bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
+  bool receptorsPrep = reader.GetBoolean("PepGA", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
   // Required by gromacs
-  std::string settings = reader.Get("paths", "settings", "");
+  std::string settings = reader.Get("GROMACS", "settings", "");
   check(settings);
-  std::string forcefieldPath = reader.Get("paths", "forcefieldpath", "");
+  std::string forcefieldPath = reader.Get("GROMACS", "forcefieldpath", "");
   check(forcefieldPath);
   std::string forcefield = reader.Get("GROMACS", "forcefield", "");
   std::string water = reader.Get("GROMACS", "water", "");
@@ -277,10 +287,11 @@ int main(int argc, char *argv[]) {
   float boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDBs for first generation
-  std::string initialpdbs = reader.Get("paths", "initialpdbs", "");
-  bool initialpdbsMD = reader.GetBoolean("paths", "initialpdbsisMD", false);
+  std::string initialpdbs = reader.Get("PepGA", "initialpdbs", "");
   // Path to PDB files to take random sample from
-  std::string randompdbs = reader.Get("paths", "randompdbs", "");
+  std::string randompdbs = reader.Get("PepGA", "randompdbs", "");
+  // PDB generation of initial population
+  bool pymolgen = reader.GetBoolean("PepGA", "pymolgen", false);
   if (!initialpdbs.empty()) {check(initialpdbs);}
   if (!randompdbs.empty()) {check(randompdbs);}
   /**************/
@@ -314,7 +325,7 @@ int main(int argc, char *argv[]) {
                   exhaustiveness, energy_range, gromacsPath.c_str(),
                   settings.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
-                  clustercutoff, &info);
+                  clustercutoff, &info, pymolgen);
   PepFitnessFunc fitnessFunc(&poolmgr);
   PepGenome vinaGenome(&mt);
   // Initial pdbs
@@ -336,8 +347,12 @@ int main(int argc, char *argv[]) {
       initPopulation.push_back(randompdbs + "/" + i);
     }
   }
-  info.errorMsg("Population size in PoolMGR: " + std::to_string(initPopulation.size()), false);
-  startingSequences = poolmgr.addElementsFromPDBs(initPopulation, world_size);
+  if (pymolgen) {
+    startingSequences = poolmgr.getFASTAS(initPopulation);
+    poolmgr.addElementsFromFASTAs(startingSequences, world_size);
+  } else {
+    startingSequences = poolmgr.addElementsFromPDBs(initPopulation, world_size);
+  }
   /**************/
   /* GA */
   std::vector<std::string> curGen = startingSequences;

@@ -5,6 +5,226 @@ std::string GMXInstance::logStr() {
   return " >> " + workDir + "/GMXINSTLOG" + " 2>&1";
 }
 
+void GMXInstance::energyMinim() {
+  // Export path to forcefield
+  info->infoMsg("(GMX, " + ligand + ") Setting env forcefield value...");
+  std::string command;
+  int success = setenv("GMXLIB", forcefieldPath.c_str(), 1);
+  if (success != 0) {
+    throw(GMXException("Could not set GMXLib Path", ""));
+  }
+  command.clear();
+  // Prepare for GROMACS
+  info->infoMsg("(GMX, " + ligand + ") Preparing cleansed PDB for GROMACS...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" pdb2gmx -f ");
+  command.append(ligand);
+  command.append(" -o ");
+  command.append("processed.gro");
+  command.append(" -p ");
+  command.append("topol.top");
+  command.append(" -i ");
+  command.append("posre.itp");
+  command.append(" -water ");
+  command.append(water);
+  command.append(" -ff ");
+  command.append(forcefield);
+  command.append(" -ignh");
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not generate topology for MD", ligand, "TOP");
+  }
+  command.clear();
+  // Define the bounding box
+  info->infoMsg("(GMX, " + ligand + ") Defining the bounding box...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" editconf");
+  command.append(" -f ");
+  command.append("processed.gro");
+  command.append(" -o ");
+  command.append("newbox.gro");
+  command.append(" -c ");
+  command.append(" -d ");
+  command.append(std::to_string(boxsize));
+  command.append(" -bt ");
+  command.append(bt);
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not define bounding box for MD", ligand);
+  }
+  command.clear();
+  // Solvate
+  info->infoMsg("(GMX, " + ligand + ") Solvating...");
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" solvate");
+  command.append(" -cp ");
+  command.append("newbox.gro");
+  command.append(" -cs ");
+  command.append("spc216.gro");
+  command.append(" -o ");
+  command.append("solv.gro");
+  command.append(" -p ");
+  command.append("topol.top");
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not solvate for MD", ligand);
+  }
+  command.clear();
+  // Add ions
+  info->infoMsg("(GMX, " + ligand + ") Adding ions...");
+  // Step one
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" grompp");
+  command.append(" -f ");
+  command.append(mdpPath);
+  command.append("/ions.mdp");
+  command.append(" -c ");
+  command.append("solv.gro");
+  command.append(" -p ");
+  command.append("topol.top");
+  command.append(" -o ");
+  command.append("ions.tpr");
+  command.append(" -po ");
+  command.append("mdout.mdp");
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not ionize for MD (1)", ligand);
+  }
+  command.clear();
+  // Step two
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" genion");
+  command.append(" -s ");
+  command.append("ions.tpr");
+  command.append(" -o ");
+  command.append("solv_ions.gro");
+  command.append(" -p ");
+  command.append("topol.top");
+  command.append(" -pname ");
+  command.append("NA");
+  command.append(" -nname ");
+  command.append("CL");
+  command.append(" -neutral ");
+  command.append(logStr());
+  command.append(" ");
+  command.append("<<eof\n13\neof");  // group SOL, might have to change
+                                     // to 16 depending on gromacs version
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not ionize for MD (2)", ligand);
+  }
+  command.clear();
+  // Energy minimization
+  info->infoMsg("(GMX, " + ligand + ") Minimzing energy...");
+  // Prepare
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" grompp");
+  command.append(" -f ");
+  command.append(mdpPath);
+  command.append("/minim.mdp");
+  command.append(" -c ");
+  command.append("solv_ions.gro");
+  command.append(" -p ");
+  command.append("topol.top");
+  command.append(" -o ");
+  command.append("em.tpr");
+  command.append(" -po ");
+  command.append("mdout.mdp");
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not prepare energy minimzation", ligand);
+  }
+  command.clear();
+  // Run MD for energy minimization
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" mdrun");
+  command.append(" -nt 1");
+  command.append(" -s ");
+  command.append("em.tpr");
+  command.append(" -deffnm em");
+  command.append(" -c ");
+  command.append("em.gro");
+  command.append(" -e ");
+  command.append("em.edr");
+  command.append(" -o ");
+  command.append("em.trr");
+  command.append(" -g ");
+  command.append("em.log");
+  command.append(logStr());
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not do energy minimzation", ligand);
+  }
+  command.clear();
+  // Centering
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" trjconv");
+  command.append(" -s ");
+  command.append("em.tpr");
+  command.append(" -f ");
+  command.append("em.trr");
+  command.append(" -o ");
+  command.append("noPBC.xtc");
+  command.append(" -pbc ");
+  command.append("mol");
+  command.append(" -center ");
+  command.append(logStr());
+  command.append(" <<eof\n1\n0\neof");
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not do energy minimzation", ligand);
+  }
+  command.clear();
+  // gmx2pdb
+  command.append("cd ");
+  command.append(workDir);
+  command.append("; ");
+  command.append(gromacsPath);
+  command.append(" trjconv");
+  command.append(" -s ");
+  command.append("em.tpr");
+  command.append(" -f ");
+  command.append("noPBC.xtc");
+  command.append(" -o ");
+  command.append("em.pdb");
+  command.append(logStr());
+  command.append(" <<eof\n1\neof");
+  success = system(command.c_str());
+  if (success != 0) {
+    throw GMXException("Could not do energy minimzation", ligand);
+  }
+  command.clear();
+}
+
 void GMXInstance::preparePDB() {
   // Export path to forcefield
   info->infoMsg("(GMX, " + ligand + ") Setting env forcefield value...");
@@ -27,8 +247,8 @@ void GMXInstance::preparePDB() {
     throw(GMXException("Could not clean PDB file for MD", ligand));
   }
   command.clear();
-  // Create topology using force field
-  info->infoMsg("(GMX, " + ligand + ") Creating topology...");
+  // Prepare for GROMACS
+  info->infoMsg("(GMX, " + ligand + ") Preparing cleansed PDB for GROMACS...");
   command.append("cd ");
   command.append(workDir);
   command.append("; ");

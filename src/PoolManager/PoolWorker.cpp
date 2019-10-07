@@ -35,6 +35,7 @@ void preparePDBQT(std::string ligand) {
 float genDock(std::string file) {
   float affinity = 10;
   std::string fileCluster = stripDir(file) + "/topcluster.pdb";
+  // std::string fileCluster = stripDir(file) + "/em.pdb";
   // Prepare ligand
   try {
     preparePDBQT(fileCluster);
@@ -52,6 +53,26 @@ float genDock(std::string file) {
   }
 
   return affinity;
+}
+
+void genEM(std::string file) {
+  GMXInstance gmxInstance(file.c_str(),
+                          gromacsPath.c_str(),
+                          pymolPath.c_str(),
+                          stripDir(file).c_str(),
+                          forcefield.c_str(),
+                          forcefieldPath.c_str(),
+                          water.c_str(),
+                          boundingboxtype.c_str(),
+                          clustercutoff,
+                          boxsize,
+                          mdpPath.c_str(),
+                          info);
+  try {
+    gmxInstance.energyMinim();
+  } catch (...) {
+    throw;
+  }
 }
 
 void genMD(std::string file) {
@@ -127,20 +148,20 @@ int main (int argc, char **argv) {
                      "Check if it exists in the same dir as PepGA";
         return 1;
   }
-  pymolPath = reader.Get("paths", "pymol", "pymol");
-  gromacsPath = reader.Get("paths", "gromacs", "gmx");
+  pymolPath = reader.Get("PepGA", "pymol", "pymol");
+  gromacsPath = reader.Get("GROMACS", "gromacs", "gmx");
   forcefield = reader.Get("GROMACS", "forcefield", "");
-  forcefieldPath = reader.Get("paths", "forcefieldpath", "");
+  forcefieldPath = reader.Get("GROMACS", "forcefieldpath", "");
   water = reader.Get("GROMACS", "water", "");
   boundingboxtype = reader.Get("GROMACS", "bt", "");
   boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
-  mdpPath = reader.Get("paths", "settings", "");
+  mdpPath = reader.Get("GROMACS", "settings", "");
   exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   energy_range = reader.GetInteger("VINA", "energy_range", 5);
-  vinaPath = reader.Get("paths", "vina", "vina");
-  pythonShPath = reader.Get("paths", "pythonsh", "pythonsh");
-  mgltoolstilitiesPath = reader.Get("paths", "MGLToolsUtilities",
+  vinaPath = reader.Get("VINA", "vina", "vina");
+  pythonShPath = reader.Get("PepGA", "pythonsh", "pythonsh");
+  mgltoolstilitiesPath = reader.Get("PepGA", "MGLToolsUtilities",
                                                 "");
   bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   std::string receptorsPath = reader.Get("paths", "receptors", "");
@@ -150,7 +171,6 @@ int main (int argc, char **argv) {
   for (auto i : oldRec) {
     receptors.push_back(receptorsPath + "/" + i);
   }
-  // Send Master the number of available threads
   unsigned int numThreads = omp_get_max_threads();
   MPI_Send(&numThreads, 1, MPI_INT, 0, SENDNMTHREADS, MPI_COMM_WORLD);
   std::string inReport;
@@ -160,6 +180,8 @@ int main (int argc, char **argv) {
   inReport.append(processor_name);
   info->infoMsg(inReport);
   while (42) {
+    // Send Master the number of available threads
+    MPI_Send(&numThreads, 1, MPI_INT, 0, SENDNMTHREADS, MPI_COMM_WORLD);
     // Wait to receive a vector of files
     info->infoMsg("Worker #" + std::to_string(world_rank)
                              + " waiting for a job...");
@@ -189,6 +211,7 @@ int main (int argc, char **argv) {
       // Do MD
       try {
         genMD(FILES.at(j));
+        // genEM(FILES.at(j));
       } catch (...) {
         info->errorMsg("MD for " + FILES.at(j) +
                        " failed, skipping...", false);
