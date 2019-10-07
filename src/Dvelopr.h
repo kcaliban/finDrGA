@@ -8,8 +8,8 @@
 #ifndef SRC_DVELOPR_H_
 #define SRC_DVELOPR_H_
 #include <mpi.h>
-#include <fstream>
 #include <sys/stat.h>
+#include <fstream>
 #include "lib/GenAlgInst.h"
 #include "DveloprGenome.h"
 #include "DveloprFitnessFunc.h"

@@ -1,10 +1,4 @@
-/* Copyright Fabian Krause 2019
- *
- * Receives vector of FILES to perform Docking and MD on,
- * using OpenMP calculates affinities on available processors, returns
- * vector of <file, affinity> pairs
- *
- */
+// Copyright Fabian Krause 2019
 #include "PoolWorker.h"
 
 std::string stripDir(std::string str) {
@@ -127,7 +121,7 @@ std::vector<std::string> getReceptors(std::string dir, bool prep = false) {
   return result;
 }
 
-int main (int argc, char **argv) {
+int main(int argc, char **argv) {
   // Initialize the MPI environment
   MPI_Init(&argc , &argv);
 
@@ -165,7 +159,7 @@ int main (int argc, char **argv) {
                                                 "");
   bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   std::string receptorsPath = reader.Get("paths", "receptors", "");
-  info = new Info(false, true, ""); // Console output
+  info = new Info(false, true, "");  // Console output
 
   std::vector<std::string> oldRec = getReceptors(receptorsPath, receptorsPrep);
   for (auto i : oldRec) {
@@ -232,16 +226,19 @@ int main (int argc, char **argv) {
                              + " is sending back the results now!");
 
     // Debug print of workers results
-    std::cout << "Worker # " << std::to_string(world_rank) << " sending: " << std::endl;
+    std::cout << "Worker # "  << std::to_string(world_rank)
+              << " sending: " << std::endl;
     for (auto i : results) {
       std::cout << i.first << ": " << i.second << std::endl;
     }
     // Send back the results
     unsigned int resultsSize;
     tmp = serialize(results, &resultsSize);
-    MPI_Isend(&resultsSize, 1, MPI_INT, 0, SENDAFFINSIZE, MPI_COMM_WORLD, &request);
+    MPI_Isend(&resultsSize, 1, MPI_INT, 0, SENDAFFINSIZE, MPI_COMM_WORLD,
+              &request);
     MPI_Wait(&request, MPI_STATUS_IGNORE);
-    MPI_Isend(&tmp[0], resultsSize, MPI_BYTE, 0, SENDAFFINCONT, MPI_COMM_WORLD, &request);
+    MPI_Isend(&tmp[0], resultsSize, MPI_BYTE, 0, SENDAFFINCONT, MPI_COMM_WORLD,
+              &request);
     MPI_Wait(&request, MPI_STATUS_IGNORE);
     free(tmp);
   }

@@ -1,7 +1,14 @@
-#ifndef SRC_POOLMANAGER_POOLSLV_H_
-#define SRC_POOLMANAGER_POOLSLV_H_
+/* Copyright 2019 Fabian Krause
+ *
+ * Receives vector of FILES to perform Docking and MD on,
+ * using OpenMP calculates affinities on available threads, returns
+ * vector of <file, affinity> pairs
+*/
+#ifndef SRC_POOLMANAGER_POOLWORKER_H_
+#define SRC_POOLMANAGER_POOLWORKER_H_
 #include <omp.h>
 #include <mpi.h>
+#include <vector>
 #include <string>
 #include <utility>
 #include "PoolManager.h"
@@ -30,4 +37,4 @@ int energy_range;
 Info * info;
 int world_size, world_rank;
 
-#endif  /* ifndef SRC_POOLMANAGER_POOLSLV_H_ */
+#endif  //  SRC_POOLMANAGER_POOLWORKER_H_

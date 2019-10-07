@@ -24,9 +24,9 @@ class TestGenomeCpy : public Genome<int> {
 
 class TestFitnessFunctionCpy : public FitnessFunction<int> {
  public:
-   float calculateFitness(int x, ...) {
-     return x;
-   }
+    float calculateFitness(int x, ...) {
+      return x;
+    }
 };
 
 TEST(GenAlgInst, topIndividuals50) {
@@ -90,9 +90,9 @@ class TestGenomeRec : public Genome<int> {
 
 class TestFitnessFunctionRec : public FitnessFunction<int> {
  public:
-   float calculateFitness(int x, ...) {
-     return x;
-   }
+    float calculateFitness(int x, ...) {
+      return x;
+    }
 };
 
 TEST(GenAlgInst, recomb1) {
@@ -140,9 +140,9 @@ class TestGenomeMut : public Genome<int> {
 
 class TestFitnessFunctionMut : public FitnessFunction<int> {
  public:
-   float calculateFitness(int x, ...) {
-     return x;
-   }
+    float calculateFitness(int x, ...) {
+      return x;
+    }
 };
 
 TEST(GenAlgInst, mutate50) {
@@ -203,19 +203,26 @@ TEST(PoolMGR, PDBtoFASTA) {
   std::vector<std::string> blub;
   std::vector<std::pair<std::string, std::string>> PDBs;
   Info * info = new Info(false, false, "");
-  PoolMGR poolmgr("", "", "", "", "", blub, 0, 0, "", "", "", "", "", "", 0, 0, info, false);
+  PoolMGR poolmgr("", "", "", "", "", blub, 0, 0, "",
+                  "", "", "", "", "", 0, 0, info, false);
   PDBs.push_back(std::make_pair("SEAHTLLYGT", "src/testpdbs/10_5zop_D_6.pdb"));
-  PDBs.push_back(std::make_pair("SLYPAQMYSR", "src/testpdbs/10_pdb2pyj_D_25.pdb"));
-  PDBs.push_back(std::make_pair("PKFFRYISERY", "src/testpdbs/11_2y35_D_1.pdb"));
-  PDBs.push_back(std::make_pair("SFYKNFTIDCS", "src/testpdbs/11_pdb1pd0_D_15.pdb"));
-  PDBs.push_back(std::make_pair("GVLGKELIDVLD", "src/testpdbs/12_2r8j_D_17.pdb"));
-  PDBs.push_back(std::make_pair("MHESMKLFDSIC", "src/testpdbs/12_pdb2g83_D_14.pdb"));
+  PDBs.push_back(std::make_pair("SLYPAQMYSR",
+                                "src/testpdbs/10_pdb2pyj_D_25.pdb"));
+  PDBs.push_back(std::make_pair("PKFFRYISERY",
+                                "src/testpdbs/11_2y35_D_1.pdb"));
+  PDBs.push_back(std::make_pair("SFYKNFTIDCS",
+                                "src/testpdbs/11_pdb1pd0_D_15.pdb"));
+  PDBs.push_back(std::make_pair("GVLGKELIDVLD",
+                                "src/testpdbs/12_2r8j_D_17.pdb"));
+  PDBs.push_back(std::make_pair("MHESMKLFDSIC",
+                                "src/testpdbs/12_pdb2g83_D_14.pdb"));
   PDBs.push_back(std::make_pair("GDGVEEAF", "src/testpdbs/8_5icn_D_18.pdb"));
   PDBs.push_back(std::make_pair("LVLLLRVL", "src/testpdbs/8_5vo8_D_14.pdb"));
   PDBs.push_back(std::make_pair("LPDLFEEQ", "src/testpdbs/8_5yko_D_16.pdb"));
   PDBs.push_back(std::make_pair("WDEHDFYCR", "src/testpdbs/9_5usn_D_2.pdb"));
   // PDBs.push_back(std::make_pair("
-  for (std::vector<std::pair<std::string, std::string>>::const_iterator it = PDBs.begin();
+  for (std::vector<std::pair<std::string, std::string>>::const_iterator
+                                                          it = PDBs.begin();
       it != PDBs.end(); it++) {
     std::string fasta = it->first;
     std::string pdb = it->second;
@@ -244,7 +251,6 @@ TEST(Serialization, Pairs) {
   std::vector<std::pair<std::string, float>> out;
   deserialize(out, seri, resultsSize);
   ASSERT_EQ(test, out);
-
 }
 
 

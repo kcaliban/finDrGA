@@ -71,11 +71,13 @@ std::vector<std::string> PoolMGR::getFASTAS(std::vector<std::string> &files) {
 }
 
 std::vector<std::string> PoolMGR::addElementsFromFiles(std::vector<std::string>
-                                                       &files, int world_size){
+                                                       &files,
+                                                       int world_size) {
   info->infoMsg("Total number of affinities to be calculated: "
                  + std::to_string(files.size()));
+  int kArrSize = world_size - 1;
   // Do MD and get docking results from PoolWorker
-  int threadsPerWorker[world_size - 1];
+  int threadsPerWorker[kArrSize];
   // Get the number of available threads for each worker to distribute
   // accordingly
   unsigned int allThreads = 0;
@@ -105,9 +107,9 @@ std::vector<std::string> PoolMGR::addElementsFromFiles(std::vector<std::string>
   }
   // Send buckets to subprocesses
   info->infoMsg("Master is sending his work...");
-  MPI_Request requests[world_size - 1];
-  unsigned int bucketSizes[world_size - 1];
-  char * bucketBin[world_size - 1];
+  MPI_Request requests[kArrSize];
+  unsigned int bucketSizes[kArrSize];
+  char * bucketBin[kArrSize];
   // Send size in bytes
   for (int i = 1; i < world_size; i++) {
     bucketBin[i - 1] = serialize(buckets.at(i - 1), &bucketSizes[i - 1]);
@@ -178,8 +180,9 @@ std::vector<std::string> PoolMGR::addElementsFromFiles(std::vector<std::string>
   return returnVal;
 }
 
-std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string> &files,
-                                  int world_size) {
+std::vector<std::string> PoolMGR::addElementsFromPDBs(std::vector<std::string>
+                                                      &files,
+                                                      int world_size) {
   // Prepare internal map and directory structure
   std::vector<std::string> newFiles;
   for (auto file : files) {

@@ -216,9 +216,11 @@ int main(int argc, char *argv[]) {
   options.add_options()
     ("n", "Number of generations", cxxopts::value<unsigned int>())
     ("m", "Size of population", cxxopts::value<unsigned int>())
-    ("p", "Probability of random point mutation for each individual", cxxopts::value<float>())
-    ("c", "Percentage of individuals to copy for each generation as a float (0.1 for 10%)", cxxopts::value<float>())
-    ;
+    ("p", "Probability of random point mutation for each individual",
+     cxxopts::value<float>())
+    ("c",
+     "Percentage of individuals to copy for each generation as a float "
+     "(0.1 for 10%)", cxxopts::value<float>());
   unsigned int gen;
   unsigned int noPop;
   float mutateProb;
@@ -297,7 +299,8 @@ int main(int argc, char *argv[]) {
   /**************/
   Info info(true, true, workDir + "/" + "DveloprLOG");
   /* Print info about master node */
-  info.infoMsg("Master has rank " + std::to_string(world_rank) + "(should be 0)");
+  info.infoMsg("Master has rank " + std::to_string(world_rank)
+               + "(should be 0)");
   /* Get receptors */
   std::vector<std::string> receptors;
   std::vector<std::string> receptorfiles = getReceptorsM(receptorsPath,
@@ -361,14 +364,13 @@ int main(int argc, char *argv[]) {
     // Output to log file
     std::string output = "Generation: ";
     output.append(std::to_string(i));
-    output.append("\nIndividuals:\n");
+    output.append("\nIndividuals in Population:\n");
     output.append(genToStr(curGen, &poolmgr));
     output.append("\nItems in Pool Manager:\n");
     output.append(poolmgr.toStr());
     info.infoMsg(output);
     // Get new generation
     curGen = inst.nextGen(vinaGenome, fitnessFunc, curGen, mutateProb, genCpy);
-
     // Remove duplicates for adding
     std::vector<std::string> curGenDistinct;
     curGenDistinct = curGen;

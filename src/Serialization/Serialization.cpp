@@ -1,7 +1,10 @@
+// Copyright 2019 Fabian Krause
 #include "Serialization.h"
 #include <iostream>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::pair;
 
 char * serialize(vector<string> &v, unsigned int *size) {
   // STR1\0STR2\0...STRN\0
@@ -49,7 +52,7 @@ char * serialize(vector<pair<string, float>> &v, unsigned int *size) {
   for (auto it = v.begin(); it != v.end(); it++) {
     totalSize += it->first.size() + 1 + sizeof(float);
   }
-  totalSize++; // Why though? Without this there is always one byte missing
+  totalSize++;
 
   char * buffer = new char[totalSize];
   unsigned int bufpt = 0;
@@ -72,7 +75,8 @@ char * serialize(vector<pair<string, float>> &v, unsigned int *size) {
   return buffer;
 }
 
-void deserialize(vector<pair<string, float>> &restore, char * buffer, unsigned int size) {
+void deserialize(vector<pair<string, float>> &restore,
+                 char * buffer, unsigned int size) {
   bool term = false;
   string curStr;
   char flt[sizeof(float)];
@@ -80,13 +84,13 @@ void deserialize(vector<pair<string, float>> &restore, char * buffer, unsigned i
 
   for (unsigned int j = 0; j < size; j++) {
     const char c = buffer[j];
-    if (!term) { // Read in string before first appearence of '\0'
+    if (!term) {  // Read in string before first appearence of '\0'
       if (c != '\0') {
         curStr.push_back(c);
       } else {
         term = true;
       }
-    } else { // Read in float
+    } else {  // Read in float
       if (fltptr < sizeof(float)) {
         flt[fltptr] = buffer[j];
         fltptr++;

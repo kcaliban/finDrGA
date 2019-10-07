@@ -124,6 +124,11 @@ class GMXInstance {
      * Relevant output: topcluster.pdb
     */
     void extractTopCluster();
+    /* energyMinim():
+     * Energy minimization without MD
+     *
+     * Relevant output: em.pdb
+    */
     void energyMinim();
 
  private:

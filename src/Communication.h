@@ -1,3 +1,8 @@
+/* Copyright 2019 Fabian Krause
+ *
+ * Global MPI tags
+ *
+*/
 #ifndef SRC_COMMUNICATION_H_
 #define SRC_COMMUNICATION_H_
 
@@ -8,4 +13,4 @@
 #define SENDRECEPTORS 4
 #define SENDNMTHREADS 5
 
-#endif /* ifndef SRC_COMMUNICATION_H_ */
+#endif  // SRC_COMMUNICATION_H_

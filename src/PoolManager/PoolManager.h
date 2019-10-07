@@ -10,6 +10,8 @@
 */
 #ifndef SRC_POOLMANAGER_POOLMANAGER_H_
 #define SRC_POOLMANAGER_POOLMANAGER_H_
+#include <mpi.h>
+#include <math.h>
 #include <iostream>
 #include <unordered_map>
 #include <tuple>
@@ -19,9 +21,7 @@
 #include <utility>
 #include "../VinaInstance/VinaInstance.h"
 #include "../GMXInstance/GMXInstance.h"
-#include <mpi.h>
 #include "../Serialization/Serialization.h"
-#include <math.h>
 #include "../Communication.h"
 class PoolManagerException : virtual public std::exception {
  public:
@@ -135,9 +135,24 @@ class PoolMGR {
      * Returns FASTA sequence of specified file
     */
     std::string PDBtoFASTA(std::string);
-    std::vector<std::string> addElementsFromFASTAs(std::vector<std::string>&, int);
-    std::vector<std::string> addElementsFromPDBs(std::vector<std::string>&, int);
-    std::vector<std::string> addElementsFromFiles(std::vector<std::string>&, int);
+    /* addElementsFromFASTAs(FASTAs, world_size):
+     *
+     * Adds elements to the pool from FASTA sequences, distributing amongst
+     * nodes according to available threads
+    */
+    std::vector<std::string> addElementsFromFASTAs(std::vector<std::string>&,
+                                                   int);
+    /* addElementsFromPDBs(PDB paths, world_size):
+     *
+     * Adds elements to the pool from PDB file paths, distributing amongst
+     * nodes according to available threads
+    */
+    std::vector<std::string> addElementsFromPDBs(std::vector<std::string>&,
+                                                 int);
+    /* getFASTAS(PDB paths):
+     *
+     * Collect FASTA sequences for given PDB file path vector
+    */
     std::vector<std::string> getFASTAS(std::vector<std::string> &);
 
  private:
@@ -193,6 +208,14 @@ class PoolMGR {
      *
     */
     void deleteElementData(std::string);
+    /* addElementsFromFiles(File paths, world_size):
+     *
+     * Used by addElementsFromPDBs and addElementsFromFASTAs to distribute
+     * docking and MD to computing nodes and collect the results
+     *
+    */
+    std::vector<std::string> addElementsFromFiles(std::vector<std::string>&,
+                                                  int);
 };
 
-#endif  // SRC_POOLMANAGER_POOLMANAGER_H_
+#endif  //  SRC_POOLMANAGER_POOLMANAGER_H_

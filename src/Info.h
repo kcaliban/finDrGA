@@ -37,6 +37,7 @@ class Info {
      * exiting the program if fatal is true
     */
     void errorMsg(std::string, bool);
+
  private:
     bool log;
     bool console;

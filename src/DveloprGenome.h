@@ -7,6 +7,7 @@
 #ifndef SRC_DVELOPRGENOME_H_
 #define SRC_DVELOPRGENOME_H_
 #include <string>
+#include <vector>
 #include <chrono>
 #include <random>
 #include "lib/Genome.h"
