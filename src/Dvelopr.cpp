@@ -1,5 +1,5 @@
 /* Copyright 2019 Fabian Krause */
-#include "PepGA.h"
+#include "Dvelopr.h"
 
 void check(const std::string p) {
   struct stat st;
@@ -212,7 +212,7 @@ void preparePDBQT(std::string receptor,
 
 int main(int argc, char *argv[]) {
   /* Get command line arguments */
-  cxxopts::Options options("PepGA", "Find the best ligands");
+  cxxopts::Options options("Dvelopr", "Find the best ligands");
   options.add_options()
     ("n", "Number of generations", cxxopts::value<unsigned int>())
     ("m", "Size of population", cxxopts::value<unsigned int>())
@@ -253,27 +253,27 @@ int main(int argc, char *argv[]) {
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
         std::cout << "Can't load 'config.ini'\n"
-                     "Check if it exists in the same dir as PepGA";
+                     "Check if it exists in the same dir as Dvelopr";
         return 1;
   }
   // Executables
   std::string vinaPath = reader.Get("VINA", "vina", "vina");
   checkExecutable(vinaPath, "vina");
-  std::string pythonShPath = reader.Get("PepGA", "pythonsh", "pythonsh");
+  std::string pythonShPath = reader.Get("Dvelopr", "pythonsh", "pythonsh");
   checkExecutable(pythonShPath, "pythonsh");
-  std::string pymolPath = reader.Get("PepGA", "pymol", "pymol");
+  std::string pymolPath = reader.Get("Dvelopr", "pymol", "pymol");
   checkExecutable(pymolPath, "pymol");
   std::string gromacsPath = reader.Get("GROMACS", "gromacs", "gmx");
   checkExecutable(gromacsPath, "");
   // Required by Vina/preparation for Vina
-  std::string mgltoolstilitiesPath = reader.Get("PepGA", "MGLToolsUtilities",
+  std::string mgltoolstilitiesPath = reader.Get("Dvelopr", "MGLToolsUtilities",
                                                 "");
   check(mgltoolstilitiesPath);
-  std::string workDir = reader.Get("PepGA", "workingDir", "");
+  std::string workDir = reader.Get("Dvelopr", "workingDir", "");
   check(workDir);
-  std::string receptorsPath = reader.Get("PepGA", "receptors", "");
+  std::string receptorsPath = reader.Get("Dvelopr", "receptors", "");
   check(receptorsPath);
-  bool receptorsPrep = reader.GetBoolean("PepGA", "receptorsprep", false);
+  bool receptorsPrep = reader.GetBoolean("Dvelopr", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
   // Required by gromacs
@@ -287,15 +287,15 @@ int main(int argc, char *argv[]) {
   float boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDBs for first generation
-  std::string initialpdbs = reader.Get("PepGA", "initialpdbs", "");
+  std::string initialpdbs = reader.Get("Dvelopr", "initialpdbs", "");
   // Path to PDB files to take random sample from
-  std::string randompdbs = reader.Get("PepGA", "randompdbs", "");
+  std::string randompdbs = reader.Get("Dvelopr", "randompdbs", "");
   // PDB generation of initial population
-  bool pymolgen = reader.GetBoolean("PepGA", "pymolgen", false);
+  bool pymolgen = reader.GetBoolean("Dvelopr", "pymolgen", false);
   if (!initialpdbs.empty()) {check(initialpdbs);}
   if (!randompdbs.empty()) {check(randompdbs);}
   /**************/
-  Info info(true, true, workDir + "/" + "PepLOG");
+  Info info(true, true, workDir + "/" + "DveloprLOG");
   /* Print info about master node */
   info.infoMsg("Master has rank " + std::to_string(world_rank) + "(should be 0)");
   /* Get receptors */
@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
   /**************/
   /* Generate ligands */
   // Initialization of key objects required
-  GenAlgInst<std::string, PepGenome, PepFitnessFunc> inst(&mt);
+  GenAlgInst<std::string, DveloprGenome, DveloprFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
                   receptors,
@@ -326,8 +326,8 @@ int main(int argc, char *argv[]) {
                   settings.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff, &info, pymolgen);
-  PepFitnessFunc fitnessFunc(&poolmgr);
-  PepGenome vinaGenome(&mt);
+  DveloprFitnessFunc fitnessFunc(&poolmgr);
+  DveloprGenome vinaGenome(&mt);
   // Initial pdbs
   std::vector<std::string> startingSequences;
   info.infoMsg("Gathering the initial population...");

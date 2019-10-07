@@ -1,6 +1,6 @@
 /* Copyright 2019 Fabian Krause
  *
- * PepGA Tests
+ * DvelopR Tests
  *
  * Testing only internal functionality, the heavy IO using other programs
  * is too time-consuming to test at this point.

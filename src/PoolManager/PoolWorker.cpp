@@ -145,10 +145,10 @@ int main (int argc, char **argv) {
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
         std::cout << "Can't load 'config.ini'\n"
-                     "Check if it exists in the same dir as PepGA";
+                     "Check if it exists in the same dir as Dvelopr";
         return 1;
   }
-  pymolPath = reader.Get("PepGA", "pymol", "pymol");
+  pymolPath = reader.Get("Dvelopr", "pymol", "pymol");
   gromacsPath = reader.Get("GROMACS", "gromacs", "gmx");
   forcefield = reader.Get("GROMACS", "forcefield", "");
   forcefieldPath = reader.Get("GROMACS", "forcefieldpath", "");
@@ -160,8 +160,8 @@ int main (int argc, char **argv) {
   exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   energy_range = reader.GetInteger("VINA", "energy_range", 5);
   vinaPath = reader.Get("VINA", "vina", "vina");
-  pythonShPath = reader.Get("PepGA", "pythonsh", "pythonsh");
-  mgltoolstilitiesPath = reader.Get("PepGA", "MGLToolsUtilities",
+  pythonShPath = reader.Get("Dvelopr", "pythonsh", "pythonsh");
+  mgltoolstilitiesPath = reader.Get("Dvelopr", "MGLToolsUtilities",
                                                 "");
   bool receptorsPrep = reader.GetBoolean("paths", "receptorsprep", false);
   std::string receptorsPath = reader.Get("paths", "receptors", "");

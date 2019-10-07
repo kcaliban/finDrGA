@@ -1,16 +1,16 @@
 /* Copyright 2019 Fabian Krause
  *
- * PepGA Genome
+ * Dvelopr Genome
  *
  * Defines possible mutations and crossover, requires a random engine
 */
-#ifndef SRC_PEPGENOME_H_
-#define SRC_PEPGENOME_H_
+#ifndef SRC_DVELOPRGENOME_H_
+#define SRC_DVELOPRGENOME_H_
 #include <string>
 #include <chrono>
 #include <random>
 #include "lib/Genome.h"
-class PepGenome : public Genome<std::string> {
+class DveloprGenome : public Genome<std::string> {
  private:
     std::vector<float> probs;
     std::uniform_int_distribution<int> distr;
@@ -18,7 +18,7 @@ class PepGenome : public Genome<std::string> {
     std::mt19937 * mt;
 
  public:
-    PepGenome(std::mt19937 * mt1) {
+    DveloprGenome(std::mt19937 * mt1) {
       mt = mt1;
       distr = std::uniform_int_distribution<int>(0, alphabet.size() - 1);
     }
@@ -27,4 +27,4 @@ class PepGenome : public Genome<std::string> {
     std::string mutate(std::string&, ...);
 };
 
-#endif  // SRC_PEPGENOME_H_
+#endif  // SRC_DVELOPRGENOME_H_
