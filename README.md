@@ -63,7 +63,7 @@ Dvelopr is written for computer clusters, it can however be executed on a single
 computer.
 
 ```bash
-mpirun -np 1 Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np 1 PoolWorker
+mpirun -np 1 ./Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np 1 ./PoolWorker
 ```
 
 ### Computer cluster
@@ -72,7 +72,7 @@ For computation on a computing cluster, you have to specify how many
 individual computing nodes (not threads!) you can use:
 
 ```bash
-mpirun -np 1 Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES PoolWorker
+mpirun -np 1 ./Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES ./PoolWorker
 ```
 
 ## License
