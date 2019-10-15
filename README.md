@@ -1,12 +1,15 @@
-# Dvelopr
+# finDr\_GA
 
-Dvelopr is a distributed computing application applying the principle of
+finDr\_GA is a distributed computing application applying the principle of
 [genetic algorithms](https://en.wikipedia.org/wiki/Genetic_algorithm)
 to find a peptide binder given a receptor.
 
+finDr\_GA is part of finDr, a software developed to find binders
+for reflect, the iGEM Team of Freiburg 2019.
+
 ## Description
 
-Dvelopr performs molecular dynamics simulations using GROMACS
+finDr\_GA performs molecular dynamics simulations using GROMACS
 and calculates binding affinities using AutoDock Vina. The results serve
 as the fitness of a possible binder and therefore as the basis for
 application of the principles of Darwinian evolution.
@@ -31,19 +34,19 @@ This process is repeated for a user-defined amount of generations.
 
 ## Installation
 
-Dvelopr is written for Linux. Make sure you have all dependencies installed, then
+finDr\_GA is written for Linux. Make sure you have all dependencies installed, then
 move on to the following steps:
 
 Go to any directory you like and clone this repository, change into its directory
 and compile using make
 ```bash
 cd ilikethisdirectory
-git clone https://github.com/kcaliban/Dvelopr.git
-cd Dvelopr
+git clone https://github.com/kcaliban/finDr\_GA.git
+cd finDr\_GA
 make
 ```
 
-Before you can use Dvelopr you have to configure it. Take a look at `config.ini`
+Before you can use finDr\_GA you have to configure it. Take a look at `config.ini`
 and change the settings accordingly, making sure all directories you
 specify exist.
 
@@ -51,7 +54,7 @@ specify exist.
 
 ### Arguments
 
-Dvelopr takes four command-line arguments.
+finDr\_GA takes four command-line arguments.
 * -n : Number of generations
 * -m : Size of population
 * -p : Probability of random-point mutation for each individual
@@ -59,20 +62,24 @@ Dvelopr takes four command-line arguments.
 
 ### Single computer
 
-Dvelopr is written for computer clusters, it can however be executed on a single
+finDr\_GA is written for computer clusters, it can however be executed on a single
 computer.
 
+Change to the directory you created in the installation step and run
+the following command:
 ```bash
-mpirun -np 1 ./Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np 1 ./PoolWorker
+mpirun -np 1 ./finDr\_GA -n 100 -m 50 -p 0.5 -c 0.2 : -np 1 ./PoolWorker
 ```
 
 ### Computer cluster
 
 For computation on a computing cluster, you have to specify how many
-individual computing nodes (not threads!) you can use:
+individual computing nodes (not threads!) you can use.
 
+Change to the directory you created in the installation step and run
+the following command:
 ```bash
-mpirun -np 1 ./Dvelopr -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES ./PoolWorker
+mpirun -np 1 ./finDr\_GA -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES ./PoolWorker
 ```
 
 ## License

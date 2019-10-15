@@ -1,17 +1,17 @@
 /* Copyright 2019 Fabian Krause
  *
- * Dvelopr Genome
+ * finDrGA Genome
  *
  * Defines possible mutations and crossover, requires a random engine
 */
-#ifndef SRC_DVELOPRGENOME_H_
-#define SRC_DVELOPRGENOME_H_
+#ifndef SRC_FINDRGAGENOME_H_
+#define SRC_FINDRGAGENOME_H_
 #include <string>
 #include <vector>
 #include <chrono>
 #include <random>
 #include "lib/Genome.h"
-class DveloprGenome : public Genome<std::string> {
+class finDrGAGenome : public Genome<std::string> {
  private:
     std::vector<float> probs;
     std::uniform_int_distribution<int> distr;
@@ -19,7 +19,7 @@ class DveloprGenome : public Genome<std::string> {
     std::mt19937 * mt;
 
  public:
-    DveloprGenome(std::mt19937 * mt1) {
+    finDrGAGenome(std::mt19937 * mt1) {
       mt = mt1;
       distr = std::uniform_int_distribution<int>(0, alphabet.size() - 1);
     }
@@ -28,4 +28,4 @@ class DveloprGenome : public Genome<std::string> {
     std::string mutate(std::string&, ...);
 };
 
-#endif  // SRC_DVELOPRGENOME_H_
+#endif  // SRC_FINDRGAGENOME_H_

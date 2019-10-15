@@ -1,5 +1,5 @@
 /* Copyright 2019 Fabian Krause */
-#include "Dvelopr.h"
+#include "finDrGA.h"
 
 void check(const std::string p) {
   struct stat st;
@@ -212,7 +212,8 @@ void preparePDBQT(std::string receptor,
 
 int main(int argc, char *argv[]) {
   /* Get command line arguments */
-  cxxopts::Options options("Dvelopr", "Find the best ligands");
+  cxxopts::Options options("finDrGA", "Find ligands through the principles"
+                           " of Darwinian evolution");
   options.add_options()
     ("n", "Number of generations", cxxopts::value<unsigned int>())
     ("m", "Size of population", cxxopts::value<unsigned int>())
@@ -255,27 +256,27 @@ int main(int argc, char *argv[]) {
   INIReader reader("config.ini");
   if (reader.ParseError() != 0) {
         std::cout << "Can't load 'config.ini'\n"
-                     "Check if it exists in the same dir as Dvelopr";
+                     "Check if it exists in the same dir as finDrGA";
         return 1;
   }
   // Executables
   std::string vinaPath = reader.Get("VINA", "vina", "vina");
   checkExecutable(vinaPath, "vina");
-  std::string pythonShPath = reader.Get("Dvelopr", "pythonsh", "pythonsh");
+  std::string pythonShPath = reader.Get("finDrGA", "pythonsh", "pythonsh");
   checkExecutable(pythonShPath, "pythonsh");
-  std::string pymolPath = reader.Get("Dvelopr", "pymol", "pymol");
+  std::string pymolPath = reader.Get("finDrGA", "pymol", "pymol");
   checkExecutable(pymolPath, "pymol");
   std::string gromacsPath = reader.Get("GROMACS", "gromacs", "gmx");
   checkExecutable(gromacsPath, "");
   // Required by Vina/preparation for Vina
-  std::string mgltoolstilitiesPath = reader.Get("Dvelopr", "MGLToolsUtilities",
+  std::string mgltoolstilitiesPath = reader.Get("finDrGA", "MGLToolsUtilities",
                                                 "");
   check(mgltoolstilitiesPath);
-  std::string workDir = reader.Get("Dvelopr", "workingDir", "");
+  std::string workDir = reader.Get("finDrGA", "workingDir", "");
   check(workDir);
-  std::string receptorsPath = reader.Get("Dvelopr", "receptors", "");
+  std::string receptorsPath = reader.Get("finDrGA", "receptors", "");
   check(receptorsPath);
-  bool receptorsPrep = reader.GetBoolean("Dvelopr", "receptorsprep", false);
+  bool receptorsPrep = reader.GetBoolean("finDrGA", "receptorsprep", false);
   int exhaustiveness = reader.GetInteger("VINA", "exhaustiveness", 1);
   int energy_range = reader.GetInteger("VINA", "energy_range", 5);
   // Required by gromacs
@@ -289,15 +290,15 @@ int main(int argc, char *argv[]) {
   float boxsize = reader.GetReal("GROMACS", "boxsize", 1.0);
   float clustercutoff = reader.GetReal("GROMACS", "clustercutoff", 0.12);
   // Path to PDBs for first generation
-  std::string initialpdbs = reader.Get("Dvelopr", "initialpdbs", "");
+  std::string initialpdbs = reader.Get("finDrGA", "initialpdbs", "");
   // Path to PDB files to take random sample from
-  std::string randompdbs = reader.Get("Dvelopr", "randompdbs", "");
+  std::string randompdbs = reader.Get("finDrGA", "randompdbs", "");
   // PDB generation of initial population
-  bool pymolgen = reader.GetBoolean("Dvelopr", "pymolgen", false);
+  bool pymolgen = reader.GetBoolean("finDrGA", "pymolgen", false);
   if (!initialpdbs.empty()) {check(initialpdbs);}
   if (!randompdbs.empty()) {check(randompdbs);}
   /**************/
-  Info info(true, true, workDir + "/" + "DveloprLOG");
+  Info info(true, true, workDir + "/" + "finDrGALOG");
   /* Print info about master node */
   info.infoMsg("Master has rank " + std::to_string(world_rank)
                + "(should be 0)");
@@ -321,7 +322,7 @@ int main(int argc, char *argv[]) {
   /**************/
   /* Generate ligands */
   // Initialization of key objects required
-  GenAlgInst<std::string, DveloprGenome, DveloprFitnessFunc> inst(&mt);
+  GenAlgInst<std::string, finDrGAGenome, finDrGAFitnessFunc> inst(&mt);
   PoolMGR poolmgr(workDir.c_str(), vinaPath.c_str(), pythonShPath.c_str(),
                   mgltoolstilitiesPath.c_str(), pymolPath.c_str(),
                   receptors,
@@ -329,8 +330,8 @@ int main(int argc, char *argv[]) {
                   settings.c_str(), forcefield.c_str(), forcefieldPath.c_str(),
                   water.c_str(), boundingboxtype.c_str(), boxsize,
                   clustercutoff, &info, pymolgen);
-  DveloprFitnessFunc fitnessFunc(&poolmgr);
-  DveloprGenome vinaGenome(&mt);
+  finDrGAFitnessFunc fitnessFunc(&poolmgr);
+  finDrGAGenome vinaGenome(&mt);
   // Initial pdbs
   std::vector<std::string> startingSequences;
   info.infoMsg("Gathering the initial population...");

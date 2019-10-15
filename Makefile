@@ -1,7 +1,7 @@
 # Specify compiler commands
 CXX = mpic++ -O3 -Wall -fopenmp -std=c++11
 # Specify name of file containing main function, without ext.
-BINARY = Dvelopr
+BINARY = finDrGA
 BINARY2 = PoolWorker
 # Source files; ** wildcard does not work on my Make so just one level depth
 SRCFILES = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
@@ -12,7 +12,7 @@ SRCFILES := $(filter-out $(wildcard src/*/*Test.cpp), $(filter-out $(wildcard sr
 OBJFILES = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCFILES)))
 
 # Testing
-TEST = DveloprTest
+TEST = finDrGATest
 SRCTEST = $(wildcard src/*Test.cpp) $(wildcard src/*/*Test.cpp)
 OBJTEST = $(patsubst src/%, obj/%, $(patsubst %.cpp,%.o,$(SRCTEST)))
 
@@ -30,14 +30,14 @@ folders:
 # Link everything together 
 compile: objs
 	$(CXX) $(filter-out $(wildcard obj/PoolManager/PoolWorker.o),$(OBJFILES)) -o $(BINARY) -lm
-	$(CXX) $(filter-out $(wildcard obj/Dvelopr.o),$(OBJFILES)) -o $(BINARY2) -lm
+	$(CXX) $(filter-out $(wildcard obj/finDrGA.o),$(OBJFILES)) -o $(BINARY2) -lm
 
 # Generate all object files
 objs: $(OBJFILES)
 
 # Test
 test: testobjs
-	$(CXX) $(OBJTEST) $(filter-out $(wildcard obj/PoolManager/PoolWorker.o), $(filter-out $(wildcard obj/Dvelopr.o),$(OBJFILES))) -o $(TEST) -lgtest -lgtest_main -lpthread
+	$(CXX) $(OBJTEST) $(filter-out $(wildcard obj/PoolManager/PoolWorker.o), $(filter-out $(wildcard obj/finDrGA.o),$(OBJFILES))) -o $(TEST) -lgtest -lgtest_main -lpthread
 	./$(TEST) # --gtest_filter=Serialization.Pairs
 
 testobjs: $(OBJTEST)
