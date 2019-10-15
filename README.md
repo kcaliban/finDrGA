@@ -4,7 +4,7 @@ finDrGA is a distributed computing application applying the principle of
 [genetic algorithms](https://en.wikipedia.org/wiki/Genetic_algorithm)
 to find a peptide binder given a receptor.
 
-finDrGA is part of finDr, a toolset developed to find binders
+finDrGA is part of finDr, a toolset developed to find peptide binders
 for reflect, the iGEM Team of Freiburg 2019.
 
 ## Description
