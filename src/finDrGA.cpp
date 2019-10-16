@@ -1,6 +1,39 @@
 /* Copyright 2019 Fabian Krause */
 #include "finDrGA.h"
 
+void mImage(const std::string pdb) {
+  // Read receptor file
+  std::ifstream t(pdb);
+  t.seekg(0, std::ios::end);
+  size_t size = t.tellg();
+  std::string buffer(size, ' ');
+  t.seekg(0);
+  t.read(&buffer[0], size);
+  t.close();
+
+  std::string output;
+  // Read line per line, set min and max accordingly
+  std::string line;
+  std::stringstream receptorStream(buffer);
+  while (std::getline(receptorStream, line, '\n')) {
+    std::string newline = line;
+    if (line.substr(0, 4) == "ATOM" || line.substr(0, 6) == "HETATM") {
+      float x = - stof(line.substr(30, 8));
+      char invertedX[9];  // Null terminating char at the end => 9
+      sprintf(invertedX, "%8.3f", x);
+      for (unsigned int i = 0; i < 8; i++) {
+        newline[30 + i] = invertedX[i];
+      }
+    }
+    output.append(newline + "\n");
+  }
+
+  std::ofstream outf(pdb, std::ofstream::out | std::ofstream::trunc);
+  outf << output;
+  outf.close();
+}
+
+
 void check(const std::string p) {
   struct stat st;
   if (stat(p.c_str(), &st) != 0) {
@@ -221,17 +254,25 @@ int main(int argc, char *argv[]) {
      cxxopts::value<float>())
     ("c",
      "Percentage of individuals to copy for each generation as a float "
-     "(0.1 for 10%)", cxxopts::value<float>());
+     "(0.1 for 10%)", cxxopts::value<float>())
+    ("mi",
+     "(optional) Convert the target into its mirror-image (L to D or D to L)\n"
+     "Target has to be unprepared (just the .pdb file, no .pdbqt and conf)\n"
+     "Attention: Original target gets overwritten!"
+     , cxxopts::value<bool>()->default_value("false"))
+    ;
   unsigned int gen;
   unsigned int noPop;
   float mutateProb;
   float genCpy;
+  bool mirrorImage;
   try {
     auto result = options.parse(argc, argv);
     gen = result["n"].as<unsigned int>();
     noPop = result["m"].as<unsigned int>();
     mutateProb = result["p"].as<float>();
     genCpy = result["c"].as<float>();
+    mirrorImage = result["mi"].as<bool>();
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
     std::cout << options.help() << std::endl;
@@ -307,9 +348,12 @@ int main(int argc, char *argv[]) {
   std::vector<std::string> receptorfiles = getReceptorsM(receptorsPath,
                                                         receptorsPrep);
   for (auto s : receptorfiles) {
+    if (mirrorImage) {
+      mImage(receptorsPath + "/" + s);
+    }
     receptors.push_back(receptorsPath + "/" + s);
   }
-  if (!receptorsPrep) {
+  if (mirrorImage || !receptorsPrep) {
     for (auto s : receptors) {
       prepareConfig(s);
       try {
