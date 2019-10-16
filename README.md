@@ -71,6 +71,11 @@ the following command:
 mpirun -np 1 ./finDrGA -n 100 -m 50 -p 0.5 -c 0.2 : -np 1 ./PoolWorker
 ```
 
+To also convert your receptor(s) from L to D or the other way around:
+```bash
+mpirun -np 1 ./finDrGA -n 100 -m 50 -p 0.5 -c 0.2 --mi : -np 1 ./PoolWorker
+```
+
 ### Computer cluster
 
 For computation on a computing cluster, you have to specify how many
@@ -80,6 +85,11 @@ Change to the directory you created in the installation step and run
 the following command:
 ```bash
 mpirun -np 1 ./finDrGA -n 100 -m 50 -p 0.5 -c 0.2 : -np NUMNODES ./PoolWorker
+```
+
+To also convert your receptor(s) from L to D or the other way around:
+```bash
+mpirun -np 1 ./finDrGA -n 100 -m 50 -p 0.5 -c 0.2 --mi : -np NUMNODES ./PoolWorker
 ```
 
 ## License
