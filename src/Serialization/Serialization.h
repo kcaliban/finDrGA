@@ -1,4 +1,4 @@
-/* Copyright 2019 Fabian Krause
+/* Copyright 2019 iGEM Team Freiburg 2019
  *
  * String and (string, float) pair serialization required for communication
  * between master and workers

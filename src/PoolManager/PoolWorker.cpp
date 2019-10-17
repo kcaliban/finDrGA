@@ -1,4 +1,4 @@
-// Copyright Fabian Krause 2019
+// Copyright iGEM Team Freiburg 2019 2019
 #include "PoolWorker.h"
 
 std::string stripDir(std::string str) {

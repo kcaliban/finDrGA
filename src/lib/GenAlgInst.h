@@ -1,4 +1,4 @@
-/* Copyright 2019 Fabian Krause
+/* Copyright 2019 iGEM Team Freiburg 2019
  *
  * Genetic algorithm functionality using
  *  GenoType: A class to define properties of an individual, e.g. std::string

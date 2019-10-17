@@ -1,4 +1,4 @@
-/* Copyright 2019 Fabian Krause */
+/* Copyright 2019 iGEM Team Freiburg 2019 */
 #include "VinaInstance.h"
 
 float VinaInstance::calculateBindingAffinity(int exhaustiveness,

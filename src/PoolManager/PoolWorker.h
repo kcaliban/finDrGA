@@ -1,4 +1,4 @@
-/* Copyright 2019 Fabian Krause
+/* Copyright 2019 iGEM Team Freiburg 2019
  *
  * Receives vector of FILES to perform Docking and MD on,
  * using OpenMP calculates affinities on available threads, returns
