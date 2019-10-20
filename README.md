@@ -30,7 +30,7 @@ This process is repeated for a user-defined amount of generations.
 * [AutoDock Vina](http://vina.scripps.edu/), for binding affinity calculations
 * [GROMACS](http://www.gromacs.org/), for molecular dynamics
 * [MGLTools](http://mgltools.scripps.edu/), for generation of files required by AutoDock Vina
-* [PyMOL (Open Source)](https://sourceforge.net/projects/pymol/), for generation of PDB files
+* [PyMOL (Open Source)](https://github.com/schrodinger/pymol-open-source), for generation of PDB files
 
 ## Installation
 
